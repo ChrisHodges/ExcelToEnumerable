@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>ExcelToEnumerable</id>
+    <version>0.1.0.5</version>
+    <title>ExcelToEnumerable</title>
+    <authors>Chris Hodges</authors>
+    <owners>Chris Hodges</owners>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>Easily converts Excel Spreadsheets to Enumerables of any type.</description>
+    <releaseNotes>Removed XUnit Dependency</releaseNotes>
+    <copyright>Copyright 2019</copyright>
+    <tags></tags>
+  </metadata>
+</package>
