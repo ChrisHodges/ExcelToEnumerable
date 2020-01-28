@@ -12,7 +12,7 @@ namespace ExcelToEnumerable
 
         IExcelToEnumerableOptionsBuilder<T> ShouldBeOneOf(IEnumerable<TProperty> minValue);
 
-        IExcelToEnumerableOptionsBuilder<T> ShouldBeOneOf(params TProperty[] minValue);
+        IExcelToEnumerableOptionsBuilder<T> ShouldBeOneOf(params TProperty[] permissiableValues);
         IExcelToEnumerableOptionsBuilder<T> MapFromColumns(IEnumerable<string> columnNames);
         IExcelToEnumerableOptionsBuilder<T> MapFromColumns(params string[] columnNames);
         IExcelToEnumerableOptionsBuilder<T> UsesCustomMapping(Func<object, object> mapping);

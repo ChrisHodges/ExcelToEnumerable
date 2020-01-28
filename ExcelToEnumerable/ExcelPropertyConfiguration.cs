@@ -37,9 +37,9 @@ namespace ExcelToEnumerable
             return _optionsBuilder;
         }
 
-        public IExcelToEnumerableOptionsBuilder<T> ShouldBeOneOf(params TProperty[] oneOf)
+        public IExcelToEnumerableOptionsBuilder<T> ShouldBeOneOf(params TProperty[] permissiableValues)
         {
-            _options.Validations[_propertyName].Add(ExcelCellValidatorFactory.CreateShouldBeOneOf(oneOf));
+            _options.Validations[_propertyName].Add(ExcelCellValidatorFactory.CreateShouldBeOneOf(permissiableValues));
             return _optionsBuilder;
         }
 

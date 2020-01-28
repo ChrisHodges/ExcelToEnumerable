@@ -165,6 +165,7 @@ namespace ExcelToEnumerable.Tests
                 testSpreadsheetLocation.ExcelToEnumerable<ComplexExampleWithCustomMappingTestClass>(
                     x => x.StartingFromRow(2)
                         .EndingWithRow(14)
+                        .HeaderOnRow(2)
                         .OutputExceptionsTo(exceptionList)
                         .UsingHeaderNames(true)
                         .UsingSheet("Prices")
@@ -179,22 +180,22 @@ namespace ExcelToEnumerable.Tests
                                 return measureReverseLookup[z.ToString()];
                             } throw new KeyNotFoundException(); })
                         .Property(y => y.PslCategory).IsRequired()
-                        .Property(y => y.PslCategory).ShouldBeOneOf("Frozen Foods")
+                        .Property(y => y.PslCategory).ShouldBeOneOf("BBB")
                         .Property(y => y.Sku).ShouldBeUnique()
                         .Property(y => y.Sku).IsRequired()
                         .Property(y => y.TranslatedSupplierDescriptions).IsRequired()
-                        .Property(y => y.TranslatedSupplierDescriptions).MapFromColumns("Supplier Description", "Dutch Description")
+                        .Property(y => y.TranslatedSupplierDescriptions).MapFromColumns("supplierdescription", "dutchdescription")
                         .Property(y => y.Price).IsRequired()
                         .Property(y => y.Price).ShouldBeGreaterThan(0)
                         .Property(y => y.Unit).IsRequired()
                         .Property(y => y.Unit).ShouldBeGreaterThan(0)
-                        .Property(y => y.DepotExclusions).MapFromColumns("Reynolds Dairy", "Waltham Cross")
+                        .Property(y => y.DepotExclusions).MapFromColumns("depotid-14403", "depotid-14760")
                 ).ToArray();
 
             var result1 = result.First();
             result1.MeasureId.Should().Be(1);
             result2 = result.Last();
-            result2.MeasureId.Should().Be(2);
+            result2.MeasureId.Should().Be(1);
         }
 
         [Fact]
@@ -677,14 +678,13 @@ namespace ExcelToEnumerable.Tests
                 testSpreadsheetLocation.ExcelToEnumerable<ComplexExampleTestClass>(
                     x => x.StartingFromRow(8)
                     .EndingWithRow(8)
-                    .UsingHeaderNames(true)
+                    .HeaderOnRow(2)
                     .UsingSheet("Prices")
                     .OutputExceptionsTo(exceptionList)
                     .Property(y => y.MinimumOrderQuantity).IsRequired()
                     .Property(y => y.MinimumOrderQuantity).ShouldBeGreaterThan(0)
-                    .Property(y => y.SupplierDescription).UsesColumnNamed("Supplier Description")
-                    .Property(y => y.TranslatedSupplierDescriptions).MapFromColumns("dutch description")
-                    .Property(y => y.DepotExclusions).MapFromColumns("reynolds dairy", "waltham cross")
+                    .Property(y => y.TranslatedSupplierDescriptions).MapFromColumns("dutchdescription")
+                    .Property(y => y.DepotExclusions).MapFromColumns("depotid-14403","depotid-14760")
                     );
             result.Count().Should().Be(0);
             var exceptions = exceptionList.Cast<ExcelToEnumerableCellException>().OrderBy(x => x.RowNumber);
@@ -704,11 +704,10 @@ namespace ExcelToEnumerable.Tests
                 testSpreadsheetLocation.ExcelToEnumerable<ComplexExampleTestClass>(
                     x => x.StartingFromRow(7)
                     .EndingWithRow(8)
-                    .UsingHeaderNames(true)
+                    .HeaderOnRow(2)
                     .UsingSheet("Prices")
-                    .Property(y => y.SupplierDescription).UsesColumnNamed("Supplier Description")
-                    .Property(y => y.TranslatedSupplierDescriptions).MapFromColumns("dutch description")
-                    .Property(y => y.DepotExclusions).MapFromColumns("reynolds dairy","waltham cross")
+                    .Property(y => y.TranslatedSupplierDescriptions).MapFromColumns("dutchdescription")
+                    .Property(y => y.DepotExclusions).MapFromColumns("depotid-14403","depotid-14760")
                     .OutputExceptionsTo(exceptionList)
                     .Property(y => y.MinimumOrderQuantity).IsRequired()
                     .Property(y => y.MinimumOrderQuantity).ShouldBeGreaterThan(0)
@@ -786,41 +785,7 @@ namespace ExcelToEnumerable.Tests
             row3.BoolCollection.First().Should().BeFalse();
         }
         
-        [Fact]
-        public void NullableBoolCollectionRequiredTest()
-        {
-            var testSpreadsheetLocation = TestHelper.TestsheetPath("MostComplexExample.xlsx");
-            var exceptionList = new List<Exception>();
-            var result =
-                testSpreadsheetLocation.ExcelToEnumerable<ComplexExampleTestClass>(
-                    x => x.StartingFromRow(3)
-                        .EndingWithRow(3)
-                        .UsingHeaderNames(true)
-                        .UsingSheet("Prices")
-                        .OutputExceptionsTo(exceptionList)
-                        .Property(y => y.MinimumOrderQuantity).IsRequired()
-                        .Property(y => y.MinimumOrderQuantity).ShouldBeGreaterThan(0)
-                        .Property(y => y.Vat).IsRequired()
-                        .Property(y => y.Vat).ShouldBeOneOf("Standard", "Reduced", "2nd Reduced", "Zero")
-                        .Property(y => y.Measure).IsRequired()
-                        .Property(y => y.Measure).ShouldBeOneOf("g", "kg", "Each", "lt")
-                        .Property(y => y.PslCategory).IsRequired()
-                        .Property(y => y.PslCategory).ShouldBeOneOf("Frozen Foods")
-                        .Property(y => y.Sku).ShouldBeUnique()
-                        .Property(y => y.Sku).IsRequired()
-                        .Property(y => y.TranslatedSupplierDescriptions).IsRequired()
-                        .Property(y => y.SupplierDescription).UsesColumnNamed("Supplier Description")
-                        .Property(y => y.TranslatedSupplierDescriptions).MapFromColumns("Dutch Description")
-                        .Property(y => y.Price).IsRequired()
-                        .Property(y => y.Price).ShouldBeGreaterThan(0)
-                        .Property(y => y.Unit).IsRequired()
-                        .Property(y => y.Unit).ShouldBeGreaterThan(0)
-                        .Property(y => y.DepotExclusions).MapFromColumns("Reynolds Dairy", "Waltham Cross")
-                ).ToArray();
-            
-            result.Count().Should().Be(1);
-        }
-
+        
         [Fact]
         public void MappingToDictionaryWorks()
         {
@@ -839,112 +804,6 @@ namespace ExcelToEnumerable.Tests
             firstResult.Collection.First().Value.Should().Be("a");
         }
 
-        [Fact]
-        public void MostComplexExampleWorks()
-        {
-            var testSpreadsheetLocation = TestHelper.TestsheetPath("MostComplexExample.xlsx");
-            var exceptionList = new List<Exception>();
-            var result =
-                testSpreadsheetLocation.ExcelToEnumerable<ComplexExampleTestClass>(
-                    x => x.StartingFromRow(3)
-                    .UsingHeaderNames(true)
-                    .UsingSheet("Prices")
-                    .OutputExceptionsTo(exceptionList)
-                    .Property(y => y.MinimumOrderQuantity).IsRequired()
-                    .Property(y => y.MinimumOrderQuantity).ShouldBeGreaterThan(0)
-                    .Property(y => y.Vat).IsRequired()
-                    .Property(y => y.Vat).ShouldBeOneOf("Standard", "Reduced", "2nd Reduced", "Zero")
-                    .Property(y => y.Measure).IsRequired()
-                    .Property(y => y.Measure).ShouldBeOneOf("g", "kg", "Each", "lt")
-                    .Property(y => y.PslCategory).IsRequired()
-                    .Property(y => y.PslCategory).ShouldBeOneOf("Frozen Foods")
-                    .Property(y => y.Sku).ShouldBeUnique()
-                    .Property(y => y.Sku).IsRequired()
-                    .Property(y => y.TranslatedSupplierDescriptions).IsRequired()
-                    .Property(y => y.SupplierDescription).UsesColumnNamed("Supplier Description")
-                    .Property(y => y.TranslatedSupplierDescriptions).MapFromColumns("Dutch Description")
-                    .Property(y => y.Price).IsRequired()
-                    .Property(y => y.Price).ShouldBeGreaterThan(0)
-                    .Property(y => y.Unit).IsRequired()
-                    .Property(y => y.Unit).ShouldBeGreaterThan(0)
-                    .Property(y => y.DepotExclusions).MapFromColumns("Reynolds Dairy","Waltham Cross")
-                ).ToArray();
-
-            //Check that all the minimum order quantities have a value:
-            var minimumOrderQuantityWithNoValue = result.FirstOrDefault(x => !x.MinimumOrderQuantity.HasValue);
-            minimumOrderQuantityWithNoValue.Should().BeNull();
-
-            //Check that there's a single dupe exception:
-            var dupeException = exceptionList.Single(x => x is ExcelToEnumerableSheetException);
-            dupeException.Message.Should().Contain("5124EA");
-
-            var cellExceptions = exceptionList.Where(x => x is ExcelToEnumerableCellException).Cast<ExcelToEnumerableCellException>();
-            var noMinimumOrderQuantityException = cellExceptions.First(x => x.RowNumber == 7 && x.Column == "H");
-            var invalidMinimumOrderQuantityException = cellExceptions.First(x => x.RowNumber == 8 && x.Column == "H");
-            var negativeMinimumOrderQuantityException = cellExceptions.First(x => x.RowNumber == 9 && x.Column == "H");
-            var missingVatException = cellExceptions.First(x => x.RowNumber == 10 && x.Column == "I");
-            var invalidVatValueException = cellExceptions.First(x => x.RowNumber == 11 && x.Column == "I");
-            var missingMeasureValue = cellExceptions.First(x => x.RowNumber == 12 && x.Column == "M");
-            var invalidMeasureValue = cellExceptions.First(x => x.RowNumber == 13 && x.Column == "M");
-            var missingPslCategory = cellExceptions.First(x => x.RowNumber == 14 && x.Column == "C");
-            var invalidPslCategory = cellExceptions.First(x => x.RowNumber == 15 && x.Column == "C");
-            var missingSku = cellExceptions.First(x => x.RowNumber == 16 && x.Column == "A");
-            var missingSupplierDescription = cellExceptions.First(x => x.RowNumber == 17 && x.Column == "E");
-            var missingDutchDescription = cellExceptions.First(x => x.RowNumber == 18 && x.Column == "F");
-            var missingPrice = cellExceptions.First(x => x.RowNumber == 19 && x.Column == "G");
-            var negativePrice = cellExceptions.First(x => x.RowNumber == 20 && x.Column == "G");
-            var badCaseQuantity = cellExceptions.First(x => x.RowNumber == 21 && x.Column == "J");
-            var badPackQuantity = cellExceptions.First(x => x.RowNumber == 22 && x.Column == "K");
-            var missingUnit = cellExceptions.First(x => x.RowNumber == 23 && x.Column == "L");
-            var badUnit = cellExceptions.First(x => x.RowNumber == 24 && x.Column == "L");
-            var negativeUnit = cellExceptions.First(x => x.RowNumber == 25 && x.Column == "L");
-            var badLastPeriodVolume = cellExceptions.First(x => x.RowNumber == 26 && x.Column == "Q");
-            var badDepotValue = cellExceptions.First(x => x.RowNumber == 27 && x.Column == "R");
-
-            exceptionList.Count.Should().Be(22);
-
-            result.Count().Should().Be(2);
-
-            var row4966cs = result.First();
-            row4966cs.Sku.Should().Be("4966CS");
-            row4966cs.SupplierCategory.Should().Be("CONNOISSEURS CHOICE");
-            row4966cs.PslCategory.Should().Be("Frozen Foods");
-            row4966cs.Store.Should().Be("Chilled");
-            row4966cs.TranslatedSupplierDescriptions.Last().Should().Be("X");
-            row4966cs.Price.Should().Be(1.01M);
-            row4966cs.MinimumOrderQuantity.Should().Be(1);
-            row4966cs.Vat.Should().Be("Standard");
-            row4966cs.CaseQty.Should().Be(1);
-            row4966cs.PackQty.Should().Be(1);
-            row4966cs.Unit.Should().Be(1);
-            row4966cs.Measure.Should().Be("Each");
-            row4966cs.UomDescription.Should().Be("1 X TRAY");
-            row4966cs.Origin.Should().BeNull();
-            row4966cs.Brand.Should().BeNull();
-            row4966cs.LastPeriodVolume.Should().BeNull();
-            row4966cs.DepotExclusions.First().Should().BeTrue();
-            row4966cs.DepotExclusions.Last().Should().BeFalse();
-            
-            var row4512cs = result.Last();
-            row4512cs.Sku.Should().Be("4512CS");
-            row4512cs.SupplierCategory.Should().Be("CONNOISSEURS CHOICE");
-            row4512cs.PslCategory.Should().Be("Frozen Foods");
-            row4512cs.Store.Should().Be("Chilled");
-            row4512cs.TranslatedSupplierDescriptions.Last().Should().Be("X");
-            row4512cs.Price.Should().Be(23.59M);
-            row4512cs.MinimumOrderQuantity.Should().Be(1);
-            row4512cs.Vat.Should().Be("Reduced");
-            row4512cs.CaseQty.Should().Be(1);
-            row4512cs.PackQty.Should().Be(1);
-            row4512cs.Unit.Should().Be(5);
-            row4512cs.Measure.Should().Be("kg");
-            row4512cs.UomDescription.Should().Be("1X 5KG");
-            row4512cs.Origin.Should().BeNull();
-            row4512cs.Brand.Should().BeNull();
-            row4512cs.LastPeriodVolume.Should().BeNull();
-            row4512cs.DepotExclusions.Should().BeNull();
-        }
-        
         /// <summary>
         /// CSH 11012019 This is not a test, it's just somewhere to check that the code in the documentation example actually compiles
         /// </summary>
