@@ -9,7 +9,7 @@ namespace ExcelToEnumerable.Exceptions
         public ExcelToEnumerableRowException(object unmappedObject, string message, int rowNumber, IDictionary<string, object> rowValues, Exception innerException = null) : base(message, innerException)
         {
             RowNumber = rowNumber;
-            RowValues = rowValues.ToDictionary(x => x.Key, x => x.Value.ToString());
+            RowValues = rowValues.ToDictionary(x => x.Key, x => x.Value?.ToString() ?? null);
             UnmappedObject = unmappedObject;
         }
 
