@@ -124,5 +124,11 @@ namespace ExcelToEnumerable
             _options.RowNumberColumn = _propertyName;
             return _optionsBuilder;
         }
+
+        public IExcelToEnumerableOptionsBuilder<T> UsesColumnNumber(int i)
+        {
+            _options.CustomHeaderNumbers[_propertyName] = i;
+            return _optionsBuilder;
+        }
     }
 }

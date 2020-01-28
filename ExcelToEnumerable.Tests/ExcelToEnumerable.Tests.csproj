@@ -101,6 +101,7 @@
     <Compile Include="TestClasses\ComplexExampleWithCustomMappingTestClass.cs" />
     <Compile Include="TestClasses\DictionaryCollectionTestClass.cs" />
     <Compile Include="TestClasses\InternalSetterTestClass.cs" />
+    <Compile Include="TestClasses\NoHeaderTestClass.cs" />
     <Compile Include="TestClasses\Product.cs" />
     <Compile Include="TestClasses\TestClass.cs" />
     <Compile Include="TestClasses\TestClass2.cs" />
@@ -115,6 +116,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="TestSpreadsheets\TestSpreadsheet4Errors.xlsx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="TestSpreadsheets\NoHeaderTests.xlsx">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

@@ -29,9 +29,11 @@ namespace ExcelToEnumerable
                 _cellSettersDictionaryForRead = new Dictionary<int, FromCellSetter>();
                 foreach (var item in Setters)
                 {
-                    _cellSettersDictionaryForRead.Add(i, item);
+                    var columnNumber = options.CustomHeaderNumbers.ContainsKey(item.PropertyName)
+                        ? options.CustomHeaderNumbers[item.PropertyName]
+                        : i;
+                    _cellSettersDictionaryForRead.Add(columnNumber, item);
                     i++;
-
                 }
             } else {
 

@@ -27,6 +27,7 @@ namespace ExcelToEnumerable
         List<string> SkippedFields { get; set; }
         string RowNumberColumn { get; set; }
         string LoweredRowNumberColumn { get; }
+        Dictionary<string,int> CustomHeaderNumbers { get;}
     }
 
     public interface IExcelToEnumerableOptions

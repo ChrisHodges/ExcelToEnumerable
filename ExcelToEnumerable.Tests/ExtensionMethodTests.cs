@@ -25,6 +25,35 @@ namespace ExcelToEnumerable.Tests
             };
             action.Should().Throw<AggregateException>().And.InnerExceptions.Count().Should().Be(3);
         }
+
+        [Fact]
+        public void NoHeaderWorks()
+        {
+            var testSpreadsheetLocation = TestHelper.TestsheetPath("NoHeaderTests.xlsx");
+            var result = testSpreadsheetLocation.ExcelToEnumerable<NoHeaderTestClass>(
+                x => x.UsingHeaderNames(false)
+            );
+            result.First().ColumnA.Should().Be("Value1");
+            result.First().ColumnB.Should().Be(1234);
+            result.Last().ColumnA.Should().Be("Value2");
+            result.Last().ColumnB.Should().Be(3456);
+        }
+        
+        [Fact]
+        public void NoHeaderWithNumberedColumnsWorks()
+        {
+            var testSpreadsheetLocation = TestHelper.TestsheetPath("NoHeaderTests.xlsx");
+            var result = testSpreadsheetLocation.ExcelToEnumerable<NoHeaderTestClass>(
+                x => x.UsingHeaderNames(false)
+                    .UsingSheet("Numbered Columns")
+                    .Property(y => y.ColumnA).UsesColumnNumber(1)
+                    .Property(y => y.ColumnB).UsesColumnNumber(0)
+            );
+            result.First().ColumnA.Should().Be("Value1");
+            result.First().ColumnB.Should().Be(1234);
+            result.Last().ColumnA.Should().Be("Value2");
+            result.Last().ColumnB.Should().Be(3456);
+        }
         
         [Fact]
         public void ExceptionValuesDictionaryIsCorrect()

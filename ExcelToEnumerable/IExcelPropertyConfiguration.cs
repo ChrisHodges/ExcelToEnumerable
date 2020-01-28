@@ -19,5 +19,6 @@ namespace ExcelToEnumerable
         IExcelToEnumerableOptionsBuilder<T> UsesColumnNamed(string columnName);
         IExcelToEnumerableOptionsBuilder<T> Ignore();
         IExcelToEnumerableOptionsBuilder<T> MapsToRowNumber();
+        IExcelToEnumerableOptionsBuilder<T> UsesColumnNumber(int i);
     }
 }

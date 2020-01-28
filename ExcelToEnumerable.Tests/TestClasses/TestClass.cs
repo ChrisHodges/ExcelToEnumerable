@@ -9,9 +9,4 @@ namespace ExcelToEnumerable.Tests
         public DateTime? DateTime { get; set; }
         public double? Decimal { get; set; }
     }
-
-    public class MissingFieldTestClass
-    {
-        
-    }
 }
