@@ -102,6 +102,7 @@
     <Compile Include="TestClasses\DictionaryCollectionTestClass.cs" />
     <Compile Include="TestClasses\InternalSetterTestClass.cs" />
     <Compile Include="TestClasses\NoHeaderTestClass.cs" />
+    <Compile Include="TestClasses\OrdinalPropertiesTestClass.cs" />
     <Compile Include="TestClasses\Product.cs" />
     <Compile Include="TestClasses\TestClass.cs" />
     <Compile Include="TestClasses\TestClass2.cs" />
@@ -109,6 +110,9 @@
     <Compile Include="TestHelper.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="TestSpreadsheets\OrdinalPropertiesTest.xlsx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="TestSpreadsheets\TestSpreadsheet1.xlsx">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

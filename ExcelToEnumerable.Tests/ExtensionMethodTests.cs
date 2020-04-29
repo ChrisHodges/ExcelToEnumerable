@@ -46,15 +46,86 @@ namespace ExcelToEnumerable.Tests
             var result = testSpreadsheetLocation.ExcelToEnumerable<NoHeaderTestClass>(
                 x => x.UsingHeaderNames(false)
                     .UsingSheet("Numbered Columns")
-                    .Property(y => y.ColumnA).UsesColumnNumber(1)
-                    .Property(y => y.ColumnB).UsesColumnNumber(0)
+                    .Property(y => y.ColumnA).UsesColumnNumber(2)
+                    .Property(y => y.ColumnB).UsesColumnNumber(1)
             );
             result.First().ColumnA.Should().Be("Value1");
             result.First().ColumnB.Should().Be(1234);
             result.Last().ColumnA.Should().Be("Value2");
             result.Last().ColumnB.Should().Be(3456);
         }
+
+        [Fact]
+        public void UsesColumnNumberWorks()
+        {
+            var testSpreadsheetLocation = TestHelper.TestsheetPath("OrdinalPropertiesTest.xlsx");
+            var result = testSpreadsheetLocation.ExcelToEnumerable<OrdinalPropertiesTestClass>(x =>
+                x.StartingFromRow(4)
+                    .UsingHeaderNames(false)
+                    .Property(y => y.ColumnA).UsesColumnNumber(1)
+                    .Property(y => y.ColumnB).UsesColumnNumber(2)
+                    .Property(y => y.ColumnC).UsesColumnNumber(3)
+                    .Property(y => y.ColumnAA).Ignore()
+                    .Property(y => y.IgnoreThisProperty).Ignore()
+            );
+            result.Count().Should().Be(2);
+            result.First().ColumnA.Should().Be("A");
+            result.First().ColumnB.Should().Be("B");
+            result.First().ColumnC.Should().Be("C");
+            result.Last().ColumnA.Should().Be("Z");
+            result.Last().ColumnB.Should().Be("Y");
+            result.Last().ColumnC.Should().Be("X");
+        }
         
+        [Fact]
+        public void UsesColumnLetterWorks()
+        {
+            var testSpreadsheetLocation = TestHelper.TestsheetPath("OrdinalPropertiesTest.xlsx");
+            var result = testSpreadsheetLocation.ExcelToEnumerable<OrdinalPropertiesTestClass>(x =>
+                x.StartingFromRow(4)
+                    .UsingHeaderNames(false)
+                    .Property(y => y.ColumnA).UsesColumnLetter("A")
+                    .Property(y => y.ColumnB).UsesColumnLetter("B")
+                    .Property(y => y.ColumnC).UsesColumnLetter("C")
+                    .Property(y => y.ColumnAA).UsesColumnLetter("AA")
+                    .Property(y => y.Row).MapsToRowNumber()
+                    .Property(y => y.IgnoreThisProperty).Ignore()
+            );
+            result.Count().Should().Be(2);
+            result.First().ColumnA.Should().Be("A");
+            result.First().ColumnB.Should().Be("B");
+            result.First().ColumnC.Should().Be("C");
+            result.First().Row.Should().Be(4);
+            result.First().ColumnAA.Should().Be("XXX");
+            result.Last().ColumnA.Should().Be("Z");
+            result.Last().ColumnB.Should().Be("Y");
+            result.Last().ColumnC.Should().Be("X");
+            result.Last().ColumnAA.Should().BeNull();
+        }
+
+        [Fact]
+        public void ThrowsConfigExceptionIfNotAllPropertiesMapped()
+        {
+            var testSpreadsheetLocation = TestHelper.TestsheetPath("LargeOrdinalColumnsTest.xlsx");
+            ExcelToEnumerableConfigException exception = null;
+            try
+            {
+                var result = testSpreadsheetLocation.ExcelToEnumerable<OrdinalPropertiesTestClass>(
+                    x => x
+                        .UsingHeaderNames(false)
+                        .StartingFromRow(4)
+                        .Property(y => y.ColumnC).UsesColumnLetter("C")
+                );
+            }
+            catch (ExcelToEnumerableConfigException ex)
+            {
+                exception = ex;
+            }
+
+            exception.Should().NotBeNull();
+            exception.Message.Should().Be("Trying to map property 'ColumnB' to column 'C' but that column is already mapped to property 'ColumnC'. If you're not using header names then all properties need to be mapped to a column or explicitly ignored.");
+        }
+
         [Fact]
         public void ExceptionValuesDictionaryIsCorrect()
         {
@@ -416,19 +487,19 @@ namespace ExcelToEnumerable.Tests
             row1.Int.Should().Be(1);
             row1.DateTime.Should().Be(new DateTime(2012, 12, 31));
             row1.Decimal.Should().Be(1.234);
-            row1.Row.Should().Be(4);
+            row1.Row.Should().Be(2);
             var row2 = result.Skip(1).First();
             row2.String.Should().Be("zyx987");
             row2.Int.Should().Be(2);
             row2.DateTime.Should().Be(new DateTime(2015, 10, 9));
             row2.Decimal.Should().Be(9.876);
-            row2.Row.Should().Be(5);
+            row2.Row.Should().Be(3);
             var row3 = result.Skip(2).First();
             row3.String.Should().BeNull();
             row3.Int.Should().BeNull();
             row3.DateTime.Should().BeNull();
             row3.Decimal.Should().Be(5);
-            row3.Row.Should().Be(6);
+            row3.Row.Should().Be(4);
         }
 
         [Fact]

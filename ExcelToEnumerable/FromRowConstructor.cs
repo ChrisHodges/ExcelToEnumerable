@@ -32,6 +32,10 @@ namespace ExcelToEnumerable
                     var columnNumber = options.CustomHeaderNumbers.ContainsKey(item.PropertyName)
                         ? options.CustomHeaderNumbers[item.PropertyName]
                         : i;
+                    if (_cellSettersDictionaryForRead.ContainsKey(columnNumber))
+                    {
+                        throw new ExcelToEnumerableConfigException($"Trying to map property '{item.PropertyName}' to column '{CellRef.NumberToColumnName(columnNumber + 1)}' but that column is already mapped to property '{_cellSettersDictionaryForRead[columnNumber].PropertyName}'. If you're not using header names then all properties need to be mapped to a column or explicitly ignored.");
+                    }
                     _cellSettersDictionaryForRead.Add(columnNumber, item);
                     i++;
                 }
@@ -283,7 +287,7 @@ namespace ExcelToEnumerable
             if (options.RowNumberColumn != null)
             {
                 var setter = Setters.First(x => x.PropertyName == options.RowNumberColumn);
-                setter.Setter(obj, rowCount + options.StartRow);
+                setter.Setter(obj, rowCount);
             }
 
             return success;
@@ -309,7 +313,7 @@ namespace ExcelToEnumerable
                 foreach (var item in options.Validations)
                 {
                     var cellSetter = _cellSettersDictionaryForRead.Values.FirstOrDefault(x =>
-                        x.ColumnName.ToLowerInvariant() == item.Key.ToLowerInvariant());
+                        x.ColumnName?.ToLowerInvariant() == item.Key.ToLowerInvariant());
                     if (cellSetter != null)
                     {
                         if (cellSetter.Validators == null)
