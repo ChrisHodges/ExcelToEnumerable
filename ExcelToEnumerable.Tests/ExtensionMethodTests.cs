@@ -106,7 +106,7 @@ namespace ExcelToEnumerable.Tests
         [Fact]
         public void ThrowsConfigExceptionIfNotAllPropertiesMapped()
         {
-            var testSpreadsheetLocation = TestHelper.TestsheetPath("LargeOrdinalColumnsTest.xlsx");
+            var testSpreadsheetLocation = TestHelper.TestsheetPath("OrdinalPropertiesTest.xlsx");
             ExcelToEnumerableConfigException exception = null;
             try
             {
@@ -905,7 +905,7 @@ namespace ExcelToEnumerable.Tests
         }
 
         /// <summary>
-        /// CSH 11012019 This is not a test, it's just somewhere to check that the code in the documentation example actually compiles
+        /// CSH 11012019 These are not real tests, it's just somewhere to check that the code in the documentation example actually compiles
         /// </summary>
         public void Test()
         {
@@ -955,6 +955,32 @@ namespace ExcelToEnumerable.Tests
                     //Map the sheet row number to a property on a class:
                     .Property(y => y.SpreadsheetRowNumber).MapsToRowNumber()
             );
+        }
+        
+        public class SpreadsheetRow
+        {
+            public string Store {get;set;}
+            public string Area {get;set;}
+            public string MonFriTimes {get;set;}
+            public string SatTimes {get;set;}
+            public string SunTimes {get;set;}
+            
+            public int RowNumber {get;set;}
+
+        }
+        
+        public void NoValidationConfigExample()
+        {
+            var spreadsheetStream = new MemoryStream();
+            var spreadsheetData = spreadsheetStream.ExcelToEnumerable<SpreadsheetRow>(o => o
+                .UsingHeaderNames(false)
+                .StartingFromRow(3) // - The data in this example starts on the 3rd row
+                .Property(c => c.Store).UsesColumnLetter("A")
+                .Property(c => c.Area).UsesColumnLetter("B")
+                .Property(c => c.MonFriTimes).UsesColumnLetter("C")
+                .Property(c => c.SatTimes).UsesColumnLetter("D")
+                .Property(c => c.SunTimes).UsesColumnLetter("E")
+                .Property(c => c.RowNumber).MapsToRowNumber());
         }
     }
 
