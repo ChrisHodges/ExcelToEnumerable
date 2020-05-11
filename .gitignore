@@ -17,3 +17,4 @@ ExcelToEnumerable/bin
 ExcelToEnumerable/obj
 ExcelToEnumerable.Benchmarks/obj
 ExcelToEnumerable.Tests/obj
+.idea/
