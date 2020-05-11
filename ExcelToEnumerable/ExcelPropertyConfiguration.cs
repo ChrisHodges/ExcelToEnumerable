@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using ExcelToEnumerable.Exceptions;
+using LightWeightExcelReader;
 
 namespace ExcelToEnumerable
 {
@@ -127,7 +129,17 @@ namespace ExcelToEnumerable
 
         public IExcelToEnumerableOptionsBuilder<T> UsesColumnNumber(int i)
         {
-            _options.CustomHeaderNumbers[_propertyName] = i;
+            if (i < 1)
+            {
+                throw new ExcelToEnumerableConfigException($"Unable to map '{_propertyName}' to column {i}. UsesColumnNumber expect a 1-based column number");
+            }
+            _options.CustomHeaderNumbers[_propertyName] = i - 1;
+            return _optionsBuilder;
+        }
+
+        public IExcelToEnumerableOptionsBuilder<T> UsesColumnLetter(string columnLetter)
+        {
+            _options.CustomHeaderNumbers[_propertyName] = CellRef.ColumnNameToNumber(columnLetter) - 1;
             return _optionsBuilder;
         }
     }
