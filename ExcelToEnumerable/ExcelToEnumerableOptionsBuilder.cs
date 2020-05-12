@@ -84,6 +84,12 @@ namespace ExcelToEnumerable
             return _options;
         }
 
+        public IExcelToEnumerableOptionsBuilder<T> IgnoreColumsWithoutMatchingProperties()
+        {
+            _options.IgnoreColumnsWithoutMatchingProperties = true;
+            return this;
+        }
+
         public IExcelToEnumerableOptionsBuilder<T> EndingWithRow(int maxRow)
         {
             _options.EndRow = maxRow;

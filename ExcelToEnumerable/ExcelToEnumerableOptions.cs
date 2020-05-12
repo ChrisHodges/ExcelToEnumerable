@@ -128,6 +128,7 @@ namespace ExcelToEnumerable
 
         public string LoweredRowNumberColumn { get; private set; }
         public Dictionary<string, int> CustomHeaderNumbers { get; } = new Dictionary<string, int>();
+        public bool IgnoreColumnsWithoutMatchingProperties { get; set; }
 
         public void AddRequiredField(string requiredField)
         {

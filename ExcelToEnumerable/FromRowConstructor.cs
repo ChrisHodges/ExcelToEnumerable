@@ -60,17 +60,33 @@ namespace ExcelToEnumerable
 
         private void ValidateColumnNames<T>(string[] headerNames, IExcelToEnumerableOptions<T> options)
         {
+            var namesOnConfig = Setters.Where(x => x.ColumnName != null).Select(x => x.ColumnName.ToLowerInvariant()).OrderBy(y => y);
             IEnumerable<string> namesOnSpreadsheet = headerNames;
             if (options.SkippedFields != null)
             {
-                namesOnSpreadsheet = namesOnSpreadsheet.Except(options.SkippedFields.Select(y => y.ToLowerInvariant()));
+                namesOnSpreadsheet =
+                    namesOnSpreadsheet.Except(options.SkippedFields.Select(y => y.ToLowerInvariant()));
             }
-
             namesOnSpreadsheet = namesOnSpreadsheet.OrderBy(x => x);
-            var namesOnConfig = Setters.Where(x => x.ColumnName != null).Select(x => x.ColumnName.ToLowerInvariant()).OrderBy(y => y);
-            if (string.Join(",", namesOnSpreadsheet) != string.Join(",", namesOnConfig))
+            
+            if (options.IgnoreColumnsWithoutMatchingProperties)
             {
-                throw new ExcelToEnumerableInvalidHeaderException(namesOnConfig.Except(namesOnSpreadsheet), namesOnSpreadsheet.Except(namesOnConfig));
+                var intersection = namesOnSpreadsheet.Intersect(namesOnConfig);
+                var intersectionCount = intersection.Count();
+                var namesOnConfigCount = namesOnConfig.Count();
+                if (intersectionCount != namesOnConfigCount)
+                {
+                    throw new ExcelToEnumerableInvalidHeaderException(namesOnConfig.Except(namesOnSpreadsheet),
+                        namesOnSpreadsheet.Except(namesOnConfig));
+                }
+            }
+            else
+            {
+                if (string.Join(",", namesOnSpreadsheet) != string.Join(",", namesOnConfig))
+                {
+                    throw new ExcelToEnumerableInvalidHeaderException(namesOnConfig.Except(namesOnSpreadsheet),
+                        namesOnSpreadsheet.Except(namesOnConfig));
+                }
             }
         }
 

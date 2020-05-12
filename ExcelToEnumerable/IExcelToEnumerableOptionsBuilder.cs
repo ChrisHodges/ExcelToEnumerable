@@ -21,5 +21,6 @@ namespace ExcelToEnumerable
         IExcelToEnumerableOptionsBuilder<T> HeaderOnRow(int rowNumber);
         IExcelToEnumerableOptionsBuilder<T> OnReadingHeaderRow(Action<IDictionary<int, string>> action);
         IExcelToEnumerableOptions<T> Build();
+        IExcelToEnumerableOptionsBuilder<T>  IgnoreColumsWithoutMatchingProperties();
     }
 }

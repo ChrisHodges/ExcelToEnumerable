@@ -28,6 +28,7 @@ namespace ExcelToEnumerable
         string RowNumberColumn { get; set; }
         string LoweredRowNumberColumn { get; }
         Dictionary<string,int> CustomHeaderNumbers { get;}
+        bool IgnoreColumnsWithoutMatchingProperties { get; set; }
     }
 
     public interface IExcelToEnumerableOptions

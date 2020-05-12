@@ -27,6 +27,19 @@ namespace ExcelToEnumerable.Tests
         }
 
         [Fact]
+        public void IgnorePropertyNamesWorks()
+        {
+            var testSpreadsheetLocation = TestHelper.TestsheetPath("PropertyNamesIgnoreAndWhitespaceTests.xlsx");
+            var result = testSpreadsheetLocation.ExcelToEnumerable<IgnorePropertyNamesTestClass>(x => x
+                .IgnoreColumsWithoutMatchingProperties()
+                .Property(y => y.NotOnSpreadsheet).Ignore()
+                .Property(y => y.ColumnA).UsesColumnNamed("Column A")
+            );
+            result.First().ColumnA.Should().Be("a");
+            result.First().ColumnB.Should().Be("b");
+        }
+
+        [Fact]
         public void NoHeaderWorks()
         {
             var testSpreadsheetLocation = TestHelper.TestsheetPath("NoHeaderTests.xlsx");
