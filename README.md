@@ -31,7 +31,7 @@ If you've got an .xlsx spreadsheet that looks like this:
 
 |   |  A               | B           | C        | D            |
 |---|------------------|-------------|----------|--------------|
-| 1 | **Animal**       | **Colour**  | **Legs** | **TopSpeed** |
+| 1 | **Name**       | **Colour**  | **Legs** | **TopSpeed** |
 | 2 | Horse            | Brown       | 4        | 70.76        |
 | 3 | African Wild Dog | Black       | 4        | 71           |
 | 4 | House Spider     | Black       | 8        | 1.9          |
