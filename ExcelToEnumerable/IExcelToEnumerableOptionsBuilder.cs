@@ -20,6 +20,7 @@ namespace ExcelToEnumerable
         IExcelToEnumerableOptionsBuilder<T> EndingWithRow(int v);
         IExcelToEnumerableOptionsBuilder<T> HeaderOnRow(int rowNumber);
         IExcelToEnumerableOptionsBuilder<T> OnReadingHeaderRow(Action<IDictionary<int, string>> action);
+        IExcelToEnumerableOptionsBuilder<T> IgnoreUnmappedColumns();
         IExcelToEnumerableOptions<T> Build();
     }
 }

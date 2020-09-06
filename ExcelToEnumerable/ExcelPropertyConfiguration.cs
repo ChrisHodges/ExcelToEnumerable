@@ -120,6 +120,16 @@ namespace ExcelToEnumerable
             _options.SkippedFields.Add(_propertyName);
             return _optionsBuilder;
         }
+        
+        public IExcelToEnumerableOptionsBuilder<T> Optional()
+        {
+            if (_options.OptionalFields == null)
+            {
+                _options.OptionalFields = new List<string>();
+            }
+            _options.OptionalFields.Add(_propertyName);
+            return _optionsBuilder;
+        }
 
         public IExcelToEnumerableOptionsBuilder<T> MapsToRowNumber()
         {

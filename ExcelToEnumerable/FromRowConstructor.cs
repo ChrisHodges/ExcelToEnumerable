@@ -65,12 +65,35 @@ namespace ExcelToEnumerable
             {
                 namesOnSpreadsheet = namesOnSpreadsheet.Except(options.SkippedFields.Select(y => y.ToLowerInvariant()));
             }
+            if (options.OptionalFields != null)
+            {
+                namesOnSpreadsheet =
+                    namesOnSpreadsheet.Except(options.OptionalFields.Select(y => y.ToLowerInvariant())).OrderBy(y => y);
+            }
 
             namesOnSpreadsheet = namesOnSpreadsheet.OrderBy(x => x);
             var namesOnConfig = Setters.Where(x => x.ColumnName != null).Select(x => x.ColumnName.ToLowerInvariant()).OrderBy(y => y);
-            if (string.Join(",", namesOnSpreadsheet) != string.Join(",", namesOnConfig))
+            if (options.OptionalFields != null)
             {
-                throw new ExcelToEnumerableInvalidHeaderException(namesOnConfig.Except(namesOnSpreadsheet), namesOnSpreadsheet.Except(namesOnConfig));
+                namesOnConfig =
+                    namesOnConfig.Except(options.OptionalFields.Select(y => y.ToLowerInvariant())).OrderBy(y => y);
+            }
+
+            if (options.IgnoreUnmappedColumns)
+            {
+                if (namesOnConfig.Except(namesOnSpreadsheet).Count() > 0)
+                {
+                    throw new ExcelToEnumerableInvalidHeaderException(namesOnConfig.Except(namesOnSpreadsheet),
+                        namesOnConfig.Except(namesOnConfig));
+                }
+            }
+            else
+            {
+                if (string.Join(",", namesOnSpreadsheet) != string.Join(",", namesOnConfig))
+                {
+                    throw new ExcelToEnumerableInvalidHeaderException(namesOnConfig.Except(namesOnSpreadsheet),
+                        namesOnSpreadsheet.Except(namesOnConfig));
+                }
             }
         }
 

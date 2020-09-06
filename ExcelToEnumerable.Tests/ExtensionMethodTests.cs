@@ -153,6 +153,68 @@ namespace ExcelToEnumerable.Tests
         }
 
         [Fact]
+        public void OptionalColumns1()
+        {
+            var testSpreadsheetLocation = TestHelper.TestsheetPath("OptionalColumns.xlsx");
+            var result1 = testSpreadsheetLocation.ExcelToEnumerable<AdriansClass>(x => x
+                .UsingSheet("2Columns")
+                .IgnoreUnmappedColumns()
+                .Property(y => y.Fee1).Optional()
+                .Property(y => y.Fee2).Optional()
+                .Property(y => y.Fee3).Optional()
+            );
+            result1.Count().Should().Be(2);
+            var first = result1.First();
+            first.Name.Should().Be("Chris");
+            first.Fee1.Should().Be((decimal) 1.1);
+            first.Fee2.Should().Be(0);
+            first.Fee3.Should().Be(0);
+            var last = result1.Last();
+            last.Name.Should().Be("Adrian");
+            last.Fee1.Should().Be((decimal) 2.2);
+        }
+        
+        [Fact]
+        public void OptionalColumns2()
+        {
+            var testSpreadsheetLocation = TestHelper.TestsheetPath("OptionalColumns.xlsx");
+            var result1 = testSpreadsheetLocation.ExcelToEnumerable<AdriansClass>(x => x
+                .UsingSheet("4Columns")
+                .Property(y => y.Fee1).Optional()
+                .Property(y => y.Fee2).Optional()
+                .Property(y => y.Fee3).Optional()
+            );
+            result1.Count().Should().Be(2);
+            var first = result1.First();
+            first.Name.Should().Be("Chris");
+            first.Fee1.Should().Be((decimal) 1.1);
+            first.Fee2.Should().Be(55);
+            first.Fee3.Should().Be(-23);
+            var last = result1.Last();
+            last.Name.Should().Be("Adrian");
+            last.Fee1.Should().Be((decimal) 2.2);
+            last.Fee2.Should().Be((decimal) 3.2);
+            last.Fee3.Should().Be((decimal) 2.4);
+        }
+        
+        [Fact]
+        public void OptionalColumns3()
+        {
+            var testSpreadsheetLocation = TestHelper.TestsheetPath("OptionalColumns.xlsx");
+            var action = new Action(() =>
+            {
+                var result1 = testSpreadsheetLocation.ExcelToEnumerable<AdriansClass>(x => x
+                        .UsingSheet("2Columns")
+                        .IgnoreUnmappedColumns()
+                        .Property(y => y.Fee1).Optional()
+                        .Property(y => y.Fee2).Optional()
+                        .Property(y => y.Fee3) //In this example Fee3 is now a mandatory column
+                );
+            });
+            action.Should().Throw<ExcelToEnumerableInvalidHeaderException>();
+        }
+
+        [Fact]
         public void OnReadHeaderRowWorks()
         {
             var testSpreadsheetLocation = TestHelper.TestsheetPath("TestSpreadsheet1.xlsx");

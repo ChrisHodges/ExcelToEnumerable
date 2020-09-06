@@ -32,5 +32,7 @@ namespace ExcelToEnumerable
         /// <param name="columnLetter">
         /// e.g. A, M, AB, ZZA, etc.</param>
         IExcelToEnumerableOptionsBuilder<T> UsesColumnLetter(string columnLetter);
+
+        IExcelToEnumerableOptionsBuilder<T> Optional();
     }
 }

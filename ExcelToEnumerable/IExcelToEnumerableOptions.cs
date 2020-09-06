@@ -28,6 +28,8 @@ namespace ExcelToEnumerable
         string RowNumberColumn { get; set; }
         string LoweredRowNumberColumn { get; }
         Dictionary<string,int> CustomHeaderNumbers { get;}
+        List<string> OptionalFields { get; set; }
+        bool IgnoreUnmappedColumns { get; set; }
     }
 
     public interface IExcelToEnumerableOptions

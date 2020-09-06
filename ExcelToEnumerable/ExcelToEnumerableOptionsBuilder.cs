@@ -84,6 +84,12 @@ namespace ExcelToEnumerable
             return _options;
         }
 
+        public IExcelToEnumerableOptionsBuilder<T> IgnoreUnmappedColumns()
+        {
+            _options.IgnoreUnmappedColumns = true;
+            return this;
+        }
+
         public IExcelToEnumerableOptionsBuilder<T> EndingWithRow(int maxRow)
         {
             _options.EndRow = maxRow;
