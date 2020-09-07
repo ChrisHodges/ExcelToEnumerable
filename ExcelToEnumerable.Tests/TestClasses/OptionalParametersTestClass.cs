@@ -1,6 +1,6 @@
 namespace ExcelToEnumerable.Tests
 {
-    public class AdriansClass
+    public class OptionalParametersTestClass
     {
         public string Name { get; set; }
         public decimal Fee1 { get; set; }

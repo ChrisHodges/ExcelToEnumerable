@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Data.SqlTypes;
 using System.Linq.Expressions;
 
 namespace ExcelToEnumerable
@@ -81,12 +82,37 @@ namespace ExcelToEnumerable
 
         public IExcelToEnumerableOptions<T> Build()
         {
+            if (_options.AllPropertiesOptionalByDefault)
+            {
+                foreach (var propertyInfo in typeof(T).GetProperties())
+                {
+                    var propertyName = propertyInfo.Name;
+                    if (!_options.OptionalFields.Contains(propertyName))
+                    {
+                        _options.OptionalFields.Add(propertyName);
+                    }
+                }
+
+                foreach (var explicitlyRequiredField in _options.ExplictlyRequiredFields)
+                {
+                    if (_options.OptionalFields.Contains(explicitlyRequiredField))
+                    {
+                        _options.OptionalFields.Remove(explicitlyRequiredField);
+                    }
+                }
+            }
             return _options;
         }
 
-        public IExcelToEnumerableOptionsBuilder<T> IgnoreUnmappedColumns()
+        public IExcelToEnumerableOptionsBuilder<T> IgnoreColumsWithoutMatchingProperties()
         {
-            _options.IgnoreUnmappedColumns = true;
+            _options.IgnoreColumnsWithoutMatchingProperties = true;
+            return this;
+        }
+
+        public IExcelToEnumerableOptionsBuilder<T> AllPropertiesOptionalByDefault()
+        {
+            _options.AllPropertiesOptionalByDefault = true;
             return this;
         }
 

@@ -79,7 +79,7 @@ namespace ExcelToEnumerable
                     namesOnConfig.Except(options.OptionalFields.Select(y => y.ToLowerInvariant())).OrderBy(y => y);
             }
 
-            if (options.IgnoreUnmappedColumns)
+            if (options.IgnoreColumnsWithoutMatchingProperties)
             {
                 if (namesOnConfig.Except(namesOnSpreadsheet).Count() > 0)
                 {

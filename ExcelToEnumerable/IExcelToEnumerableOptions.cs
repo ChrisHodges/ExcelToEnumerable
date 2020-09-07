@@ -29,7 +29,8 @@ namespace ExcelToEnumerable
         string LoweredRowNumberColumn { get; }
         Dictionary<string,int> CustomHeaderNumbers { get;}
         List<string> OptionalFields { get; set; }
-        bool IgnoreUnmappedColumns { get; set; }
+        bool IgnoreColumnsWithoutMatchingProperties { get; set; }
+        List<string> ExplictlyRequiredFields { get; set; }
     }
 
     public interface IExcelToEnumerableOptions

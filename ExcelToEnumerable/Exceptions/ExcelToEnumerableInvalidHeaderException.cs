@@ -1,12 +1,24 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 
 namespace ExcelToEnumerable.Exceptions
 {
     public class ExcelToEnumerableInvalidHeaderException : ExcelToEnumerableSheetException
     {
+        private static string BuildExceptionMessage(IEnumerable<string> missingHeaders,
+            IEnumerable<string> missingProperties)
+        {
+            var missingHeadersMessage = missingHeaders != null && missingHeaders.Any()
+                ? $"Missing headers: {string.Join(", ", missingHeaders.Select(x => $"'{x}'"))}. "
+                : "";
+            var missingPropertyMessages = missingProperties != null && missingProperties.Any()
+                ? $"Missing properties: {string.Join(", ", missingProperties.Select(x => $"'{x}'"))}."
+                : "";
+            return $"{missingHeadersMessage}{missingPropertyMessages}";
+        }
         public ExcelToEnumerableInvalidHeaderException(IEnumerable<string> missingHeaders, IEnumerable<string> missingProperties) : base(
-            $"Missing headers: {string.Join(", ", missingHeaders)}. Missing properties: {string.Join(", ", missingProperties)}"
-            )
+        BuildExceptionMessage(missingHeaders, missingProperties)
+        )
         {
             MissingHeaders = missingHeaders;
             MissingProperties = missingProperties;

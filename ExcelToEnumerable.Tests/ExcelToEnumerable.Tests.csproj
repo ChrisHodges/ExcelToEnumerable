@@ -94,7 +94,7 @@
     <Compile Include="RowColumnExtensionMethodTests.cs" />
     <Compile Include="ExtensionMethodTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="TestClasses\AdriansClass.cs">
+    <Compile Include="TestClasses\OptionalParametersTestClass.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
     <Compile Include="TestClasses\BoolCollectionTestClass.cs" />
@@ -103,6 +103,7 @@
     <Compile Include="TestClasses\ComplexExampleTestClass.cs" />
     <Compile Include="TestClasses\ComplexExampleWithCustomMappingTestClass.cs" />
     <Compile Include="TestClasses\DictionaryCollectionTestClass.cs" />
+    <Compile Include="TestClasses\IgnorePropertyNamesTestClass.cs" />
     <Compile Include="TestClasses\InternalSetterTestClass.cs" />
     <Compile Include="TestClasses\NoHeaderTestClass.cs" />
     <Compile Include="TestClasses\OrdinalPropertiesTestClass.cs" />
@@ -117,6 +118,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="TestSpreadsheets\OrdinalPropertiesTest.xlsx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="TestSpreadsheets\PropertyNamesIgnoreAndWhitespaceTests.xlsx">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="TestSpreadsheets\TestSpreadsheet1.xlsx">

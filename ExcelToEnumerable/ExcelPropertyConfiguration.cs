@@ -121,13 +121,18 @@ namespace ExcelToEnumerable
             return _optionsBuilder;
         }
         
-        public IExcelToEnumerableOptionsBuilder<T> Optional()
+        public IExcelToEnumerableOptionsBuilder<T> Optional(bool isOptional)
         {
-            if (_options.OptionalFields == null)
+            if (isOptional)
             {
-                _options.OptionalFields = new List<string>();
+                _options.OptionalFields.Add(_propertyName);
+                _options.ExplictlyRequiredFields.Remove(_propertyName);
             }
-            _options.OptionalFields.Add(_propertyName);
+            else
+            {
+                _options.OptionalFields.Remove(_propertyName);
+                _options.ExplictlyRequiredFields.Add(_propertyName);
+            }
             return _optionsBuilder;
         }
 

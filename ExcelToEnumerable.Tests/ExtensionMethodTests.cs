@@ -27,6 +27,19 @@ namespace ExcelToEnumerable.Tests
         }
 
         [Fact]
+        public void IgnorePropertyNamesWorks()
+        {
+            var testSpreadsheetLocation = TestHelper.TestsheetPath("PropertyNamesIgnoreAndWhitespaceTests.xlsx");
+            var result = testSpreadsheetLocation.ExcelToEnumerable<IgnorePropertyNamesTestClass>(x => x
+                .IgnoreColumsWithoutMatchingProperties()
+                .Property(y => y.NotOnSpreadsheet).Ignore()
+                .Property(y => y.ColumnA).UsesColumnNamed("Column A")
+            );
+            result.First().ColumnA.Should().Be("a");
+            result.First().ColumnB.Should().Be("b");
+        }
+
+        [Fact]
         public void NoHeaderWorks()
         {
             var testSpreadsheetLocation = TestHelper.TestsheetPath("NoHeaderTests.xlsx");
@@ -156,9 +169,9 @@ namespace ExcelToEnumerable.Tests
         public void OptionalColumns1()
         {
             var testSpreadsheetLocation = TestHelper.TestsheetPath("OptionalColumns.xlsx");
-            var result1 = testSpreadsheetLocation.ExcelToEnumerable<AdriansClass>(x => x
+            var result1 = testSpreadsheetLocation.ExcelToEnumerable<OptionalParametersTestClass>(x => x
                 .UsingSheet("2Columns")
-                .IgnoreUnmappedColumns()
+                .IgnoreColumsWithoutMatchingProperties()
                 .Property(y => y.Fee1).Optional()
                 .Property(y => y.Fee2).Optional()
                 .Property(y => y.Fee3).Optional()
@@ -178,7 +191,8 @@ namespace ExcelToEnumerable.Tests
         public void OptionalColumns2()
         {
             var testSpreadsheetLocation = TestHelper.TestsheetPath("OptionalColumns.xlsx");
-            var result1 = testSpreadsheetLocation.ExcelToEnumerable<AdriansClass>(x => x
+            var result1 = testSpreadsheetLocation.ExcelToEnumerable<OptionalParametersTestClass>(x => x
+                .IgnoreColumsWithoutMatchingProperties()
                 .UsingSheet("4Columns")
                 .Property(y => y.Fee1).Optional()
                 .Property(y => y.Fee2).Optional()
@@ -196,22 +210,62 @@ namespace ExcelToEnumerable.Tests
             last.Fee2.Should().Be((decimal) 3.2);
             last.Fee3.Should().Be((decimal) 2.4);
         }
-        
+
         [Fact]
         public void OptionalColumns3()
         {
             var testSpreadsheetLocation = TestHelper.TestsheetPath("OptionalColumns.xlsx");
             var action = new Action(() =>
             {
-                var result1 = testSpreadsheetLocation.ExcelToEnumerable<AdriansClass>(x => x
+                testSpreadsheetLocation.ExcelToEnumerable<OptionalParametersTestClass>(x => x
                         .UsingSheet("2Columns")
-                        .IgnoreUnmappedColumns()
+                        .IgnoreColumsWithoutMatchingProperties()
                         .Property(y => y.Fee1).Optional()
                         .Property(y => y.Fee2).Optional()
                         .Property(y => y.Fee3) //In this example Fee3 is now a mandatory column
                 );
             });
             action.Should().Throw<ExcelToEnumerableInvalidHeaderException>();
+        }
+        
+        [Fact]
+        public void OptionalColumns4()
+        {
+            var testSpreadsheetLocation = TestHelper.TestsheetPath("OptionalColumns.xlsx");
+            var result1 = testSpreadsheetLocation.ExcelToEnumerable<OptionalParametersTestClass>(x => x
+                .UsingSheet("4Columns")
+                .IgnoreColumsWithoutMatchingProperties()
+                .AllPropertiesOptionalByDefault()
+            );
+            result1.Count().Should().Be(2);
+            var first = result1.First();
+            first.Name.Should().Be("Chris");
+            first.Fee1.Should().Be((decimal) 1.1);
+            first.Fee2.Should().Be(55);
+            first.Fee3.Should().Be(-23);
+            var last = result1.Last();
+            last.Name.Should().Be("Adrian");
+            last.Fee1.Should().Be((decimal) 2.2);
+            last.Fee2.Should().Be((decimal) 3.2);
+            last.Fee3.Should().Be((decimal) 2.4);
+        }
+        
+        [Fact]
+        public void OptionalColumns5()
+        {
+            var testSpreadsheetLocation = TestHelper.TestsheetPath("OptionalColumns.xlsx");
+            var action = new Action(() =>
+            {
+                testSpreadsheetLocation.ExcelToEnumerable<OptionalParametersTestClass>(x => x
+                        .UsingSheet("2Columns")
+                        .IgnoreColumsWithoutMatchingProperties()
+                        .AllPropertiesOptionalByDefault()
+                        .Property(y => y.Fee3).Optional()
+                        .Property(y => y.Fee3).Optional(false)
+                    );
+            });
+            action.Should().Throw<ExcelToEnumerableInvalidHeaderException>(
+                because: "Property Fee3 is not optional and the spreadsheet 2Columns does not contain it");
         }
 
         [Fact]
