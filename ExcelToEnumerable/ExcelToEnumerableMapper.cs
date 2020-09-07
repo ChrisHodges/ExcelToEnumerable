@@ -213,7 +213,8 @@ namespace ExcelToEnumerable
 
             if (fromRowConstructor.RowIsPopulated)
             {
-                var obj = new T(); if (fromRowConstructor.AddPropertiesFromRowValues(obj, worksheet.CurrentRowNumber.Value, _options, _exceptionList))
+                var obj = new T(); 
+                if (fromRowConstructor.AddPropertiesFromRowValues(obj, worksheet.CurrentRowNumber.Value, _options, _exceptionList))
                 {
                     list.Add(obj);
                 }
