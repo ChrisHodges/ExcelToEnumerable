@@ -85,7 +85,9 @@ namespace ExcelToEnumerable
                 Type = propertyInfo.PropertyType,
                 ColumnName = options.CustomHeaderNames != null && options.CustomHeaderNames.ContainsKey(propertyInfo.Name) ? options.CustomHeaderNames[propertyInfo.Name] : propertyInfo.Name.ToLowerInvariant(),
                 PropertyName = propertyInfo.Name,
-                CustomMapping = options.CustomMappings != null && options.CustomMappings.ContainsKey(propertyInfo.Name) ? options.CustomMappings[propertyInfo.Name] : null
+                CustomMapping = options.CustomMappings != null && options.CustomMappings.ContainsKey(propertyInfo.Name)
+                    ? options.CustomMappings[propertyInfo.Name] : 
+                    DefaultTypeMappers.Dictionary.ContainsKey(propertyInfo.PropertyType) ? DefaultTypeMappers.Dictionary[propertyInfo.PropertyType] : null
             };
             if (propertyInfo.Name == options.RowNumberColumn)
             {
@@ -103,16 +105,20 @@ namespace ExcelToEnumerable
         {
             var collectionsConfig = options.CollectionConfigurations[propertyInfo.Name];
             var isDictionary = typeof(IDictionary).IsAssignableFrom(propertyInfo.PropertyType);
-            return collectionsConfig.ColumnNames.Select(x => new FromCellSetter
+            var enumerableType = propertyInfo.PropertyType.GenericTypeArguments[0];
+            var fromCellSetters = collectionsConfig.ColumnNames.Select(x => new FromCellSetter
             {
                 ColumnName = x.ToLowerInvariant(),
                 PropertyName = propertyInfo.Name,
                 Setter = isDictionary ? 
                 GetterSetterHelpers.GetDictionaryAdder(propertyInfo, x) : 
                 GetterSetterHelpers.GetAdder(propertyInfo),
-                Type = propertyInfo.PropertyType.GenericTypeArguments[0],
-                CustomMapping = options.CustomMappings != null && options.CustomMappings.ContainsKey(propertyInfo.Name) ? options.CustomMappings[propertyInfo.Name] : null
+                Type = enumerableType,
+                CustomMapping = options.CustomMappings != null && options.CustomMappings.ContainsKey(propertyInfo.Name)
+                    ? options.CustomMappings[propertyInfo.Name] : 
+                    DefaultTypeMappers.Dictionary.ContainsKey(enumerableType) ? DefaultTypeMappers.Dictionary[enumerableType] : null
             });
+            return fromCellSetters;
         }
 
         internal FromRowConstructor CreateFromRowConstructorFromPropertyDescriptorCollection<T>(

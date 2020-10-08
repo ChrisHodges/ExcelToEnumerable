@@ -207,25 +207,7 @@ namespace ExcelToEnumerable
                 }
                 cellValue = Convert.ToInt32(cellValue);
             }
-
-            if ((type == typeof(bool?) || type == typeof(bool)) && cellValue is string)
-            {
-                var normValue = ((string)cellValue).Trim().ToLowerInvariant();
-                switch (normValue)
-                {
-                    case "yes":
-                        cellValue = true;
-                        break;
-                    case "no":
-                        cellValue = false;
-                        break;
-                    case "":
-                        cellValue = false;
-                        break;
-                    default:
-                        throw new InvalidCastException();
-                }
-            }
+            
             return cellValue;
         }
 

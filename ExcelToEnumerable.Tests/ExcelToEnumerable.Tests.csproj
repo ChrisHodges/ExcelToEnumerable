@@ -94,6 +94,7 @@
     <Compile Include="RowColumnExtensionMethodTests.cs" />
     <Compile Include="ExtensionMethodTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TestClasses\BooleansTestClass.cs" />
     <Compile Include="TestClasses\OptionalParametersTestClass.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
@@ -114,6 +115,9 @@
     <Compile Include="TestHelper.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="TestSpreadsheets\Booleans.xlsx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="TestSpreadsheets\OptionalColumns.xlsx">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

@@ -33,6 +33,7 @@ namespace ExcelToEnumerable.Tests
             var result = testSpreadsheetLocation.ExcelToEnumerable<IgnorePropertyNamesTestClass>(x => x
                 .IgnoreColumsWithoutMatchingProperties()
                 .Property(y => y.NotOnSpreadsheet).Ignore()
+                .Property(y => y.ColumnA).MapFromColumns("A", "B")
                 .Property(y => y.ColumnA).UsesColumnNamed("Column A")
             );
             result.First().ColumnA.Should().Be("a");
@@ -266,6 +267,25 @@ namespace ExcelToEnumerable.Tests
             });
             action.Should().Throw<ExcelToEnumerableInvalidHeaderException>(
                 because: "Property Fee3 is not optional and the spreadsheet 2Columns does not contain it");
+        }
+
+        [Fact]
+        public void BooleansWork()
+        {
+            var testSpreadsheetLocation = TestHelper.TestsheetPath("Booleans.xlsx");
+            var results = testSpreadsheetLocation.ExcelToEnumerable<BooleansTestClass>();
+            results.Count().Should().Be(2);
+            var r1 = results.First();
+            r1.BoolAsInt.Should().BeFalse();
+            r1.BoolAsText.Should().BeFalse();
+            r1.NullableBool.Should().BeTrue();
+            r1.MixedFormat.Should().BeTrue();
+            
+            var r2 = results.Last();
+            r2.BoolAsInt.Should().BeTrue();
+            r2.BoolAsText.Should().BeTrue();
+            r2.NullableBool.Should().BeNull();
+            r2.MixedFormat.Should().BeTrue();
         }
 
         [Fact]
