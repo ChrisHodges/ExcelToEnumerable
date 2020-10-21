@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using ExcelToEnumerable.Exceptions;
 using FluentAssertions;
 using Xunit;
@@ -460,6 +462,37 @@ namespace ExcelToEnumerable.Tests
             var result2 = result.Skip(1).First();
             result2.Sku.Should().Be("9.999");
             result.Count().Should().Be(2999);
+        }
+
+        [Fact]
+        public void ReadsGermanDecimalsCorrectlyWhenCultureSetInThread()
+        {
+            Thread.CurrentThread.CurrentCulture = new CultureInfo("de-DE"); 
+            var testSpreadsheetLocation = TestHelper.TestsheetPath("GermanDecimals.xlsx");
+            var results = testSpreadsheetLocation.ExcelToEnumerable<GermanDecimals>(x => x
+                .Property(y => y.GermanDecimalAsText).UsesCustomMapping(cellValueObject => Convert.ToDouble(cellValueObject)));
+            results.Count().Should().Be(2);
+            results.First().GermanDecimal.Should().Be(1.234);
+            results.First().UkDecimal.Should().Be(1.234);
+            results.First().GermanDecimalAsText.Should().Be(1.234);
+            results.Last().GermanDecimal.Should().Be(9.876);
+            results.Last().UkDecimal.Should().Be(9.876);
+            results.Last().GermanDecimalAsText.Should().Be(9.876);
+        }
+        
+        [Fact]
+        public void ReadsGermanDecimalsCorrectlyWhenCultureSetInCustomMapping()
+        {
+            var testSpreadsheetLocation = TestHelper.TestsheetPath("GermanDecimals.xlsx");
+            var results = testSpreadsheetLocation.ExcelToEnumerable<GermanDecimals>(x => x
+                .Property(y => y.GermanDecimalAsText).UsesCustomMapping(cellValueObject => Convert.ToDouble(cellValueObject, new CultureInfo("de-DE"))));
+            results.Count().Should().Be(2);
+            results.First().GermanDecimal.Should().Be(1.234);
+            results.First().UkDecimal.Should().Be(1.234);
+            results.First().GermanDecimalAsText.Should().Be(1.234);
+            results.Last().GermanDecimal.Should().Be(9.876);
+            results.Last().UkDecimal.Should().Be(9.876);
+            results.Last().GermanDecimalAsText.Should().Be(9.876);
         }
 
         [Fact]
