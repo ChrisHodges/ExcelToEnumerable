@@ -25,7 +25,6 @@
       <PackageReference Include="ExcelDataReader" Version="3.6.0" />
       <PackageReference Include="ExcelMapper" Version="5.1.210" />
       <PackageReference Include="FileHelpers" Version="3.4.1" />
-      <PackageReference Include="FileHelpers.ExcelNPOIStorage" Version="3.4.1" />
       <PackageReference Include="System.Text.Encoding.CodePages" Version="4.7.1" />
     </ItemGroup>
 
