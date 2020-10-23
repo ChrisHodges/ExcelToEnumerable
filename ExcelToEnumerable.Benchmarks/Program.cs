@@ -1,15 +1,14 @@
-﻿using BenchmarkDotNet.Configs;
+﻿using System;
 using BenchmarkDotNet.Running;
 
-namespace ExcelToEnumerable.Benchmarks
+namespace ExcelToEnumerable.Benchmarks.Core
 {
-    public class Program
+    class Program
     {
         public static void Main(string[] args)
         {
             var benchmarks = new Benchmarks();
             benchmarks.Setup();
-            benchmarks.ExcelNPOIStorage();
             var summary = BenchmarkRunner.Run<Benchmarks>();
         }
     }

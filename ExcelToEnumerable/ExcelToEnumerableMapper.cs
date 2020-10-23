@@ -7,6 +7,7 @@ using ExcelToEnumerable.Exceptions;
 using LightWeightExcelReader;
 
 [assembly: InternalsVisibleTo("ExcelToEnumerable.Tests")]
+[assembly: InternalsVisibleTo("ExcelToEnumerable.Tests.Core")]
 
 namespace ExcelToEnumerable
 {

@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29613.14
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExcelToEnumerable.Tests", "ExcelToEnumerable.Tests\ExcelToEnumerable.Tests.csproj", "{6F83D752-FAFA-4D86-8E51-9D1BBAA7531D}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExcelToEnumerable.Benchmarks", "ExcelToEnumerable.Benchmarks\ExcelToEnumerable.Benchmarks.csproj", "{CB3D4E5E-8852-4485-87EC-A80DFD638D8D}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ExcelToEnumerable", "ExcelToEnumerable\ExcelToEnumerable.csproj", "{66AA5F8D-6CB7-4AC8-8E24-250F022AA88B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExcelToEnumerable.Tests", "ExcelToEnumerable.Tests\ExcelToEnumerable.Tests.csproj", "{D1622197-74B1-4EB9-9923-B56E3C8BFEA3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExcelToEnumerable.Benchmarks", "ExcelToEnumerable.Benchmarks\ExcelToEnumerable.Benchmarks.csproj", "{07D6DE08-0B53-4D2D-9C4E-2DC15B8FC1F1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,18 +15,18 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{6F83D752-FAFA-4D86-8E51-9D1BBAA7531D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{6F83D752-FAFA-4D86-8E51-9D1BBAA7531D}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{6F83D752-FAFA-4D86-8E51-9D1BBAA7531D}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{6F83D752-FAFA-4D86-8E51-9D1BBAA7531D}.Release|Any CPU.Build.0 = Release|Any CPU
-		{CB3D4E5E-8852-4485-87EC-A80DFD638D8D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{CB3D4E5E-8852-4485-87EC-A80DFD638D8D}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{CB3D4E5E-8852-4485-87EC-A80DFD638D8D}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{CB3D4E5E-8852-4485-87EC-A80DFD638D8D}.Release|Any CPU.Build.0 = Release|Any CPU
 		{66AA5F8D-6CB7-4AC8-8E24-250F022AA88B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{66AA5F8D-6CB7-4AC8-8E24-250F022AA88B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{66AA5F8D-6CB7-4AC8-8E24-250F022AA88B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{66AA5F8D-6CB7-4AC8-8E24-250F022AA88B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D1622197-74B1-4EB9-9923-B56E3C8BFEA3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D1622197-74B1-4EB9-9923-B56E3C8BFEA3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D1622197-74B1-4EB9-9923-B56E3C8BFEA3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D1622197-74B1-4EB9-9923-B56E3C8BFEA3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{07D6DE08-0B53-4D2D-9C4E-2DC15B8FC1F1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{07D6DE08-0B53-4D2D-9C4E-2DC15B8FC1F1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{07D6DE08-0B53-4D2D-9C4E-2DC15B8FC1F1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{07D6DE08-0B53-4D2D-9C4E-2DC15B8FC1F1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -6,7 +6,6 @@ using System.Reflection;
 using System.Text.RegularExpressions;
 using BenchmarkDotNet.Attributes;
 using ExcelDataReader;
-using FileHelpers.ExcelNPOIStorage;
 using Ganss.Excel;
 
 namespace ExcelToEnumerable.Benchmarks
@@ -74,18 +73,6 @@ namespace ExcelToEnumerable.Benchmarks
         }
 
         [Benchmark]
-        public void ExcelNPOIStorage()
-        {
-            var provider = new ExcelNPOIStorage(typeof (TestClass2))
-            {
-                StartRow = 3,
-                StartColumn = 0,
-                FileName = _filePath
-            };
-            var res = (TestClass2[]) provider.ExtractRecords();
-        }
-
-        [Benchmark]
         public void ExcelEntityMapper()
         {
             var testClasses = new ExcelMapper(_filePath).Fetch<TestClass2>();
@@ -94,6 +81,7 @@ namespace ExcelToEnumerable.Benchmarks
         [Benchmark]
         public List<TestClass2> ExcelDataReader()
         {
+            System.Text.Encoding.RegisterProvider(System.Text.CodePagesEncodingProvider.Instance);
             var list = new List<TestClass2>();
             using (var stream = File.Open(_filePath, FileMode.Open, FileAccess.Read))
             {
