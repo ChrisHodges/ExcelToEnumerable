@@ -112,14 +112,13 @@ var result = "filePath".ExcelToEnumerable<Product>(
 ```
 
 ### Performance
-We believe **ExcelToEnumerable** is the fastest way to map Excel data to a collection of objects in .Net. We've included a [Benchmark Dot Net](https://github.com/dotnet/BenchmarkDotNet) project in the repo to compare **ExcelToEnumerable** performance against other libraries. For comparison, here are the results from running the benchmark on a 2.7 GHz Quad-Core Intel Core i7 laptop in Windows 10:
+We believe **ExcelToEnumerable** is the fastest way to map Excel data to a collection of objects in .Net. We've included a [Benchmark Dot Net](https://github.com/dotnet/BenchmarkDotNet) project in the repo to compare **ExcelToEnumerable** performance against other libraries. For comparison, here are the results from running the benchmark on a 2016 Macbook Pro 2.7 GHz Quad-Core Intel Core i7 laptop in MacOS:
 
 | Package             | Operation |
 |---------------------|----------:|
-| *ExcelToEnumerable* | *30.86 ms*|
-| ExcelEntityMapper   | 176.03 ms |
-| ExcelNPOIStorage    | 212.79 ms |
-| ExcelDataReader     | 239.45 ms |
+| *ExcelToEnumerable* | *34.58 ms*|
+| ExcelEntityMapper   | 155.42 ms |
+| ExcelDataReader     | 140.75 ms |
 
 ### Support
 **ExcelToEnumerable** is currently in beta. If you discover a bug please [raise an issue](https://github.com/ChrisHodges/ExcelToEnumerable/issues/new) or better still [fork the project](https://help.github.com/en/github/getting-started-with-github/fork-a-repo) and raise a Pull Request if you can fix the issue yourself.
