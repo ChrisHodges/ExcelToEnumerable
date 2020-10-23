@@ -479,6 +479,15 @@ namespace ExcelToEnumerable.Tests
             results.Last().UkDecimal.Should().Be(9.876);
             results.Last().GermanDecimalAsText.Should().Be(9.876);
         }
+
+        [Fact]
+        public void ReadsGermanDecimalsCorrectlyWhenCultureSetInThreadDifferentSheetFormat()
+        {
+            Thread.CurrentThread.CurrentCulture = new CultureInfo("de-DE");
+            var testSpreadsheetLocation = TestHelper.TestsheetPath("doubletest.xlsx");
+            var contracts = testSpreadsheetLocation.ExcelToEnumerable<Contract>();
+            contracts.Last().Pr01_Jb.Should().Be(289.99);
+        }
         
         [Fact]
         public void ReadsGermanDecimalsCorrectlyWhenCultureSetInCustomMapping()

@@ -4,21 +4,21 @@
         <TargetFrameworks>net461;netstandard2.0</TargetFrameworks>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <PackageId>ExcelToEnumerable</PackageId>
-        <PackageVersion>0.3.7</PackageVersion>
+        <PackageVersion>0.3.8</PackageVersion>
         <Title>ExcelToEnumerable</Title>
         <Authors>ExcelToEnumerable</Authors>
         <Description>Easily converts Excel Spreadsheets to Enumerables of any type.</Description>
-        <AssemblyVersion>0.3.7</AssemblyVersion>
-        <FileVersion>0.3.7</FileVersion>
+        <AssemblyVersion>0.3.8</AssemblyVersion>
+        <FileVersion>0.3.8</FileVersion>
         <PackageProjectUrl>https://github.com/ChrisHodges/ExcelToEnumerable/</PackageProjectUrl>
         <RepositoryUrl>https://github.com/ChrisHodges/ExcelToEnumerable/</RepositoryUrl>
-        <PackageReleaseNotes>Fixed issue where German decimals were being parsed incorrectly</PackageReleaseNotes>
+        <PackageReleaseNotes>Fixed issue where German decimals were being parsed incorrectly for cells with null value type</PackageReleaseNotes>
     </PropertyGroup>
 
     <ItemGroup>
         <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.0" PrivateAssets="All" />
       <PackageReference Include="LightweightExcelReader">
-        <Version>0.1.7</Version>
+        <Version>0.1.8</Version>
       </PackageReference>
     </ItemGroup>
 
