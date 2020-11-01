@@ -46,9 +46,7 @@ namespace ExcelToEnumerable
             var worksheet = _options.WorksheetNumber.HasValue
                 ? workbook[_options.WorksheetNumber.Value]
                 : workbook[_options.WorksheetName];
-            
-            _options.MappedType = typeof(T);
-            
+
             var fromRowConstructor = excelToEnumerableContext.GetFromRowConstructor(_options) ??
                                      excelToEnumerableContext.SetFromRowConstructor(_options);
 

@@ -9,7 +9,7 @@ namespace ExcelToEnumerable.Tests
         [Fact]
         public void FromRowConstructorHasCorrectNumberOfSetters()
         {
-            var options = new ExcelToEnumerableOptions<TestClass2> {MappedType = typeof(TestClass2)};
+            var options = new ExcelToEnumerableOptions<TestClass2>();
             ExcelToEnumerableContext.Instance.CreateMapper(options);
             var fromRowConstructor = ExcelToEnumerableContext.Instance.GetFromRowConstructor(options);
             fromRowConstructor.Setters.Count().Should().Be(14);
