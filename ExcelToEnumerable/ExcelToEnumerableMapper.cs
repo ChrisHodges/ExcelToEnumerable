@@ -38,33 +38,10 @@ namespace ExcelToEnumerable
             list.Add(obj);
         }
 
-        private IEnumerable<T> MapWorkbookToEnumerable(ExcelReader workbook, 
-            IExcelToEnumerableContext excelToEnumerableContext,
+        private List<T> MainLoop(SheetReader worksheet, FromRowConstructor fromRowConstructor,
             IExcelToEnumerableOptions<T> options)
         {
-            _options = options;
-            var worksheet = _options.WorksheetNumber.HasValue
-                ? workbook[_options.WorksheetNumber.Value]
-                : workbook[_options.WorksheetName];
-
-            var fromRowConstructor = excelToEnumerableContext.GetFromRowConstructor(_options) ??
-                                     excelToEnumerableContext.SetFromRowConstructor(_options);
-
             var list = new List<T>();
-
-            while (!worksheet.CurrentRowNumber.HasValue || worksheet.CurrentRowNumber < _options.HeaderRow)
-            {
-                worksheet.ReadNext();
-            }
-
-            var headerArray = HandleHeader(options, worksheet);
-            fromRowConstructor.PrepareForRead(headerArray, options);
-
-            _exceptionList =
-                options.ExceptionHandlingBehaviour == ExceptionHandlingBehaviour.ThrowOnFirstException
-                    ? null
-                    : new List<Exception>();
-
             do
             {
                 if (worksheet.CurrentRowNumber > _options.EndRow)
@@ -104,6 +81,36 @@ namespace ExcelToEnumerable
                 }
                 fromRowConstructor.Clear();
             } while (worksheet.ReadNext());
+
+            return list;
+        }
+
+        private IEnumerable<T> MapWorkbookToEnumerable(ExcelReader workbook, 
+            IExcelToEnumerableContext excelToEnumerableContext,
+            IExcelToEnumerableOptions<T> options)
+        {
+            _options = options;
+            var worksheet = _options.WorksheetNumber.HasValue
+                ? workbook[_options.WorksheetNumber.Value]
+                : workbook[_options.WorksheetName];
+            
+            while (!worksheet.CurrentRowNumber.HasValue || worksheet.CurrentRowNumber < _options.HeaderRow)
+            {
+                worksheet.ReadNext();
+            }
+
+            var fromRowConstructor = excelToEnumerableContext.GetFromRowConstructor(_options) ??
+                                     excelToEnumerableContext.SetFromRowConstructor(_options);
+
+            var headerArray = HandleHeader(options, worksheet);
+            fromRowConstructor.PrepareForRead(headerArray, options);
+
+            _exceptionList =
+                options.ExceptionHandlingBehaviour == ExceptionHandlingBehaviour.ThrowOnFirstException
+                    ? null
+                    : new List<Exception>();
+            
+            var list = MainLoop(worksheet, fromRowConstructor, options);
 
             if (_options.UniqueFields != null)
             {
