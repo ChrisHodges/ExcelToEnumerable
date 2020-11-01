@@ -17,9 +17,9 @@ namespace ExcelToEnumerable
 
         private IExcelToEnumerableOptions<T> _options;
 
-        private void HandleCreateEntityBehaviour(SheetReader worksheet, List<T> list,
-            FromRowConstructor fromRowConstructor)
+        private IEnumerable<T> HandleCreateEntityBehaviour(SheetReader worksheet, FromRowConstructor fromRowConstructor)
         {
+            var list = new List<T>();
             var rowDiff = worksheet.CurrentRowNumber - worksheet.PreviousRowNumber;
             if (rowDiff > 1)
             {
@@ -36,9 +36,10 @@ namespace ExcelToEnumerable
             }
 
             list.Add(obj);
+            return list;
         }
 
-        private List<T> MainLoop(SheetReader worksheet, FromRowConstructor fromRowConstructor,
+        private IEnumerable<T> MainLoop(SheetReader worksheet, FromRowConstructor fromRowConstructor,
             IExcelToEnumerableOptions<T> options)
         {
             var list = new List<T>();
@@ -53,10 +54,15 @@ namespace ExcelToEnumerable
                 switch (options.BlankRowBehaviour)
                 {
                     case BlankRowBehaviour.CreateEntity:
-                        HandleCreateEntityBehaviour(worksheet, list, fromRowConstructor);
+                        var newEntities = HandleCreateEntityBehaviour(worksheet, fromRowConstructor);
+                        list.AddRange(newEntities);
                         break;
                     case BlankRowBehaviour.Ignore:
-                        HandleIgnoreBehaviour(list, fromRowConstructor, rowNumber);
+                        var item = HandleIgnoreBehaviour(fromRowConstructor, rowNumber);
+                        if (item != null)
+                        {
+                            list.Add(item);
+                        }
                         break;
                     case BlankRowBehaviour.StopReading:
                         var continu =
@@ -65,7 +71,6 @@ namespace ExcelToEnumerable
                         {
                             return list;
                         }
-
                         break;
                     case BlankRowBehaviour.ThrowException:
                         var addedRow =
@@ -122,7 +127,7 @@ namespace ExcelToEnumerable
             return list;
         }
 
-        private List<T> CheckUniqueFields(FromRowConstructor fromRowConstructor, List<T> list)
+        private IEnumerable<T> CheckUniqueFields(FromRowConstructor fromRowConstructor, IEnumerable<T> list)
         {
             var itemsToRemove = new List<T>();
             foreach (var uniqueField in _options.UniqueFields)
@@ -230,16 +235,18 @@ namespace ExcelToEnumerable
             return false;
         }
 
-        private void HandleIgnoreBehaviour(List<T> list, FromRowConstructor fromRowConstructor, int rowCount)
+        private T HandleIgnoreBehaviour(FromRowConstructor fromRowConstructor, int rowCount)
         {
             if (fromRowConstructor.RowIsPopulated)
             {
                 var obj = new T();
                 if (fromRowConstructor.AddPropertiesFromRowValues(obj, rowCount, _options, _exceptionList))
                 {
-                    list.Add(obj);
+                    return obj;
                 }
             }
+
+            return default;
         }
 
         private Dictionary<int, string> GetHeaderRow(SheetReader worksheet)
