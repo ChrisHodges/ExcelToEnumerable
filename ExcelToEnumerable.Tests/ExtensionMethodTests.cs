@@ -522,7 +522,7 @@ namespace ExcelToEnumerable.Tests
             var testSpreadsheetLocation = TestHelper.TestsheetPath("Exceptions.xlsx");
             try
             {
-                var results = testSpreadsheetLocation.ExcelToEnumerable<ExceptionsTestClass>();
+                var results = testSpreadsheetLocation.ExcelToEnumerable<DoubleTestClass>();
             }
             catch (ExcelToEnumerableCellException e)
             {
@@ -533,6 +533,14 @@ namespace ExcelToEnumerable.Tests
                 e.PropertyName.Should().Be("double");
             }
         }
+
+        [Fact]
+        public void ReadsExcelOnlineFormatLargeDoubleCorrectly()
+        {
+            var testSpreadsheetLocation = TestHelper.TestsheetPath("LargeDouble.xlsx");
+            var results = testSpreadsheetLocation.ExcelToEnumerable<DoubleTestClass>();
+            results.First().Double.Should().Be(7060151014090010);
+        }
         
         [Fact]
         public void ThrowsCorrectExcelToEnumerableCellExceptionForCustomMapping()
@@ -540,7 +548,7 @@ namespace ExcelToEnumerable.Tests
             var testSpreadsheetLocation = TestHelper.TestsheetPath("Exceptions.xlsx");
             try
             {
-                var results = testSpreadsheetLocation.ExcelToEnumerable<ExceptionsTestClass>(
+                var results = testSpreadsheetLocation.ExcelToEnumerable<DoubleTestClass>(
                     x => x.Property(y => y.Double).UsesCustomMapping((z) =>
                     {
                         return Double.Parse(z.ToString());

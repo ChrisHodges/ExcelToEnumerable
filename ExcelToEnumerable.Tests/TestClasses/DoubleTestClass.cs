@@ -1,6 +1,6 @@
 namespace ExcelToEnumerable.Tests
 {
-    public class ExceptionsTestClass
+    public class DoubleTestClass
     {
         public double Double { get; set; }
     }
