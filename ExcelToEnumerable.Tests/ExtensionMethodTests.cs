@@ -515,6 +515,46 @@ namespace ExcelToEnumerable.Tests
             );
             result.Count().Should().Be(3000);
         }
+
+        [Fact]
+        public void ThrowsCorrectExcelToEnumerableCellExceptionForInvalidDouble()
+        {
+            var testSpreadsheetLocation = TestHelper.TestsheetPath("Exceptions.xlsx");
+            try
+            {
+                var results = testSpreadsheetLocation.ExcelToEnumerable<ExceptionsTestClass>();
+            }
+            catch (ExcelToEnumerableCellException e)
+            {
+                e.Message.Should().Be("Unable to set value 'Not a double' to property 'double' on row 2 column A. Value is invalid");
+                e.InnerException.GetType().Should().Be(typeof(InvalidCastException));
+                e.Column.Should().Be("A");
+                e.RowNumber.Should().Be(2);
+                e.PropertyName.Should().Be("double");
+            }
+        }
+        
+        [Fact]
+        public void ThrowsCorrectExcelToEnumerableCellExceptionForCustomMapping()
+        {
+            var testSpreadsheetLocation = TestHelper.TestsheetPath("Exceptions.xlsx");
+            try
+            {
+                var results = testSpreadsheetLocation.ExcelToEnumerable<ExceptionsTestClass>(
+                    x => x.Property(y => y.Double).UsesCustomMapping((z) =>
+                    {
+                        return Double.Parse(z.ToString());
+                    }));
+            }
+            catch (ExcelToEnumerableCellException e)
+            {
+                e.Message.Should().Be("Unable to set value 'Not a double' to property 'double' on row 2 column A. Value is invalid");
+                e.InnerException.GetType().Should().Be(typeof(FormatException));
+                e.Column.Should().Be("A");
+                e.RowNumber.Should().Be(2);
+                e.PropertyName.Should().Be("double");
+            }
+        }
         
         [Fact]
         public void DefaultExceptionHandlingWorks()
