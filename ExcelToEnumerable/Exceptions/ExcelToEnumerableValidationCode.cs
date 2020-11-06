@@ -2,6 +2,9 @@
 {
     public enum ExcelToEnumerableValidationCode
     {
-        Required
+        Required,
+        OneOf,
+        LessThan,
+        GreaterThan
     }
 }

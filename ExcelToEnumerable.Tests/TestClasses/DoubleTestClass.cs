@@ -1,6 +1,4 @@
-using System;
-
-namespace ExcelToEnumerable.Tests
+namespace ExcelToEnumerable.Tests.TestClasses
 {
     public class DoubleTestClass
     {

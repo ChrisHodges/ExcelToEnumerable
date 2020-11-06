@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using ExcelToEnumerable.Exceptions;
+using ExcelToEnumerable.Tests.TestClasses;
 using FluentAssertions;
 using Xunit;
 
@@ -540,6 +541,29 @@ namespace ExcelToEnumerable.Tests
             var testSpreadsheetLocation = TestHelper.TestsheetPath("LargeDouble.xlsx");
             var results = testSpreadsheetLocation.ExcelToEnumerable<DoubleTestClass>();
             results.First().Double.Should().Be(7060151014090010);
+        }
+
+        [Fact]
+        public void CustomValidatorWorks()
+        {
+            var testSpreadsheetLocation = TestHelper.TestsheetPath("CustomValidator.xlsx");
+            var exceptionList = new List<Exception>();
+            var results = testSpreadsheetLocation.ExcelToEnumerable<CustomValidatorTestClass>(
+                x => x.Property(y => y.IsItCheese).UsesCustomValidator(
+                        new ExcelCellValidator
+                        {
+                            Message = "Should contain 'cheese'",
+                            // ReSharper disable once PossibleNullReferenceException
+                            Validator = o => o != null && o.ToString().IndexOf("cheese", StringComparison.Ordinal) > -1
+                        }
+                    )
+                    .OutputExceptionsTo(exceptionList)
+            ).ToArray();
+            results.Length.Should().Be(2);
+            results.First().IsItCheese.Should().Be("cheese");
+            results.Last().IsItCheese.Should().Be("also cheese");
+            exceptionList.Count().Should().Be(1);
+            exceptionList.First().Message.Should().Be("Unable to set value 'regret' to property 'isitcheese' on row 4 column A. Should contain 'cheese'");
         }
 
         [Fact]

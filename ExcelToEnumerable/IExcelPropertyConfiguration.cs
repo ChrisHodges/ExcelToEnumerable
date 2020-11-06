@@ -34,5 +34,6 @@ namespace ExcelToEnumerable
         IExcelToEnumerableOptionsBuilder<T> UsesColumnLetter(string columnLetter);
 
         IExcelToEnumerableOptionsBuilder<T> Optional(bool isOptional = true);
+        IExcelToEnumerableOptionsBuilder<T> UsesCustomValidator(ExcelCellValidator excelCellValidator);
     }
 }

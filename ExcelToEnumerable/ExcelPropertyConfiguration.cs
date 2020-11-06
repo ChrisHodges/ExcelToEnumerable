@@ -136,6 +136,12 @@ namespace ExcelToEnumerable
             return _optionsBuilder;
         }
 
+        public IExcelToEnumerableOptionsBuilder<T> UsesCustomValidator(ExcelCellValidator excelCellValidator)
+        {
+            _options.Validations[_propertyName].Add(excelCellValidator);
+            return _optionsBuilder;
+        }
+
         public IExcelToEnumerableOptionsBuilder<T> MapsToRowNumber()
         {
             _options.RowNumberColumn = _propertyName;

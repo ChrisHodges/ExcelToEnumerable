@@ -2,8 +2,8 @@ namespace ExcelToEnumerable
 {
     /// <summary>
     /// Defines what ExcelToEnumerable should do when it encounters a blank row in the spreadsheet
-    /// Example:
-    ///  testSpreadsheetLocation.ExcelToEnumerable<SomeClass>(x => .BlankRowBehaviour(BlankRowBehaviour.ThrowException))
+    /// e.g.
+    ///  testSpreadsheetLocation.ExcelToEnumerable	&lt;SomeClass&gt; (x => .BlankRowBehaviour(BlankRowBehaviour.ThrowException))
     /// </summary>
     public enum BlankRowBehaviour
     {
