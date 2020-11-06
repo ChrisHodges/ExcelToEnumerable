@@ -541,6 +541,29 @@ namespace ExcelToEnumerable.Tests
             var results = testSpreadsheetLocation.ExcelToEnumerable<DoubleTestClass>();
             results.First().Double.Should().Be(7060151014090010);
         }
+
+        [Fact]
+        public void ReadsMillionsOfCells()
+        {
+            var testSpreadsheetLocation = TestHelper.TestsheetPath("OneMillionCells.xlsx");
+            var results = testSpreadsheetLocation.ExcelToEnumerable<MillionCellTestClass>().ToArray();
+            results.Count().Should().Be(99999);
+            var i = 1;
+            foreach(var result in results)
+            {
+                result.Col1.Should().Be(7060151014090012 + i);
+                result.Col2.Should().Be("X" + (i + 2 + 7060151014090011));
+                result.Col3.Should().Be("X" + (i + 3 + 7060151014090011));
+                result.Col4.Should().Be("X" + (i + 4 + 7060151014090011));
+                result.Col5.Should().Be("X" + (i + 5 + 7060151014090011));
+                result.Col6.Should().Be("X" + (i + 6 + 7060151014090011));
+                result.Col7.Should().Be("X" + (i + 7 + 7060151014090011));
+                result.Col8.Should().Be("X" + (i + 8 + 7060151014090011));
+                result.Col9.Should().Be("X" + (i + 9 + 7060151014090011));
+                result.Col10.Should().Be("X" + (i + 10 + 7060151014090011));
+                i++;
+            }
+        }
         
         [Fact]
         public void ThrowsCorrectExcelToEnumerableCellExceptionForCustomMapping()

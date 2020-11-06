@@ -84,4 +84,11 @@
       <ProjectReference Include="..\ExcelToEnumerable\ExcelToEnumerable.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <None Remove="TestSpreadsheets\OneMillionCells.xlsx" />
+      <Content Include="TestSpreadsheets\OneMillionCells.xlsx">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+    </ItemGroup>
+
 </Project>

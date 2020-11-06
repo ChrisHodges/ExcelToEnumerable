@@ -7,9 +7,7 @@ namespace ExcelToEnumerable.Benchmarks.Core
     {
         public static void Main(string[] args)
         {
-            var benchmarks = new Benchmarks();
-            benchmarks.Setup();
-            var summary = BenchmarkRunner.Run<Benchmarks>();
+            BenchmarkRunner.Run<Benchmarks>();
         }
     }
 }
