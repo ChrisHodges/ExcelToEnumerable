@@ -12,9 +12,9 @@ namespace ExcelToEnumerable
         private object _currentObject;
 
         public Dictionary<int, object> RowValues { get; set; }
-        
+
         public Dictionary<string, object> RowValuesByColumRef { get; set; } = new Dictionary<string, object>();
-        
+
         public Type Type { get; set; }
 
         public IEnumerable<FromCellSetter> Setters { get; set; }
@@ -34,20 +34,24 @@ namespace ExcelToEnumerable
                         : i;
                     if (_cellSettersDictionaryForRead.ContainsKey(columnNumber))
                     {
-                        throw new ExcelToEnumerableConfigException($"Trying to map property '{item.PropertyName}' to column '{CellRef.NumberToColumnName(columnNumber + 1)}' but that column is already mapped to property '{_cellSettersDictionaryForRead[columnNumber].PropertyName}'. If you're not using header names then all properties need to be mapped to a column or explicitly ignored.");
+                        throw new ExcelToEnumerableConfigException(
+                            $"Trying to map property '{item.PropertyName}' to column '{CellRef.NumberToColumnName(columnNumber + 1)}' but that column is already mapped to property '{_cellSettersDictionaryForRead[columnNumber].PropertyName}'. If you're not using header names then all properties need to be mapped to a column or explicitly ignored.");
                     }
+
                     _cellSettersDictionaryForRead.Add(columnNumber, item);
                     i++;
                 }
-            } else {
-
+            }
+            else
+            {
                 ValidateColumnNames(headerNames, options);
 
                 var index = 0;
                 _cellSettersDictionaryForRead = new Dictionary<int, FromCellSetter>();
                 foreach (var headerName in headerNames)
                 {
-                    var cellSetter = Setters.Where(x => x.ColumnName != null).FirstOrDefault(x => x.ColumnName.ToLowerInvariant() == headerName);
+                    var cellSetter = Setters.Where(x => x.ColumnName != null)
+                        .FirstOrDefault(x => x.ColumnName.ToLowerInvariant() == headerName);
                     if (cellSetter != null)
                     {
                         _cellSettersDictionaryForRead.Add(index, cellSetter);
@@ -65,6 +69,7 @@ namespace ExcelToEnumerable
             {
                 namesOnSpreadsheet = namesOnSpreadsheet.Except(options.SkippedFields.Select(y => y.ToLowerInvariant()));
             }
+
             if (options.OptionalFields != null)
             {
                 namesOnSpreadsheet =
@@ -72,7 +77,8 @@ namespace ExcelToEnumerable
             }
 
             namesOnSpreadsheet = namesOnSpreadsheet.OrderBy(x => x);
-            var namesOnConfig = Setters.Where(x => x.ColumnName != null).Select(x => x.ColumnName.ToLowerInvariant()).OrderBy(y => y);
+            var namesOnConfig = Setters.Where(x => x.ColumnName != null).Select(x => x.ColumnName.ToLowerInvariant())
+                .OrderBy(y => y);
             if (options.OptionalFields != null)
             {
                 namesOnConfig =
@@ -101,11 +107,11 @@ namespace ExcelToEnumerable
         {
             do
             {
-                
                 if (sheetReader.Address == null)
                 {
                     continue;
                 }
+
                 var cellRef = new CellRef(sheetReader.Address);
                 RowValuesByColumRef.Add(cellRef.Column, sheetReader.Value);
                 var colNumber = cellRef.ColumnNumber - 1;
@@ -162,6 +168,7 @@ namespace ExcelToEnumerable
                         break;
                 }
             }
+
             return success;
         }
 
@@ -194,20 +201,23 @@ namespace ExcelToEnumerable
             {
                 cellValue = cellValue.ToString();
             }
+
             if ((type == typeof(decimal) || type == typeof(decimal?)) && cellValue is double)
             {
                 cellValue = Convert.ToDecimal(cellValue);
             }
+
             if ((type == typeof(int?) || type == typeof(int)) && cellValue is double)
             {
                 // CSH 14/11/2019 This IF statement tests for a fraction when casting to int
-                if (Math.Abs((double)cellValue % 1) > (Double.Epsilon * 100))
+                if (Math.Abs((double) cellValue % 1) > double.Epsilon * 100)
                 {
                     throw new InvalidCastException();
                 }
+
                 cellValue = Convert.ToInt32(cellValue);
             }
-            
+
             return cellValue;
         }
 
@@ -237,7 +247,8 @@ namespace ExcelToEnumerable
                     }
                     catch (Exception e)
                     {
-                        HandleException(cellValue, fromCellSetter.ColumnName, rowCount, item.Key, options, exceptionsList, e, null, "Value is invalid");
+                        HandleException(cellValue, fromCellSetter.ColumnName, rowCount, item.Key, options,
+                            exceptionsList, e, null, "Value is invalid");
                         success = false;
                         invalidCast = true;
                     }
@@ -251,29 +262,34 @@ namespace ExcelToEnumerable
                     }
                     catch (InvalidCastException e)
                     {
-                        HandleException(cellValue, fromCellSetter.ColumnName, rowCount, item.Key, options, exceptionsList, e, null, "Value is invalid");
+                        HandleException(cellValue, fromCellSetter.ColumnName, rowCount, item.Key, options,
+                            exceptionsList, e, null, "Value is invalid");
                         success = false;
                         invalidCast = true;
                     }
                 }
+
                 if (fromCellSetter.Validators != null && !invalidCast)
                 {
                     foreach (var validator in fromCellSetter.Validators)
                     {
                         if (!validator.Validator(cellValue))
                         {
-                            HandleException(cellValue, fromCellSetter.ColumnName, rowCount, item.Key, options, exceptionsList, null,
+                            HandleException(cellValue, fromCellSetter.ColumnName, rowCount, item.Key, options,
+                                exceptionsList, null,
                                 validator.ExcelToEnumerableValidationCode,
                                 validator.Message);
                             if (validator.ExcelToEnumerableValidationCode == ExcelToEnumerableValidationCode.Required)
                             {
                                 isRequiredAlreadyAdded = true;
                             }
+
                             success = false;
                             break;
                         }
                     }
                 }
+
                 if (fieldsPresentInThisRow != null && !isRequiredAlreadyAdded)
                 {
                     fieldsPresentInThisRow.Add(fromCellSetter.ColumnName);
@@ -300,14 +316,18 @@ namespace ExcelToEnumerable
 
         private ExcelToEnumerableCellException CreateExceptionForMissingField(string missingField, int rowCount)
         {
-            if (!_cellSettersDictionaryForRead.Any(x => x.Value.ColumnName.ToLowerInvariant() == missingField.ToLowerInvariant()))
+            if (!_cellSettersDictionaryForRead.Any(x =>
+                x.Value.ColumnName.ToLowerInvariant() == missingField.ToLowerInvariant()))
             {
                 throw new Exception($"Unable to map {missingField} to cell setter");
             }
-            var setterKvp = _cellSettersDictionaryForRead.First(x => x.Value.ColumnName.ToLowerInvariant() == missingField.ToLowerInvariant());
+
+            var setterKvp = _cellSettersDictionaryForRead.First(x =>
+                x.Value.ColumnName.ToLowerInvariant() == missingField.ToLowerInvariant());
             var msg =
                 "Value is required";
-            return new ExcelToEnumerableCellException(_currentObject, rowCount, setterKvp.Key, null, setterKvp.Value.ColumnName, RowValuesByColumRef, msg);
+            return new ExcelToEnumerableCellException(_currentObject, rowCount, setterKvp.Key, null,
+                setterKvp.Value.ColumnName, RowValuesByColumRef, msg);
         }
 
         public void PrepareForRead<T>(string[] headerArray, IExcelToEnumerableOptions<T> options)

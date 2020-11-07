@@ -1,9 +1,8 @@
-﻿using System;
-using BenchmarkDotNet.Running;
+﻿using BenchmarkDotNet.Running;
 
 namespace ExcelToEnumerable.Benchmarks.Core
 {
-    class Program
+    internal class Program
     {
         public static void Main(string[] args)
         {

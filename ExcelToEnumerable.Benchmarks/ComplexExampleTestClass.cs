@@ -18,6 +18,6 @@ namespace ExcelToEnumerable.Benchmarks
         public string Origin { get; set; }
         public string Brand { get; set; }
         public decimal? LastPeriodVolume { get; set; }
-        public Dictionary<string,bool?> DepotExclusions { get; set; }
+        public Dictionary<string, bool?> DepotExclusions { get; set; }
     }
 }

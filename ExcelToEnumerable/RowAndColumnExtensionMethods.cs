@@ -5,10 +5,10 @@ namespace ExcelToEnumerable
     public static class RowAndColumnExtensionMethods
     {
         /// <summary>
-        /// 
         /// </summary>
         /// <param name="i">
-        /// This is 1-based not 0-based</param>
+        ///     This is 1-based not 0-based
+        /// </param>
         /// <returns></returns>
         public static string ToColumnName(this int i)
         {

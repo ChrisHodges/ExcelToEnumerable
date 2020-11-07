@@ -24,7 +24,7 @@ namespace ExcelToEnumerable.Tests
             var result = _subject.Build();
             result.StartRow.Should().Be(2);
         }
-        
+
         [Fact]
         public void DefaultRowNumberIsOne()
         {

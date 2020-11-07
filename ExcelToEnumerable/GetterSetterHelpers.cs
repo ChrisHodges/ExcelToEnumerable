@@ -30,12 +30,12 @@ namespace ExcelToEnumerable
             var argument = Expression.Parameter(typeof(object), "value");
             var setterCall = Expression.Call(
                 Expression.Convert(instance, propertyInfo.DeclaringType),
-                propertyInfo.GetSetMethod(true), 
+                propertyInfo.GetSetMethod(true),
                 Expression.Convert(argument, propertyInfo.PropertyType));
             var setter = (Action<object, object>) Expression.Lambda(setterCall, instance, argument).Compile();
             return setter;
         }
-        
+
         public static Action<object, object> GetAdder(PropertyInfo propertyInfo)
         {
             var getter = GetGetter(propertyInfo);
@@ -50,6 +50,7 @@ namespace ExcelToEnumerable
                     list = collectionCreator();
                     setter(o, list);
                 }
+
                 collectionAdder(list, o1);
             };
             return expr;
@@ -70,7 +71,8 @@ namespace ExcelToEnumerable
             var argument = Expression.Parameter(typeof(object), "value");
             var addMethodInfo = propertyInfo.PropertyType.GetMethod("Add");
             var collectionGenericType = propertyInfo.PropertyType.GetGenericArguments().First();
-            var methodCall = Expression.Call(Expression.Convert(instance, propertyInfo.PropertyType), addMethodInfo, Expression.Convert(argument, collectionGenericType));
+            var methodCall = Expression.Call(Expression.Convert(instance, propertyInfo.PropertyType), addMethodInfo,
+                Expression.Convert(argument, collectionGenericType));
             var expr = Expression.Lambda<Action<object, object>>(methodCall, instance, argument).Compile();
             return expr;
         }
@@ -84,7 +86,8 @@ namespace ExcelToEnumerable
             var genericArguments = propertyInfo.PropertyType.GetGenericArguments();
             var keyGenericType = genericArguments.First();
             var valueGenericType = genericArguments.Skip(1).First();
-            var methodCall = Expression.Call(Expression.Convert(instance, propertyInfo.PropertyType), addMethodInfo, Expression.Convert(key, keyGenericType), Expression.Convert(value, valueGenericType));
+            var methodCall = Expression.Call(Expression.Convert(instance, propertyInfo.PropertyType), addMethodInfo,
+                Expression.Convert(key, keyGenericType), Expression.Convert(value, valueGenericType));
             var expr = Expression.Lambda<Action<object, object, object>>(methodCall, instance, key, value).Compile();
             return expr;
         }
@@ -103,6 +106,7 @@ namespace ExcelToEnumerable
                     list = collectionCreator();
                     setter(o, list);
                 }
+
                 collectionAdder(list, oKey, oValue);
             };
             return expr;
@@ -122,6 +126,7 @@ namespace ExcelToEnumerable
                     list = collectionCreator();
                     setter(o, list);
                 }
+
                 collectionAdder(list, key, oValue);
             };
             return expr;

@@ -18,14 +18,16 @@ namespace ExcelToEnumerable
         {
             var builtOptions = BuildOptions(options);
             var excelToEnumerableMapper = new ExcelToEnumerableMapper<T>();
-            return excelToEnumerableMapper.MapExcelToEnumerable(excelFilePath, ExcelToEnumerableContext.Instance, builtOptions);
+            return excelToEnumerableMapper.MapExcelToEnumerable(excelFilePath, ExcelToEnumerableContext.Instance,
+                builtOptions);
         }
 
         public static IEnumerable<T> ExcelToEnumerable<T>(this string excelFilePath,
-    IExcelToEnumerableOptionsBuilder<T> options) where T : new()
+            IExcelToEnumerableOptionsBuilder<T> options) where T : new()
         {
             var excelToEnumerableMapper = new ExcelToEnumerableMapper<T>();
-            return excelToEnumerableMapper.MapExcelToEnumerable(excelFilePath, ExcelToEnumerableContext.Instance, options.Build());
+            return excelToEnumerableMapper.MapExcelToEnumerable(excelFilePath, ExcelToEnumerableContext.Instance,
+                options.Build());
         }
 
 
@@ -34,14 +36,16 @@ namespace ExcelToEnumerable
         {
             var builtOptions = BuildOptions(options);
             var excelToEnumerableMapper = new ExcelToEnumerableMapper<T>();
-            return excelToEnumerableMapper.MapExcelToEnumerable(excelStream, ExcelToEnumerableContext.Instance, builtOptions);
+            return excelToEnumerableMapper.MapExcelToEnumerable(excelStream, ExcelToEnumerableContext.Instance,
+                builtOptions);
         }
 
         public static IEnumerable<T> ExcelToEnumerable<T>(this Stream excelStream,
-           IExcelToEnumerableOptionsBuilder<T> options) where T : new()
+            IExcelToEnumerableOptionsBuilder<T> options) where T : new()
         {
             var excelToEnumerableMapper = new ExcelToEnumerableMapper<T>();
-            return excelToEnumerableMapper.MapExcelToEnumerable(excelStream, ExcelToEnumerableContext.Instance, options.Build());
+            return excelToEnumerableMapper.MapExcelToEnumerable(excelStream, ExcelToEnumerableContext.Instance,
+                options.Build());
         }
     }
 }

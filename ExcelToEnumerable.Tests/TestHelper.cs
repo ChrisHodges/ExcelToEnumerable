@@ -11,7 +11,8 @@ namespace ExcelToEnumerable.Tests
         {
             var assembly = Assembly.GetExecutingAssembly();
             var assemblyPath = Path.GetDirectoryName(assembly.GetName().CodeBase).Substring(5);
-            assemblyPath = Regex.Replace(assemblyPath, @"^\\+(?<drive>[A-Z]:)", "${drive}"); //Fix for windows based file systems
+            assemblyPath =
+                Regex.Replace(assemblyPath, @"^\\+(?<drive>[A-Z]:)", "${drive}"); //Fix for windows based file systems
             var testSpreadsheetLocation = Path.Combine(assemblyPath, "TestSpreadsheets", spreadsheetName);
             File.Exists(testSpreadsheetLocation).Should().BeTrue();
             return testSpreadsheetLocation;

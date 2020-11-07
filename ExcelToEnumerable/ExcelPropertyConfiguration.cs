@@ -10,9 +10,10 @@ namespace ExcelToEnumerable
     {
         private readonly IExcelToEnumerableOptions<T> _options;
         private readonly string _propertyName;
-        private IExcelToEnumerableOptionsBuilder<T> _optionsBuilder;
+        private readonly IExcelToEnumerableOptionsBuilder<T> _optionsBuilder;
 
-        public ExcelPropertyConfiguration(IExcelToEnumerableOptionsBuilder<T> optionsBuilder, string propertyName, IExcelToEnumerableOptions<T> options)
+        public ExcelPropertyConfiguration(IExcelToEnumerableOptionsBuilder<T> optionsBuilder, string propertyName,
+            IExcelToEnumerableOptions<T> options)
         {
             _options = options;
             _optionsBuilder = optionsBuilder;
@@ -67,28 +68,13 @@ namespace ExcelToEnumerable
             return MapFromColumns(columnNames.ToList());
         }
 
-        private void CreateEntryIfNotExists()
-        {
-            if (!_options.Validations.ContainsKey(_propertyName))
-            {
-                _options.Validations[_propertyName] = new List<ExcelCellValidator>();
-            }
-        }
-
-        private void CreateDictionaryIfNotExists()
-        {
-            if (_options.Validations == null)
-            {
-                _options.Validations = new Dictionary<string, List<ExcelCellValidator>>();
-            }
-        }
-
         public IExcelToEnumerableOptionsBuilder<T> ShouldBeUnique()
         {
             if (_options.UniqueFields == null)
             {
                 _options.UniqueFields = new List<string>();
             }
+
             _options.UniqueFields.Add(_propertyName);
             return _optionsBuilder;
         }
@@ -117,10 +103,11 @@ namespace ExcelToEnumerable
             {
                 _options.SkippedFields = new List<string>();
             }
+
             _options.SkippedFields.Add(_propertyName);
             return _optionsBuilder;
         }
-        
+
         public IExcelToEnumerableOptionsBuilder<T> Optional(bool isOptional)
         {
             if (isOptional)
@@ -133,6 +120,7 @@ namespace ExcelToEnumerable
                 _options.OptionalFields.Remove(_propertyName);
                 _options.ExplictlyRequiredFields.Add(_propertyName);
             }
+
             return _optionsBuilder;
         }
 
@@ -152,8 +140,10 @@ namespace ExcelToEnumerable
         {
             if (i < 1)
             {
-                throw new ExcelToEnumerableConfigException($"Unable to map '{_propertyName}' to column {i}. UsesColumnNumber expect a 1-based column number");
+                throw new ExcelToEnumerableConfigException(
+                    $"Unable to map '{_propertyName}' to column {i}. UsesColumnNumber expect a 1-based column number");
             }
+
             _options.CustomHeaderNumbers[_propertyName] = i - 1;
             return _optionsBuilder;
         }
@@ -162,6 +152,22 @@ namespace ExcelToEnumerable
         {
             _options.CustomHeaderNumbers[_propertyName] = CellRef.ColumnNameToNumber(columnLetter) - 1;
             return _optionsBuilder;
+        }
+
+        private void CreateEntryIfNotExists()
+        {
+            if (!_options.Validations.ContainsKey(_propertyName))
+            {
+                _options.Validations[_propertyName] = new List<ExcelCellValidator>();
+            }
+        }
+
+        private void CreateDictionaryIfNotExists()
+        {
+            if (_options.Validations == null)
+            {
+                _options.Validations = new Dictionary<string, List<ExcelCellValidator>>();
+            }
         }
     }
 }

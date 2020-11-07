@@ -6,10 +6,10 @@ namespace ExcelToEnumerable
 {
     internal class ExcelToEnumerableOptions<T> : IExcelToEnumerableOptions<T>
     {
+        private Dictionary<string, string> _customHeaderNames;
+        private Dictionary<string, Func<object, object>> _customMappings;
         private IEnumerable<string> _loweredRequiredColumns;
         private List<string> _requiredFields = new List<string>();
-        private Dictionary<string, Func<object, object>> _customMappings;
-        private Dictionary<string, string> _customHeaderNames;
         private string rowNumberColumn;
 
         public ExcelToEnumerableOptions()
@@ -19,6 +19,8 @@ namespace ExcelToEnumerable
             ExceptionHandlingBehaviour = ExceptionHandlingBehaviour.ThrowOnFirstException;
             UseHeaderNames = true;
         }
+
+        public bool AllPropertiesOptionalByDefault { get; set; }
 
         public Dictionary<string, List<ExcelCellValidator>> Validations { get; set; }
 
@@ -52,35 +54,6 @@ namespace ExcelToEnumerable
             }
         }
 
-        private IEnumerable<string> CreateLoweredRequiredColumns()
-        {
-            var requiredFields = RequiredFields.Select(x => x.ToLowerInvariant());
-            if (CollectionConfigurations == null && CustomHeaderNames == null)
-            {
-                return requiredFields;
-            }
-
-            var fieldList = RequiredFields.Select(x => x.ToLowerInvariant()).ToList();
-            if (CollectionConfigurations != null)
-            {
-                foreach (var collectionConfig in CollectionConfigurations.Where(x => requiredFields.Contains(x.Value.PropertyName.ToLowerInvariant())))
-                {
-                    fieldList.Remove(collectionConfig.Value.PropertyName.ToLowerInvariant());
-                    fieldList.AddRange(collectionConfig.Value.ColumnNames.Select(x => x.ToLowerInvariant()));
-                }
-            }
-            if (CustomHeaderNames != null)
-            {
-                foreach (var item in CustomHeaderNames)
-                {
-                    fieldList.Remove(item.Key.ToLowerInvariant());
-                    fieldList.Add(item.Value);
-                }
-            }
-
-            return fieldList;
-        }
-
         public Dictionary<string, ExcelToEnumerableCollectionConfiguration> CollectionConfigurations { get; set; }
 
         public string WorksheetName { get; set; }
@@ -99,6 +72,7 @@ namespace ExcelToEnumerable
                 {
                     _customMappings = new Dictionary<string, Func<object, object>>();
                 }
+
                 return _customMappings;
             }
         }
@@ -111,11 +85,13 @@ namespace ExcelToEnumerable
                 {
                     _customHeaderNames = new Dictionary<string, string>();
                 }
+
                 return _customHeaderNames;
             }
         }
 
         public List<string> SkippedFields { get; set; }
+
         public string RowNumberColumn
         {
             get => rowNumberColumn;
@@ -131,7 +107,37 @@ namespace ExcelToEnumerable
         public List<string> OptionalFields { get; set; } = new List<string>();
         public bool IgnoreColumnsWithoutMatchingProperties { get; set; }
         public List<string> ExplictlyRequiredFields { get; set; } = new List<string>();
-        public bool AllPropertiesOptionalByDefault { get; set; }
+
+        private IEnumerable<string> CreateLoweredRequiredColumns()
+        {
+            var requiredFields = RequiredFields.Select(x => x.ToLowerInvariant());
+            if (CollectionConfigurations == null && CustomHeaderNames == null)
+            {
+                return requiredFields;
+            }
+
+            var fieldList = RequiredFields.Select(x => x.ToLowerInvariant()).ToList();
+            if (CollectionConfigurations != null)
+            {
+                foreach (var collectionConfig in CollectionConfigurations.Where(x =>
+                    requiredFields.Contains(x.Value.PropertyName.ToLowerInvariant())))
+                {
+                    fieldList.Remove(collectionConfig.Value.PropertyName.ToLowerInvariant());
+                    fieldList.AddRange(collectionConfig.Value.ColumnNames.Select(x => x.ToLowerInvariant()));
+                }
+            }
+
+            if (CustomHeaderNames != null)
+            {
+                foreach (var item in CustomHeaderNames)
+                {
+                    fieldList.Remove(item.Key.ToLowerInvariant());
+                    fieldList.Add(item.Value);
+                }
+            }
+
+            return fieldList;
+        }
 
         public void AddRequiredField(string requiredField)
         {

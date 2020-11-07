@@ -23,11 +23,11 @@ namespace ExcelToEnumerable
         List<string> UniqueFields { get; set; }
         Action<IDictionary<int, string>> OnReadingerHeaderRowAction { get; }
         Dictionary<string, Func<object, object>> CustomMappings { get; }
-        Dictionary<string,string> CustomHeaderNames { get; }
+        Dictionary<string, string> CustomHeaderNames { get; }
         List<string> SkippedFields { get; set; }
         string RowNumberColumn { get; set; }
         string LoweredRowNumberColumn { get; }
-        Dictionary<string,int> CustomHeaderNumbers { get;}
+        Dictionary<string, int> CustomHeaderNumbers { get; }
         List<string> OptionalFields { get; set; }
         bool IgnoreColumnsWithoutMatchingProperties { get; set; }
         List<string> ExplictlyRequiredFields { get; set; }

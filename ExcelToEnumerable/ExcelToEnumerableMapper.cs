@@ -32,7 +32,8 @@ namespace ExcelToEnumerable
             var obj = new T();
             if (fromRowConstructor.RowIsPopulated)
             {
-                fromRowConstructor.AddPropertiesFromRowValues(obj, worksheet.CurrentRowNumber.Value, _options, _exceptionList);
+                fromRowConstructor.AddPropertiesFromRowValues(obj, worksheet.CurrentRowNumber.Value, _options,
+                    _exceptionList);
             }
 
             list.Add(obj);
@@ -49,6 +50,7 @@ namespace ExcelToEnumerable
                 {
                     break;
                 }
+
                 fromRowConstructor.ReadRowValues(worksheet);
                 var rowNumber = worksheet.CurrentRowNumber.Value;
                 switch (options.BlankRowBehaviour)
@@ -63,6 +65,7 @@ namespace ExcelToEnumerable
                         {
                             list.Add(item);
                         }
+
                         break;
                     case BlankRowBehaviour.StopReading:
                         var continu =
@@ -71,6 +74,7 @@ namespace ExcelToEnumerable
                         {
                             return list;
                         }
+
                         break;
                     case BlankRowBehaviour.ThrowException:
                         var addedRow =
@@ -79,18 +83,20 @@ namespace ExcelToEnumerable
                         {
                             throw new ExcelToEnumerableRowException(
                                 null,
-                                $"Blank row found at row: '{rowNumber}'", rowNumber, fromRowConstructor.RowValuesByColumRef);
+                                $"Blank row found at row: '{rowNumber}'", rowNumber,
+                                fromRowConstructor.RowValuesByColumRef);
                         }
 
                         break;
                 }
+
                 fromRowConstructor.Clear();
             } while (worksheet.ReadNext());
 
             return list;
         }
 
-        private IEnumerable<T> MapWorkbookToEnumerable(ExcelReader workbook, 
+        private IEnumerable<T> MapWorkbookToEnumerable(ExcelReader workbook,
             IExcelToEnumerableContext excelToEnumerableContext,
             IExcelToEnumerableOptions<T> options)
         {
@@ -98,7 +104,7 @@ namespace ExcelToEnumerable
             var worksheet = _options.WorksheetNumber.HasValue
                 ? workbook[_options.WorksheetNumber.Value]
                 : workbook[_options.WorksheetName];
-            
+
             while (!worksheet.CurrentRowNumber.HasValue || worksheet.CurrentRowNumber < _options.HeaderRow)
             {
                 worksheet.ReadNext();
@@ -114,7 +120,7 @@ namespace ExcelToEnumerable
                 options.ExceptionHandlingBehaviour == ExceptionHandlingBehaviour.ThrowOnFirstException
                     ? null
                     : new List<Exception>();
-            
+
             var list = MainLoop(worksheet, fromRowConstructor, options);
 
             if (_options.UniqueFields != null)
@@ -132,32 +138,37 @@ namespace ExcelToEnumerable
             var itemsToRemove = new List<T>();
             foreach (var uniqueField in _options.UniqueFields)
             {
-                var getter = fromRowConstructor.Setters.First(x => x.ColumnName == uniqueField.ToLowerInvariant()).Getter;
+                var getter = fromRowConstructor.Setters.First(x => x.ColumnName == uniqueField.ToLowerInvariant())
+                    .Getter;
                 var kvps = list.Select(x => new KeyValuePair<object, T>(getter(x), x));
                 var dupes = kvps.GroupBy(x => x.Key)
-                  .Where(g => g.Count() > 1)
-                  .ToList();
+                    .Where(g => g.Count() > 1)
+                    .ToList();
                 if (dupes.Any())
                 {
                     itemsToRemove.AddRange(dupes.SelectMany(x => x.Select(y => y.Value)));
-                    var exception = new ExcelToEnumerableSheetException($"Duplicate values for column '{uniqueField}': {string.Join(", ", dupes.Select(x => x.Key))}");
-                    
+                    var exception = new ExcelToEnumerableSheetException(
+                        $"Duplicate values for column '{uniqueField}': {string.Join(", ", dupes.Select(x => x.Key))}");
+
                     //CSH 2019-11-12 If the exception list is not null we're either throwing an aggregate exeption
                     //or returning an exception list. Either way, we don't want to throw the exception now.
                     if (_exceptionList != null)
                     {
                         _exceptionList.Add(exception);
-                    } else
+                    }
+                    else
                     {
                         throw exception;
                     }
                 }
             }
+
             list = list.Where(x => !itemsToRemove.Contains(x)).ToList();
             return list;
         }
 
-        internal IEnumerable<T> MapExcelToEnumerable(string filePath, IExcelToEnumerableContext excelToEnumerableContext,
+        internal IEnumerable<T> MapExcelToEnumerable(string filePath,
+            IExcelToEnumerableContext excelToEnumerableContext,
             IExcelToEnumerableOptions<T> options)
         {
             var workbook = new ExcelReader(filePath);
@@ -165,7 +176,8 @@ namespace ExcelToEnumerable
             return list;
         }
 
-        internal IEnumerable<T> MapExcelToEnumerable(Stream excelStream, ExcelToEnumerableContext excelToEnumerableContext, IExcelToEnumerableOptions<T> options)
+        internal IEnumerable<T> MapExcelToEnumerable(Stream excelStream,
+            ExcelToEnumerableContext excelToEnumerableContext, IExcelToEnumerableOptions<T> options)
         {
             var workbook = new ExcelReader(excelStream);
             var list = MapWorkbookToEnumerable(workbook, excelToEnumerableContext, options);
@@ -224,11 +236,13 @@ namespace ExcelToEnumerable
 
             if (fromRowConstructor.RowIsPopulated)
             {
-                var obj = new T(); 
-                if (fromRowConstructor.AddPropertiesFromRowValues(obj, worksheet.CurrentRowNumber.Value, _options, _exceptionList))
+                var obj = new T();
+                if (fromRowConstructor.AddPropertiesFromRowValues(obj, worksheet.CurrentRowNumber.Value, _options,
+                    _exceptionList))
                 {
                     list.Add(obj);
                 }
+
                 return true;
             }
 
@@ -251,7 +265,7 @@ namespace ExcelToEnumerable
 
         private Dictionary<int, string> GetHeaderRow(SheetReader worksheet)
         {
-            var dict = new Dictionary<int,string>();
+            var dict = new Dictionary<int, string>();
             var previousColumnNumber = 0;
             do
             {
@@ -261,6 +275,7 @@ namespace ExcelToEnumerable
                 {
                     dict.Add(i, $"**blank column** ({CellRef.NumberToColumnName(i)})");
                 }
+
                 dict.Add(cellRef.ColumnNumber, worksheet.Value.ToString());
                 previousColumnNumber = columnNumber;
             } while (worksheet.ReadNextInRow());

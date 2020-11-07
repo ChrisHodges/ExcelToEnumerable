@@ -19,18 +19,18 @@ namespace ExcelToEnumerable
         IExcelToEnumerableOptionsBuilder<T> UsesColumnNamed(string columnName);
         IExcelToEnumerableOptionsBuilder<T> Ignore();
         IExcelToEnumerableOptionsBuilder<T> MapsToRowNumber();
+
         /// <summary>
-        /// 
         /// </summary>
         /// <param name="i">The ZERO-INDEXED column number</param>
         /// <returns></returns>
         IExcelToEnumerableOptionsBuilder<T> UsesColumnNumber(int i);
 
         /// <summary>
-        /// 
         /// </summary>
         /// <param name="columnLetter">
-        /// e.g. A, M, AB, ZZA, etc.</param>
+        ///     e.g. A, M, AB, ZZA, etc.
+        /// </param>
         IExcelToEnumerableOptionsBuilder<T> UsesColumnLetter(string columnLetter);
 
         IExcelToEnumerableOptionsBuilder<T> Optional(bool isOptional = true);

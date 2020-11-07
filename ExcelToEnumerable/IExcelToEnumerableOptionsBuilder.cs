@@ -17,11 +17,12 @@ namespace ExcelToEnumerable
 
         IExcelPropertyConfiguration<T, TProperty>
             Property<TProperty>(Expression<Func<T, TProperty>> propertyExpression);
+
         IExcelToEnumerableOptionsBuilder<T> EndingWithRow(int v);
         IExcelToEnumerableOptionsBuilder<T> HeaderOnRow(int rowNumber);
         IExcelToEnumerableOptionsBuilder<T> OnReadingHeaderRow(Action<IDictionary<int, string>> action);
         IExcelToEnumerableOptions<T> Build();
-        IExcelToEnumerableOptionsBuilder<T>  IgnoreColumsWithoutMatchingProperties();
+        IExcelToEnumerableOptionsBuilder<T> IgnoreColumsWithoutMatchingProperties();
         IExcelToEnumerableOptionsBuilder<T> AllPropertiesOptionalByDefault();
     }
 }

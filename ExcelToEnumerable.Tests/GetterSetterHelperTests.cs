@@ -11,7 +11,7 @@ namespace ExcelToEnumerable.Tests
         public void GetGetterWorks()
         {
             var propertyInfo = typeof(CollectionTestClass).GetProperty("Collection");
-            var getter = GetterSetterHelpers.GetGetter( propertyInfo);
+            var getter = GetterSetterHelpers.GetGetter(propertyInfo);
             var testClass = new CollectionTestClass();
             var result = getter(testClass);
             result.Should().BeNull();

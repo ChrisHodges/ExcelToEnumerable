@@ -1,18 +1,17 @@
 using System;
 using System.Collections.Generic;
-using System.Data.SqlTypes;
 using System.Linq.Expressions;
 
 namespace ExcelToEnumerable
 {
     public class ExcelToEnumerableOptionsBuilder<T> : IExcelToEnumerableOptionsBuilder<T>
     {
+        private readonly ExcelToEnumerableOptions<T> _options = new ExcelToEnumerableOptions<T>();
+
         public ExcelToEnumerableOptionsBuilder()
         {
             _options.StartRow = 1;
         }
-        
-        private readonly ExcelToEnumerableOptions<T> _options = new ExcelToEnumerableOptions<T>();
 
         public IExcelToEnumerableOptionsBuilder<T> StartingFromRow(int startRow)
         {
@@ -20,7 +19,7 @@ namespace ExcelToEnumerable
             return this;
         }
 
-        public IExcelToEnumerableOptionsBuilder<T> OnReadingHeaderRow(Action<IDictionary<int,string>> action)
+        public IExcelToEnumerableOptionsBuilder<T> OnReadingHeaderRow(Action<IDictionary<int, string>> action)
         {
             _options.OnReadingerHeaderRowAction = action;
             return this;
@@ -74,12 +73,6 @@ namespace ExcelToEnumerable
             return excelPropertyConfiguration;
         }
 
-        private static string GetExpressionName<TRequiredField>(
-            Expression<Func<T, TRequiredField>> isRequiredExpression)
-        {
-            return ((MemberExpression) isRequiredExpression.Body).Member.Name;
-        }
-
         public IExcelToEnumerableOptions<T> Build()
         {
             if (_options.AllPropertiesOptionalByDefault)
@@ -101,6 +94,7 @@ namespace ExcelToEnumerable
                     }
                 }
             }
+
             return _options;
         }
 
@@ -126,6 +120,12 @@ namespace ExcelToEnumerable
         {
             _options.HeaderRow = rowNumber;
             return this;
+        }
+
+        private static string GetExpressionName<TRequiredField>(
+            Expression<Func<T, TRequiredField>> isRequiredExpression)
+        {
+            return ((MemberExpression) isRequiredExpression.Body).Member.Name;
         }
     }
 }

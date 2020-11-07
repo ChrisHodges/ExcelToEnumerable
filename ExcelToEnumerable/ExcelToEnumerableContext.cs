@@ -52,20 +52,25 @@ namespace ExcelToEnumerable
             {
                 list = list.Where(x => !options.SkippedFields.Contains(x.Name));
             }
-            return list.Select(x => GetSettersForProperty(type.GetProperty(x.Name), Array.IndexOf(list.ToArray(), x), options)).SelectMany(y => y).ToArray();
+
+            return list.Select(x =>
+                    GetSettersForProperty(type.GetProperty(x.Name), Array.IndexOf(list.ToArray(), x), options))
+                .SelectMany(y => y).ToArray();
         }
-        
+
         /// <summary>
-        /// This usually returns a single setter apart from where the property is of type IEnumerable
+        ///     This usually returns a single setter apart from where the property is of type IEnumerable
         /// </summary>
         /// <param name="propertyInfo"></param>
         /// <param name="index"></param>
         /// <param name="options"></param>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        internal IEnumerable<FromCellSetter> GetSettersForProperty<T>(PropertyInfo propertyInfo, int index, IExcelToEnumerableOptions<T> options)
+        internal IEnumerable<FromCellSetter> GetSettersForProperty<T>(PropertyInfo propertyInfo, int index,
+            IExcelToEnumerableOptions<T> options)
         {
-            if (propertyInfo.PropertyType != typeof(string) && typeof(IEnumerable).IsAssignableFrom(propertyInfo.PropertyType))
+            if (propertyInfo.PropertyType != typeof(string) &&
+                typeof(IEnumerable).IsAssignableFrom(propertyInfo.PropertyType))
             {
                 if (options.CollectionConfigurations == null ||
                     !options.CollectionConfigurations.ContainsKey(propertyInfo.Name))
@@ -76,32 +81,41 @@ namespace ExcelToEnumerable
                 return GetSettersForEnumerable(propertyInfo, index, options);
             }
 
-            var setter = GetterSetterHelpers.GetSetter(propertyInfo); 
-            var getter = options.UniqueFields != null && options.UniqueFields.Contains(propertyInfo.Name) ? GetterSetterHelpers.GetGetter(propertyInfo) : null;
+            var setter = GetterSetterHelpers.GetSetter(propertyInfo);
+            var getter = options.UniqueFields != null && options.UniqueFields.Contains(propertyInfo.Name)
+                ? GetterSetterHelpers.GetGetter(propertyInfo)
+                : null;
             var fromCellSetter = new FromCellSetter
             {
                 Getter = getter,
                 Setter = setter,
                 Type = propertyInfo.PropertyType,
-                ColumnName = options.CustomHeaderNames != null && options.CustomHeaderNames.ContainsKey(propertyInfo.Name) ? options.CustomHeaderNames[propertyInfo.Name] : propertyInfo.Name.ToLowerInvariant(),
+                ColumnName =
+                    options.CustomHeaderNames != null && options.CustomHeaderNames.ContainsKey(propertyInfo.Name)
+                        ? options.CustomHeaderNames[propertyInfo.Name]
+                        : propertyInfo.Name.ToLowerInvariant(),
                 PropertyName = propertyInfo.Name,
                 CustomMapping = options.CustomMappings != null && options.CustomMappings.ContainsKey(propertyInfo.Name)
-                    ? options.CustomMappings[propertyInfo.Name] : 
-                    DefaultTypeMappers.Dictionary.ContainsKey(propertyInfo.PropertyType) ? DefaultTypeMappers.Dictionary[propertyInfo.PropertyType] : null
+                    ? options.CustomMappings[propertyInfo.Name]
+                    : DefaultTypeMappers.Dictionary.ContainsKey(propertyInfo.PropertyType)
+                        ? DefaultTypeMappers.Dictionary[propertyInfo.PropertyType]
+                        : null
             };
             if (propertyInfo.Name == options.RowNumberColumn)
             {
                 fromCellSetter.ColumnName = null;
             }
+
             if (options.RequiredFields.Contains(propertyInfo.Name))
             {
-                fromCellSetter.Validators = new List<ExcelCellValidator>{ExcelCellValidatorFactory.CreateRequired()};
+                fromCellSetter.Validators = new List<ExcelCellValidator> {ExcelCellValidatorFactory.CreateRequired()};
             }
 
-            return new []{fromCellSetter};
+            return new[] {fromCellSetter};
         }
 
-        private IEnumerable<FromCellSetter> GetSettersForEnumerable<T>(PropertyInfo propertyInfo, int index, IExcelToEnumerableOptions<T> options)
+        private IEnumerable<FromCellSetter> GetSettersForEnumerable<T>(PropertyInfo propertyInfo, int index,
+            IExcelToEnumerableOptions<T> options)
         {
             var collectionsConfig = options.CollectionConfigurations[propertyInfo.Name];
             var isDictionary = typeof(IDictionary).IsAssignableFrom(propertyInfo.PropertyType);
@@ -110,13 +124,15 @@ namespace ExcelToEnumerable
             {
                 ColumnName = x.ToLowerInvariant(),
                 PropertyName = propertyInfo.Name,
-                Setter = isDictionary ? 
-                GetterSetterHelpers.GetDictionaryAdder(propertyInfo, x) : 
-                GetterSetterHelpers.GetAdder(propertyInfo),
+                Setter = isDictionary
+                    ? GetterSetterHelpers.GetDictionaryAdder(propertyInfo, x)
+                    : GetterSetterHelpers.GetAdder(propertyInfo),
                 Type = enumerableType,
                 CustomMapping = options.CustomMappings != null && options.CustomMappings.ContainsKey(propertyInfo.Name)
-                    ? options.CustomMappings[propertyInfo.Name] : 
-                    DefaultTypeMappers.Dictionary.ContainsKey(enumerableType) ? DefaultTypeMappers.Dictionary[enumerableType] : null
+                    ? options.CustomMappings[propertyInfo.Name]
+                    : DefaultTypeMappers.Dictionary.ContainsKey(enumerableType)
+                        ? DefaultTypeMappers.Dictionary[enumerableType]
+                        : null
             });
             return fromCellSetters;
         }

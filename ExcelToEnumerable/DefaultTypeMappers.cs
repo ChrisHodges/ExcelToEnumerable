@@ -3,9 +3,9 @@ using System.Collections.Generic;
 
 namespace ExcelToEnumerable
 {
-    static class DefaultTypeMappers
+    internal static class DefaultTypeMappers
     {
-        private static readonly Func<object,object> NullableBoolean = (o =>
+        private static readonly Func<object, object> NullableBoolean = o =>
         {
             if (o == null)
             {
@@ -13,7 +13,7 @@ namespace ExcelToEnumerable
             }
 
             var oStr = o.ToString().ToLowerInvariant();
-            
+
             switch (oStr)
             {
                 case "1":
@@ -25,11 +25,12 @@ namespace ExcelToEnumerable
                 case "no":
                     return false;
                 default:
-                    throw new InvalidCastException($"Unable to parse '{(oStr == "" ? "EMPTY STRING" : oStr)}' to type Boolean");
+                    throw new InvalidCastException(
+                        $"Unable to parse '{(oStr == "" ? "EMPTY STRING" : oStr)}' to type Boolean");
             }
-        });
+        };
 
-        private static readonly Func<object,object> Boolean = (o =>
+        private static readonly Func<object, object> Boolean = o =>
         {
             if (o == null)
             {
@@ -37,9 +38,9 @@ namespace ExcelToEnumerable
             }
 
             return NullableBoolean(o);
-        });
+        };
 
-        public static Dictionary<Type, Func<object,object>> Dictionary = new Dictionary<Type, Func<object, object>>
+        public static Dictionary<Type, Func<object, object>> Dictionary = new Dictionary<Type, Func<object, object>>
         {
             {typeof(bool), Boolean},
             {typeof(bool?), NullableBoolean}

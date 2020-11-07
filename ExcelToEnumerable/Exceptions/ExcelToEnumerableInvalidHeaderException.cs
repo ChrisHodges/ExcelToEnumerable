@@ -5,6 +5,18 @@ namespace ExcelToEnumerable.Exceptions
 {
     public class ExcelToEnumerableInvalidHeaderException : ExcelToEnumerableSheetException
     {
+        public ExcelToEnumerableInvalidHeaderException(IEnumerable<string> missingHeaders,
+            IEnumerable<string> missingProperties) : base(
+            BuildExceptionMessage(missingHeaders, missingProperties)
+        )
+        {
+            MissingHeaders = missingHeaders;
+            MissingProperties = missingProperties;
+        }
+
+        public IEnumerable<string> MissingHeaders { get; }
+        public IEnumerable<string> MissingProperties { get; }
+
         private static string BuildExceptionMessage(IEnumerable<string> missingHeaders,
             IEnumerable<string> missingProperties)
         {
@@ -16,15 +28,5 @@ namespace ExcelToEnumerable.Exceptions
                 : "";
             return $"{missingHeadersMessage}{missingPropertyMessages}";
         }
-        public ExcelToEnumerableInvalidHeaderException(IEnumerable<string> missingHeaders, IEnumerable<string> missingProperties) : base(
-        BuildExceptionMessage(missingHeaders, missingProperties)
-        )
-        {
-            MissingHeaders = missingHeaders;
-            MissingProperties = missingProperties;
-        }
-
-        public IEnumerable<string> MissingHeaders { get; }
-        public IEnumerable<string> MissingProperties { get; }
     }
 }
