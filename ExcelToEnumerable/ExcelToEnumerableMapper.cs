@@ -4,7 +4,8 @@ using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using ExcelToEnumerable.Exceptions;
-using LightWeightExcelReader;
+using LightweightExcelReader;
+using SpreadsheetCellRef;
 
 [assembly: InternalsVisibleTo("ExcelToEnumerable.Tests")]
 

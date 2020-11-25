@@ -2,7 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using ExcelToEnumerable.Exceptions;
-using LightWeightExcelReader;
+using LightweightExcelReader;
+using SpreadsheetCellRef;
 
 namespace ExcelToEnumerable
 {

@@ -40,13 +40,5 @@ namespace ExcelToEnumerable.Tests
             var result = _subject.Build();
             result.StartRow.Should().Be(2);
         }
-
-        [Fact]
-        public void DefaultRowNumberIsOne()
-        {
-            _subject = new ExcelToEnumerableOptionsBuilder<TestClass>();
-            var result = _subject.Build();
-            result.StartRow.Should().Be(1);
-        }
     }
 }

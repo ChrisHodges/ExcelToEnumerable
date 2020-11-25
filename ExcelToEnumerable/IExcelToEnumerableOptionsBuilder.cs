@@ -187,20 +187,20 @@ namespace ExcelToEnumerable
         /// </code>
         /// </example>
         /// <returns></returns>
-        IExcelToEnumerableOptionsBuilder<T> IgnoreColumnsWithoutMatchingProperties();
-        
+        IExcelToEnumerableOptionsBuilder<T> IgnoreColumnsWithoutMatchingProperties(bool b);
+
         /// <summary>
-        /// Makes all properties of the mapped class as optional. To make a specific property as required,
+        /// Makes all properties of the mapped class as optional. To mark a specific property as required,
         /// use Property(y => y.MyProperty).Optional(false)
         /// </summary>
         /// <example>
         /// <code>
         /// IEnumerable&lt;MyClass&gt; results = excelStream.ExcelToEnumerable&lt;MyClass&gt;(x => x
-        ///     .AllPropertiesOptionalByDefault()
+        ///     .IgnorePropertiesWithoutMatchingColumns()
         /// );
         /// </code>
         /// </example>
         /// <returns></returns>
-        IExcelToEnumerableOptionsBuilder<T> AllPropertiesOptionalByDefault();
+        IExcelToEnumerableOptionsBuilder<T> IgnorePropertiesWithoutMatchingColumns(bool b);
     }
 }

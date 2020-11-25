@@ -30,7 +30,7 @@ namespace ExcelToEnumerable
 
         public bool UseHeaderNames { get; set; }
 
-        public int StartRow { get; set; } = 1;
+        public int? StartRow { get; set; }
 
         public BlankRowBehaviour BlankRowBehaviour { get; internal set; }
 

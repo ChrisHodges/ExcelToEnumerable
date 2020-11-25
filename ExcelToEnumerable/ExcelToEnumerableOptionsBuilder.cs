@@ -6,7 +6,11 @@ namespace ExcelToEnumerable
 {
     internal class ExcelToEnumerableOptionsBuilder<T> : IExcelToEnumerableOptionsBuilder<T>
     {
-        private readonly ExcelToEnumerableOptions<T> _options = new ExcelToEnumerableOptions<T>();
+        private readonly ExcelToEnumerableOptions<T> _options = new ExcelToEnumerableOptions<T>
+        {
+            AllPropertiesOptionalByDefault = true,
+            IgnoreColumnsWithoutMatchingProperties = true
+        };
         
         public IExcelToEnumerableOptionsBuilder<T> StartingFromRow(int startRow)
         {
@@ -93,15 +97,15 @@ namespace ExcelToEnumerable
             return _options;
         }
         
-        public IExcelToEnumerableOptionsBuilder<T> IgnoreColumnsWithoutMatchingProperties()
+        public IExcelToEnumerableOptionsBuilder<T> IgnoreColumnsWithoutMatchingProperties(bool b)
         {
-            _options.IgnoreColumnsWithoutMatchingProperties = true;
+            _options.IgnoreColumnsWithoutMatchingProperties = b;
             return this;
         }
         
-        public IExcelToEnumerableOptionsBuilder<T> AllPropertiesOptionalByDefault()
+        public IExcelToEnumerableOptionsBuilder<T> IgnorePropertiesWithoutMatchingColumns(bool b)
         {
-            _options.AllPropertiesOptionalByDefault = true;
+            _options.AllPropertiesOptionalByDefault = b;
             return this;
         }
         

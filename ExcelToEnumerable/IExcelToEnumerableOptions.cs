@@ -17,7 +17,7 @@ namespace ExcelToEnumerable
         
         bool UseHeaderNames { get; }
         
-        int StartRow { get; }
+        int? StartRow { get; }
         
         int HeaderRow { get; }
         

@@ -31,8 +31,9 @@
     </PropertyGroup>
     <ItemGroup>
         <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.0" PrivateAssets="All" />
-      <PackageReference Include="LightweightExcelReader" Version="0.1.10">
+      <PackageReference Include="LightweightExcelReader" Version="0.1.13-alpha">
       </PackageReference>
+      <PackageReference Include="SpreadsheetCellRef" Version="1.0.1" />
     </ItemGroup>
 
 

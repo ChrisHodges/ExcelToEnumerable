@@ -34,7 +34,7 @@ namespace ExcelToEnumerable.Tests
         {
             var testSpreadsheetLocation = TestHelper.TestsheetPath("PropertyNamesIgnoreAndWhitespaceTests.xlsx");
             var result = testSpreadsheetLocation.ExcelToEnumerable<IgnorePropertyNamesTestClass>(x => x
-                .IgnoreColumnsWithoutMatchingProperties()
+                .IgnoreColumnsWithoutMatchingProperties(true)
                 .Property(y => y.NotOnSpreadsheet).Ignore()
                 .Property(y => y.ColumnA).MapFromColumns("A", "B")
                 .Property(y => y.ColumnA).UsesColumnNamed("Column A")
@@ -177,7 +177,7 @@ namespace ExcelToEnumerable.Tests
             var testSpreadsheetLocation = TestHelper.TestsheetPath("OptionalColumns.xlsx");
             var result1 = testSpreadsheetLocation.ExcelToEnumerable<OptionalParametersTestClass>(x => x
                 .UsingSheet("2Columns")
-                .IgnoreColumnsWithoutMatchingProperties()
+                .IgnoreColumnsWithoutMatchingProperties(true)
                 .Property(y => y.Fee1).Optional()
                 .Property(y => y.Fee2).Optional()
                 .Property(y => y.Fee3).Optional()
@@ -198,7 +198,7 @@ namespace ExcelToEnumerable.Tests
         {
             var testSpreadsheetLocation = TestHelper.TestsheetPath("OptionalColumns.xlsx");
             var result1 = testSpreadsheetLocation.ExcelToEnumerable<OptionalParametersTestClass>(x => x
-                .IgnoreColumnsWithoutMatchingProperties()
+                .IgnoreColumnsWithoutMatchingProperties(true)
                 .UsingSheet("4Columns")
                 .Property(y => y.Fee1).Optional()
                 .Property(y => y.Fee2).Optional()
@@ -225,10 +225,8 @@ namespace ExcelToEnumerable.Tests
             {
                 testSpreadsheetLocation.ExcelToEnumerable<OptionalParametersTestClass>(x => x
                         .UsingSheet("2Columns")
-                        .IgnoreColumnsWithoutMatchingProperties()
-                        .Property(y => y.Fee1).Optional()
-                        .Property(y => y.Fee2).Optional()
-                        .Property(y => y.Fee3) //In this example Fee3 is now a mandatory column
+                        .IgnoreColumnsWithoutMatchingProperties(true)
+                        .Property(y => y.Fee3).Optional(false) //In this example Fee3 is now a mandatory column
                 );
             });
             action.Should().Throw<ExcelToEnumerableInvalidHeaderException>();
@@ -240,8 +238,8 @@ namespace ExcelToEnumerable.Tests
             var testSpreadsheetLocation = TestHelper.TestsheetPath("OptionalColumns.xlsx");
             var result1 = testSpreadsheetLocation.ExcelToEnumerable<OptionalParametersTestClass>(x => x
                 .UsingSheet("4Columns")
-                .IgnoreColumnsWithoutMatchingProperties()
-                .AllPropertiesOptionalByDefault()
+                .IgnoreColumnsWithoutMatchingProperties(true)
+                .IgnorePropertiesWithoutMatchingColumns(true)
             );
             result1.Count().Should().Be(2);
             var first = result1.First();
@@ -264,8 +262,8 @@ namespace ExcelToEnumerable.Tests
             {
                 testSpreadsheetLocation.ExcelToEnumerable<OptionalParametersTestClass>(x => x
                     .UsingSheet("2Columns")
-                    .IgnoreColumnsWithoutMatchingProperties()
-                    .AllPropertiesOptionalByDefault()
+                    .IgnoreColumnsWithoutMatchingProperties(true)
+                    .IgnorePropertiesWithoutMatchingColumns(true)
                     .Property(y => y.Fee3).Optional()
                     .Property(y => y.Fee3).Optional(false)
                 );
@@ -563,8 +561,8 @@ namespace ExcelToEnumerable.Tests
             var exceptionList = new List<Exception>();
             var results = testSpreadsheetLocation.ExcelToEnumerable<CustomValidatorTestClass>(
                 x => x.Property(y => y.IsItCheese).UsesCustomValidator(
-                    o => o != null && o.ToString().IndexOf("cheese", StringComparison.Ordinal) > -1,
-                    "Should contain 'cheese'")
+                        o => o != null && o.ToString().IndexOf("cheese", StringComparison.Ordinal) > -1,
+                        "Should contain 'cheese'")
                     .OutputExceptionsTo(exceptionList)
             ).ToArray();
             results.Length.Should().Be(2);
@@ -793,11 +791,12 @@ namespace ExcelToEnumerable.Tests
             ExcelToEnumerableSheetException sheetException = null;
             try
             {
-                testSpreadsheetLocation.ExcelToEnumerable<TestClass>(x =>
-                    x.StartingFromRow(1)
-                        .UsingSheet("BadHeaderNames")
-                        .UsingHeaderNames(true)
-                        .AggregateExceptions()
+                testSpreadsheetLocation.ExcelToEnumerable<TestClass>(x => x
+                    .StartingFromRow(1)
+                    .IgnoreColumnsWithoutMatchingProperties(false)
+                    .UsingSheet("BadHeaderNames")
+                    .UsingHeaderNames(true)
+                    .AggregateExceptions()
                 );
             }
             catch (ExcelToEnumerableSheetException e)
@@ -815,11 +814,12 @@ namespace ExcelToEnumerable.Tests
             ExcelToEnumerableInvalidHeaderException sheetException = null;
             try
             {
-                testSpreadsheetLocation.ExcelToEnumerable<TestClass>(x =>
-                    x.StartingFromRow(1)
-                        .UsingSheet("EmptyColumnNames")
-                        .UsingHeaderNames(true)
-                        .AggregateExceptions()
+                testSpreadsheetLocation.ExcelToEnumerable<TestClass>(x => x
+                    .StartingFromRow(1)
+                    .IgnoreColumnsWithoutMatchingProperties(false)
+                    .UsingSheet("EmptyColumnNames")
+                    .UsingHeaderNames(true)
+                    .AggregateExceptions()
                 );
             }
             catch (ExcelToEnumerableInvalidHeaderException e)
@@ -1192,86 +1192,16 @@ namespace ExcelToEnumerable.Tests
             firstResult.Collection.First().Value.Should().Be("a");
         }
 
-        /// <summary>
-        ///     CSH 11012019 These are not real tests, it's just somewhere to check that the code in the documentation example
-        ///     actually compiles
-        /// </summary>
-        internal void Test()
+        [Fact]
+        public void AutoLocateHeaderWorks()
         {
-            var exceptionList = new List<Exception>();
-            var result = "filePath".ExcelToEnumerable<Product>(
-                //Specify the spreadsheet name:
-                x => x.UsingSheet("Prices")
-
-                    //Header on different row:
-                    .HeaderOnRow(2)
-
-                    //Data on different row:
-                    .StartingFromRow(4)
-
-                    //Stop reading data on row 10:
-                    .EndingWithRow(10)
-
-                    //Add validation exceptions to a list instead of throwing them:
-                    .OutputExceptionsTo(exceptionList)
-
-                    //Create a Product class even if the spreadsheet row is blank:
-                    .BlankRowBehaviour(BlankRowBehaviour.CreateEntity)
-
-                    //Execute arbitrary code after the header row has been read:
-                    .OnReadingHeaderRow(headerRowValues =>
-                    {
-                        foreach (var item in headerRowValues)
-                        {
-                            Console.WriteLine($"Found header label {item.Value} on column {item.Key}");
-                        }
-                    })
-
-                    //Lots of property validation options:
-                    .Property(y => y.ShippingLabel).Ignore()
-                    .Property(y => y.MinimumOrderQuantity).IsRequired()
-                    .Property(y => y.MinimumOrderQuantity).ShouldBeGreaterThan(0)
-                    .Property(y => y.Vat).ShouldBeOneOf("Standard", "Reduced", "2nd Reduced", "Zero")
-                    .Property(y => y.Measure).IsRequired()
-                    .Property(y => y.Id).ShouldBeUnique()
-                    .Property(y => y.SupplierDescription).UsesColumnNamed("Supplier Description")
-
-                    //Map a collection to a set of columns:
-                    .Property(y => y.SalesVolumes).MapFromColumns("Jan-Mar", "Apr-Jun", "Jul-Sep", "Oct-Dec")
-
-                    //Use a custom mapper to map to a Boolean property, for example:
-                    .Property(y => y.IsOnPromotion)
-                    .UsesCustomMapping(cellValueObject => cellValueObject.ToString() == "Yes!")
-
-                    //Map the sheet row number to a property on a class:
-                    .Property(y => y.SpreadsheetRowNumber).MapsToRowNumber()
-            );
-        }
-
-        // ReSharper disable once xUnit1013
-        internal void NoValidationConfigExample()
-        {
-            var spreadsheetStream = new MemoryStream();
-            var spreadsheetData = spreadsheetStream.ExcelToEnumerable<SpreadsheetRow>(o => o
-                .UsingHeaderNames(false)
-                .StartingFromRow(3) // - The data in this example starts on the 3rd row
-                .Property(c => c.Store).UsesColumnLetter("A")
-                .Property(c => c.Area).UsesColumnLetter("B")
-                .Property(c => c.MonFriTimes).UsesColumnLetter("C")
-                .Property(c => c.SatTimes).UsesColumnLetter("D")
-                .Property(c => c.SunTimes).UsesColumnLetter("E")
-                .Property(c => c.RowNumber).MapsToRowNumber());
-        }
-
-        public class SpreadsheetRow
-        {
-            public string Store { get; set; }
-            public string Area { get; set; }
-            public string MonFriTimes { get; set; }
-            public string SatTimes { get; set; }
-            public string SunTimes { get; set; }
-
-            public int RowNumber { get; set; }
+            var testSpreadsheetLocation = TestHelper.TestsheetPath("AutoLocateHeaderTest.xlsx");
+            var results = testSpreadsheetLocation.ExcelToEnumerable<AutoLocateHeaderTestClass>().ToArray();
+            results.Length.Should().Be(1);
+            var result = results.First();
+            result.Header.Should().Be("A");
+            result.Starts.Should().Be(1);
+            result.Here.Should().Be(new DateTime(2020, 11, 25));
         }
     }
 }
