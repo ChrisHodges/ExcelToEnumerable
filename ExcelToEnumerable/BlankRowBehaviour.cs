@@ -1,20 +1,26 @@
+using ExcelToEnumerable.Exceptions;
+
 namespace ExcelToEnumerable
 {
     /// <summary>
-    ///     Defines what ExcelToEnumerable should do when it encounters a blank row in the spreadsheet
-    ///     e.g.
-    ///     testSpreadsheetLocation.ExcelToEnumerable	&lt;SomeClass&gt; (x =>
-    ///     .BlankRowBehaviour(BlankRowBehaviour.ThrowException))
+    ///     Enum. Defines what ExcelToEnumerable should do when it encounters a blank row in the spreadsheet. Defaults to <c>ExcelToEnumerable.ThrowException</c>
     /// </summary>
+    /// <example>
+    /// <code>
+    /// IEnumerable&lt;MyClass&gt; results = spreadsheetStream.ExcelToEnumerable&lt;MyClass&gt;(x => x
+    ///   .BlankRowBehaviour(BlankRowBehaviour.ThrowException)
+    /// );
+    /// </code>
+    /// </example>
     public enum BlankRowBehaviour
     {
         /// <summary>
-        ///     Ignores the blank row, but continues reading the spreadsheet
+        ///     Ignores the blank row but continues reading the spreadsheet
         /// </summary>
         Ignore,
 
         /// <summary>
-        ///     Throws an ExcelToEnumerableRowException
+        ///     Stops reading the spreadsheet and throws an <see cref="ExcelToEnumerableRowException"/>
         /// </summary>
         ThrowException,
 
@@ -24,7 +30,7 @@ namespace ExcelToEnumerable
         StopReading,
 
         /// <summary>
-        ///     Creates an instance of type T, where T is the Enumerable type being mapped
+        ///     Creates an instance of the mapped type with the default constructor and continues reading the spreadsheet
         /// </summary>
         CreateEntity
     }

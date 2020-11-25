@@ -70,12 +70,12 @@ namespace ExcelToEnumerable
 
         public IExcelToEnumerableOptionsBuilder<T> ShouldBeUnique()
         {
-            if (_options.UniqueFields == null)
+            if (_options.UniqueProperties == null)
             {
-                _options.UniqueFields = new List<string>();
+                _options.UniqueProperties = new List<string>();
             }
 
-            _options.UniqueFields.Add(_propertyName);
+            _options.UniqueProperties.Add(_propertyName);
             return _optionsBuilder;
         }
 
@@ -99,12 +99,12 @@ namespace ExcelToEnumerable
 
         public IExcelToEnumerableOptionsBuilder<T> Ignore()
         {
-            if (_options.SkippedFields == null)
+            if (_options.UnmappedProperties == null)
             {
-                _options.SkippedFields = new List<string>();
+                _options.UnmappedProperties = new List<string>();
             }
 
-            _options.SkippedFields.Add(_propertyName);
+            _options.UnmappedProperties.Add(_propertyName);
             return _optionsBuilder;
         }
 
@@ -112,27 +112,32 @@ namespace ExcelToEnumerable
         {
             if (isOptional)
             {
-                _options.OptionalFields.Add(_propertyName);
-                _options.ExplictlyRequiredFields.Remove(_propertyName);
+                _options.OptionalProperties.Add(_propertyName);
+                _options.ExplicitlyRequiredProperties.Remove(_propertyName);
             }
             else
             {
-                _options.OptionalFields.Remove(_propertyName);
-                _options.ExplictlyRequiredFields.Add(_propertyName);
+                _options.OptionalProperties.Remove(_propertyName);
+                _options.ExplicitlyRequiredProperties.Add(_propertyName);
             }
 
             return _optionsBuilder;
         }
 
-        public IExcelToEnumerableOptionsBuilder<T> UsesCustomValidator(ExcelCellValidator excelCellValidator)
+        public IExcelToEnumerableOptionsBuilder<T> UsesCustomValidator(Func<object, bool> validator, string message)
         {
+            var excelCellValidator = new ExcelCellValidator
+            {
+                Message = message,
+                Validator = validator
+            };
             _options.Validations[_propertyName].Add(excelCellValidator);
             return _optionsBuilder;
         }
 
         public IExcelToEnumerableOptionsBuilder<T> MapsToRowNumber()
         {
-            _options.RowNumberColumn = _propertyName;
+            _options.RowNumberProperty = _propertyName;
             return _optionsBuilder;
         }
 
@@ -141,7 +146,7 @@ namespace ExcelToEnumerable
             if (i < 1)
             {
                 throw new ExcelToEnumerableConfigException(
-                    $"Unable to map '{_propertyName}' to column {i}. UsesColumnNumber expect a 1-based column number");
+                    $"Unable to map '{_propertyName}' to column {i}. UsesColumnNumber expects a 1-based column number");
             }
 
             _options.CustomHeaderNumbers[_propertyName] = i - 1;

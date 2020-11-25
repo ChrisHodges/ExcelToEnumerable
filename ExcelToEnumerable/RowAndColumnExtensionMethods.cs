@@ -2,7 +2,7 @@ using System;
 
 namespace ExcelToEnumerable
 {
-    public static class RowAndColumnExtensionMethods
+    internal static class RowAndColumnExtensionMethods
     {
         /// <summary>
         /// </summary>

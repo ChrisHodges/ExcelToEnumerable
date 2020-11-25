@@ -5,7 +5,7 @@ using System.Reflection;
 
 namespace ExcelToEnumerable
 {
-    public static class GetterSetterHelpers
+    internal static class GetterSetterHelpers
     {
         public static Func<object, object> GetGetter(PropertyInfo propertyInfo)
         {

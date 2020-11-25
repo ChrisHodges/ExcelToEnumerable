@@ -7,7 +7,6 @@ using ExcelToEnumerable.Exceptions;
 using LightWeightExcelReader;
 
 [assembly: InternalsVisibleTo("ExcelToEnumerable.Tests")]
-[assembly: InternalsVisibleTo("ExcelToEnumerable.Tests.Core")]
 
 namespace ExcelToEnumerable
 {
@@ -123,7 +122,7 @@ namespace ExcelToEnumerable
 
             var list = MainLoop(worksheet, fromRowConstructor, options);
 
-            if (_options.UniqueFields != null)
+            if (_options.UniqueProperties != null)
             {
                 list = CheckUniqueFields(fromRowConstructor, list);
             }
@@ -136,7 +135,7 @@ namespace ExcelToEnumerable
         private IEnumerable<T> CheckUniqueFields(FromRowConstructor fromRowConstructor, IEnumerable<T> list)
         {
             var itemsToRemove = new List<T>();
-            foreach (var uniqueField in _options.UniqueFields)
+            foreach (var uniqueField in _options.UniqueProperties)
             {
                 var getter = fromRowConstructor.Setters.First(x => x.ColumnName == uniqueField.ToLowerInvariant())
                     .Getter;
@@ -207,10 +206,10 @@ namespace ExcelToEnumerable
         private string[] HandleHeader(IExcelToEnumerableOptions<T> options, SheetReader worksheet)
         {
             string[] returnArray = null;
-            if (options.UseHeaderNames || _options.OnReadingerHeaderRowAction != null)
+            if (options.UseHeaderNames || _options.OnReadingHeaderRowAction != null)
             {
                 var header = GetHeaderRow(worksheet);
-                _options.OnReadingerHeaderRowAction?.Invoke(header);
+                _options.OnReadingHeaderRowAction?.Invoke(header);
                 if (_options.UseHeaderNames)
                 {
                     returnArray = header.Values.Select(x => x.ToLowerInvariant()).ToArray();

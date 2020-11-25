@@ -15,9 +15,9 @@ namespace ExcelToEnumerable
                 new Lazy<ExcelToEnumerableContext>
                     (() => new ExcelToEnumerableContext());
 
-        private readonly ConcurrentDictionary<IExcelToEnumerableOptions, FromRowConstructor>
+        private readonly ConcurrentDictionary<int, FromRowConstructor>
             _fromRowConstructorDictionary =
-                new ConcurrentDictionary<IExcelToEnumerableOptions, FromRowConstructor>();
+                new ConcurrentDictionary<int, FromRowConstructor>();
 
         private ExcelToEnumerableContext()
         {
@@ -27,20 +27,22 @@ namespace ExcelToEnumerable
 
         public FromRowConstructor GetFromRowConstructor<T>(IExcelToEnumerableOptions<T> options)
         {
-            return _fromRowConstructorDictionary.ContainsKey(options)
-                ? _fromRowConstructorDictionary[options]
+            var hashCode = options.GetHashCode();
+            return _fromRowConstructorDictionary.ContainsKey(hashCode)
+                ? _fromRowConstructorDictionary[hashCode]
                 : null;
         }
 
         public FromRowConstructor SetFromRowConstructor<T>(IExcelToEnumerableOptions<T> options)
         {
-            if (_fromRowConstructorDictionary.ContainsKey(options))
+            var hashCode = options.GetHashCode();
+            if (_fromRowConstructorDictionary.ContainsKey(hashCode))
             {
-                return _fromRowConstructorDictionary[options];
+                return _fromRowConstructorDictionary[hashCode];
             }
 
             var fromRowConstructor = CreateFromRowConstructorFromPropertyDescriptorCollection(options);
-            _fromRowConstructorDictionary.TryAdd(options, fromRowConstructor);
+            _fromRowConstructorDictionary.TryAdd(hashCode, fromRowConstructor);
             return fromRowConstructor;
         }
 
@@ -48,25 +50,17 @@ namespace ExcelToEnumerable
         {
             var propertyDescriptorCollection = TypeDescriptor.GetProperties(type);
             var list = propertyDescriptorCollection.Cast<PropertyDescriptor>();
-            if (options.SkippedFields != null)
+            if (options.UnmappedProperties != null)
             {
-                list = list.Where(x => !options.SkippedFields.Contains(x.Name));
+                list = list.Where(x => !options.UnmappedProperties.Contains(x.Name));
             }
 
             return list.Select(x =>
                     GetSettersForProperty(type.GetProperty(x.Name), Array.IndexOf(list.ToArray(), x), options))
                 .SelectMany(y => y).ToArray();
         }
-
-        /// <summary>
-        ///     This usually returns a single setter apart from where the property is of type IEnumerable
-        /// </summary>
-        /// <param name="propertyInfo"></param>
-        /// <param name="index"></param>
-        /// <param name="options"></param>
-        /// <typeparam name="T"></typeparam>
-        /// <returns></returns>
-        internal IEnumerable<FromCellSetter> GetSettersForProperty<T>(PropertyInfo propertyInfo, int index,
+        
+        private IEnumerable<FromCellSetter> GetSettersForProperty<T>(PropertyInfo propertyInfo, int index,
             IExcelToEnumerableOptions<T> options)
         {
             if (propertyInfo.PropertyType != typeof(string) &&
@@ -82,7 +76,7 @@ namespace ExcelToEnumerable
             }
 
             var setter = GetterSetterHelpers.GetSetter(propertyInfo);
-            var getter = options.UniqueFields != null && options.UniqueFields.Contains(propertyInfo.Name)
+            var getter = options.UniqueProperties != null && options.UniqueProperties.Contains(propertyInfo.Name)
                 ? GetterSetterHelpers.GetGetter(propertyInfo)
                 : null;
             var fromCellSetter = new FromCellSetter
@@ -101,7 +95,7 @@ namespace ExcelToEnumerable
                         ? DefaultTypeMappers.Dictionary[propertyInfo.PropertyType]
                         : null
             };
-            if (propertyInfo.Name == options.RowNumberColumn)
+            if (propertyInfo.Name == options.RowNumberProperty)
             {
                 fromCellSetter.ColumnName = null;
             }
@@ -152,7 +146,7 @@ namespace ExcelToEnumerable
         public void CreateMapper<T>(IExcelToEnumerableOptions<T> options)
         {
             var fromRowConstructor = CreateFromRowConstructorFromPropertyDescriptorCollection(options);
-            _fromRowConstructorDictionary.TryAdd(options, fromRowConstructor);
+            _fromRowConstructorDictionary.TryAdd(options.GetHashCode(), fromRowConstructor);
         }
     }
 }

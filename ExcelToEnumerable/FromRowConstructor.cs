@@ -65,24 +65,24 @@ namespace ExcelToEnumerable
         private void ValidateColumnNames<T>(string[] headerNames, IExcelToEnumerableOptions<T> options)
         {
             IEnumerable<string> namesOnSpreadsheet = headerNames;
-            if (options.SkippedFields != null)
+            if (options.UnmappedProperties != null)
             {
-                namesOnSpreadsheet = namesOnSpreadsheet.Except(options.SkippedFields.Select(y => y.ToLowerInvariant()));
+                namesOnSpreadsheet = namesOnSpreadsheet.Except(options.UnmappedProperties.Select(y => y.ToLowerInvariant()));
             }
 
-            if (options.OptionalFields != null)
+            if (options.OptionalProperties != null)
             {
                 namesOnSpreadsheet =
-                    namesOnSpreadsheet.Except(options.OptionalFields.Select(y => y.ToLowerInvariant())).OrderBy(y => y);
+                    namesOnSpreadsheet.Except(options.OptionalProperties.Select(y => y.ToLowerInvariant())).OrderBy(y => y);
             }
 
             namesOnSpreadsheet = namesOnSpreadsheet.OrderBy(x => x);
             var namesOnConfig = Setters.Where(x => x.ColumnName != null).Select(x => x.ColumnName.ToLowerInvariant())
                 .OrderBy(y => y);
-            if (options.OptionalFields != null)
+            if (options.OptionalProperties != null)
             {
                 namesOnConfig =
-                    namesOnConfig.Except(options.OptionalFields.Select(y => y.ToLowerInvariant())).OrderBy(y => y);
+                    namesOnConfig.Except(options.OptionalProperties.Select(y => y.ToLowerInvariant())).OrderBy(y => y);
             }
 
             if (options.IgnoreColumnsWithoutMatchingProperties)
@@ -305,9 +305,9 @@ namespace ExcelToEnumerable
                 }
             }
 
-            if (options.RowNumberColumn != null)
+            if (options.RowNumberProperty != null)
             {
-                var setter = Setters.First(x => x.PropertyName == options.RowNumberColumn);
+                var setter = Setters.First(x => x.PropertyName == options.RowNumberProperty);
                 setter.Setter(obj, rowCount);
             }
 

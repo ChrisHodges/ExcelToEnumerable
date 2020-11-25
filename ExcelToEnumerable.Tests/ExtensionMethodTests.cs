@@ -34,7 +34,7 @@ namespace ExcelToEnumerable.Tests
         {
             var testSpreadsheetLocation = TestHelper.TestsheetPath("PropertyNamesIgnoreAndWhitespaceTests.xlsx");
             var result = testSpreadsheetLocation.ExcelToEnumerable<IgnorePropertyNamesTestClass>(x => x
-                .IgnoreColumsWithoutMatchingProperties()
+                .IgnoreColumnsWithoutMatchingProperties()
                 .Property(y => y.NotOnSpreadsheet).Ignore()
                 .Property(y => y.ColumnA).MapFromColumns("A", "B")
                 .Property(y => y.ColumnA).UsesColumnNamed("Column A")
@@ -177,7 +177,7 @@ namespace ExcelToEnumerable.Tests
             var testSpreadsheetLocation = TestHelper.TestsheetPath("OptionalColumns.xlsx");
             var result1 = testSpreadsheetLocation.ExcelToEnumerable<OptionalParametersTestClass>(x => x
                 .UsingSheet("2Columns")
-                .IgnoreColumsWithoutMatchingProperties()
+                .IgnoreColumnsWithoutMatchingProperties()
                 .Property(y => y.Fee1).Optional()
                 .Property(y => y.Fee2).Optional()
                 .Property(y => y.Fee3).Optional()
@@ -198,7 +198,7 @@ namespace ExcelToEnumerable.Tests
         {
             var testSpreadsheetLocation = TestHelper.TestsheetPath("OptionalColumns.xlsx");
             var result1 = testSpreadsheetLocation.ExcelToEnumerable<OptionalParametersTestClass>(x => x
-                .IgnoreColumsWithoutMatchingProperties()
+                .IgnoreColumnsWithoutMatchingProperties()
                 .UsingSheet("4Columns")
                 .Property(y => y.Fee1).Optional()
                 .Property(y => y.Fee2).Optional()
@@ -225,7 +225,7 @@ namespace ExcelToEnumerable.Tests
             {
                 testSpreadsheetLocation.ExcelToEnumerable<OptionalParametersTestClass>(x => x
                         .UsingSheet("2Columns")
-                        .IgnoreColumsWithoutMatchingProperties()
+                        .IgnoreColumnsWithoutMatchingProperties()
                         .Property(y => y.Fee1).Optional()
                         .Property(y => y.Fee2).Optional()
                         .Property(y => y.Fee3) //In this example Fee3 is now a mandatory column
@@ -240,7 +240,7 @@ namespace ExcelToEnumerable.Tests
             var testSpreadsheetLocation = TestHelper.TestsheetPath("OptionalColumns.xlsx");
             var result1 = testSpreadsheetLocation.ExcelToEnumerable<OptionalParametersTestClass>(x => x
                 .UsingSheet("4Columns")
-                .IgnoreColumsWithoutMatchingProperties()
+                .IgnoreColumnsWithoutMatchingProperties()
                 .AllPropertiesOptionalByDefault()
             );
             result1.Count().Should().Be(2);
@@ -264,7 +264,7 @@ namespace ExcelToEnumerable.Tests
             {
                 testSpreadsheetLocation.ExcelToEnumerable<OptionalParametersTestClass>(x => x
                     .UsingSheet("2Columns")
-                    .IgnoreColumsWithoutMatchingProperties()
+                    .IgnoreColumnsWithoutMatchingProperties()
                     .AllPropertiesOptionalByDefault()
                     .Property(y => y.Fee3).Optional()
                     .Property(y => y.Fee3).Optional(false)
@@ -563,13 +563,8 @@ namespace ExcelToEnumerable.Tests
             var exceptionList = new List<Exception>();
             var results = testSpreadsheetLocation.ExcelToEnumerable<CustomValidatorTestClass>(
                 x => x.Property(y => y.IsItCheese).UsesCustomValidator(
-                        new ExcelCellValidator
-                        {
-                            Message = "Should contain 'cheese'",
-                            // ReSharper disable once PossibleNullReferenceException
-                            Validator = o => o != null && o.ToString().IndexOf("cheese", StringComparison.Ordinal) > -1
-                        }
-                    )
+                    o => o != null && o.ToString().IndexOf("cheese", StringComparison.Ordinal) > -1,
+                    "Should contain 'cheese'")
                     .OutputExceptionsTo(exceptionList)
             ).ToArray();
             results.Length.Should().Be(2);
@@ -627,17 +622,19 @@ namespace ExcelToEnumerable.Tests
         public void DefaultExceptionHandlingWorks()
         {
             ///CSH 12-11-2019: This should throw an exception on Row 1 as we're expecting the first row 
-            ///in the spreadsheet to be data, and in 'TestSpreadsheet4Errors.xlsx' the first row
+            ///in the spreadsheet to be data, but in 'TestSpreadsheet4Errors.xlsx' the first row
             ///is a header
             var testSpreadsheetLocation = TestHelper.TestsheetPath("TestSpreadsheet4Errors.xlsx");
             ExcelToEnumerableCellException excelToEnumerableCellException = null;
-            Action action = () =>
+
+            void Action()
             {
                 testSpreadsheetLocation.ExcelToEnumerable<TestClass>(x => x.UsingHeaderNames(false));
-            };
+            }
+
             try
             {
-                action();
+                Action();
             }
             catch (ExcelToEnumerableCellException e)
             {
@@ -1199,7 +1196,7 @@ namespace ExcelToEnumerable.Tests
         ///     CSH 11012019 These are not real tests, it's just somewhere to check that the code in the documentation example
         ///     actually compiles
         /// </summary>
-        public void Test()
+        internal void Test()
         {
             var exceptionList = new List<Exception>();
             var result = "filePath".ExcelToEnumerable<Product>(
@@ -1251,7 +1248,8 @@ namespace ExcelToEnumerable.Tests
             );
         }
 
-        public void NoValidationConfigExample()
+        // ReSharper disable once xUnit1013
+        internal void NoValidationConfigExample()
         {
             var spreadsheetStream = new MemoryStream();
             var spreadsheetData = spreadsheetStream.ExcelToEnumerable<SpreadsheetRow>(o => o

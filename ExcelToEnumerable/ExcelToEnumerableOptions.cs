@@ -1,16 +1,20 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Runtime.Serialization.Formatters.Binary;
+using System.Security.Cryptography;
 
 namespace ExcelToEnumerable
 {
+    [Serializable]
     internal class ExcelToEnumerableOptions<T> : IExcelToEnumerableOptions<T>
     {
         private Dictionary<string, string> _customHeaderNames;
         private Dictionary<string, Func<object, object>> _customMappings;
         private IEnumerable<string> _loweredRequiredColumns;
         private List<string> _requiredFields = new List<string>();
-        private string rowNumberColumn;
+        private string _rowNumberColumn;
 
         public ExcelToEnumerableOptions()
         {
@@ -26,12 +30,11 @@ namespace ExcelToEnumerable
 
         public bool UseHeaderNames { get; set; }
 
-        public int StartRow { get; set; }
+        public int StartRow { get; set; } = 1;
 
         public BlankRowBehaviour BlankRowBehaviour { get; internal set; }
 
         public ExceptionHandlingBehaviour ExceptionHandlingBehaviour { get; set; }
-        public Type MappedType { get; set; }
 
         public IList<string> RequiredFields
         {
@@ -59,10 +62,10 @@ namespace ExcelToEnumerable
         public string WorksheetName { get; set; }
 
         public int? WorksheetNumber { get; set; }
-        public List<string> UniqueFields { get; set; }
+        public List<string> UniqueProperties { get; set; }
         public int? EndRow { get; internal set; }
         public int HeaderRow { get; internal set; }
-        public Action<IDictionary<int, string>> OnReadingerHeaderRowAction { get; internal set; }
+        public Action<IDictionary<int, string>> OnReadingHeaderRowAction { get; internal set; }
 
         public Dictionary<string, Func<object, object>> CustomMappings
         {
@@ -90,23 +93,23 @@ namespace ExcelToEnumerable
             }
         }
 
-        public List<string> SkippedFields { get; set; }
+        public List<string> UnmappedProperties { get; set; }
 
-        public string RowNumberColumn
+        public string RowNumberProperty
         {
-            get => rowNumberColumn;
+            get => _rowNumberColumn;
             set
             {
-                LoweredRowNumberColumn = value.ToLowerInvariant();
-                rowNumberColumn = value;
+                LoweredRowNumberProperty = value.ToLowerInvariant();
+                _rowNumberColumn = value;
             }
         }
 
-        public string LoweredRowNumberColumn { get; private set; }
+        public string LoweredRowNumberProperty { get; private set; }
         public Dictionary<string, int> CustomHeaderNumbers { get; } = new Dictionary<string, int>();
-        public List<string> OptionalFields { get; set; } = new List<string>();
+        public List<string> OptionalProperties { get; set; } = new List<string>();
         public bool IgnoreColumnsWithoutMatchingProperties { get; set; }
-        public List<string> ExplictlyRequiredFields { get; set; } = new List<string>();
+        public List<string> ExplicitlyRequiredProperties { get; set; } = new List<string>();
 
         private IEnumerable<string> CreateLoweredRequiredColumns()
         {

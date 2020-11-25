@@ -2,13 +2,12 @@ using System;
 
 namespace ExcelToEnumerable.Exceptions
 {
+    /// <summary>
+    /// Thrown when an invalid configuration is encountered by the mapper.
+    /// </summary>
     public class ExcelToEnumerableConfigException : ExcelToEnumerableException
     {
-        public ExcelToEnumerableConfigException(string message, Exception exception) : base(message, exception)
-        {
-        }
-
-        public ExcelToEnumerableConfigException(string message) : base(message)
+        internal ExcelToEnumerableConfigException(string message) : base(message)
         {
         }
     }

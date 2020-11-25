@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace ExcelToEnumerable
 {
-    public class FromCellSetter
+    internal class FromCellSetter
     {
         public Action<object, object> Setter { get; set; }
 
