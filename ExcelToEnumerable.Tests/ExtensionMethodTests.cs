@@ -573,7 +573,7 @@ namespace ExcelToEnumerable.Tests
                 .Be("Unable to set value 'regret' to property 'isitcheese' on row 4 column A. Should contain 'cheese'");
         }
 
-        [Fact]
+        [Fact(Skip = "Temporarily skipped as slowing tests down. CH 25112020")]
         public void ReadsMillionsOfCells()
         {
             var testSpreadsheetLocation = TestHelper.TestsheetPath("OneMillionCells.xlsx");
@@ -828,8 +828,8 @@ namespace ExcelToEnumerable.Tests
             }
 
             sheetException.MissingProperties.Count().Should().Be(2);
-            sheetException.MissingProperties.Single(x => x == "**blank column** (b)");
-            sheetException.MissingProperties.Single(x => x == "**blank column** (c)");
+            sheetException.MissingProperties.Single(x => x == "**blankcolumn**(b)");
+            sheetException.MissingProperties.Single(x => x == "**blankcolumn**(c)");
         }
 
         [Fact]
@@ -1202,6 +1202,29 @@ namespace ExcelToEnumerable.Tests
             result.Header.Should().Be("A");
             result.Starts.Should().Be(1);
             result.Here.Should().Be(new DateTime(2020, 11, 25));
+        }
+
+        [Fact]
+        public void FuzzyMatchingOfHeaderNamesWorks()
+        {
+            var testSpreadsheetLocation = TestHelper.TestsheetPath("FuzzyMatchHeaderNames.xlsx");
+            var results = testSpreadsheetLocation.ExcelToEnumerable<FuzzyMatchHeaderNamesTestClass>(
+                x => x
+                    .IgnoreColumnsWithoutMatchingProperties(false)
+                    .IgnorePropertiesWithoutMatchingColumns(false)).ToArray();
+            results.Length.Should().Be(1);
+            var result = results.First();
+            result.FlatCase.Should().Be(1);
+            result.UpperFlatCase.Should().Be(1);
+            result.CamelCase.Should().Be(1);
+            result.PascalCase.Should().Be(1);
+            result.SnakeCase.Should().Be(1);
+            result.ScreamingSnakeCase.Should().Be(1);
+            result.CamelSnakeCase.Should().Be(1);
+            result.KebabCase.Should().Be(1);
+            result.CobolCase.Should().Be(1);
+            result.TrainCase.Should().Be(1);
+            result.WhiteSpace.Should().Be(1);
         }
     }
 }

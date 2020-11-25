@@ -5,6 +5,7 @@ using Xunit;
 
 namespace ExcelToEnumerable.Tests
 {
+
     public class GetterSetterHelperTests
     {
         [Fact]

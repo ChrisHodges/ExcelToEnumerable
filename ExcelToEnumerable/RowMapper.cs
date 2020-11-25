@@ -7,102 +7,18 @@ using SpreadsheetCellRef;
 
 namespace ExcelToEnumerable
 {
-    internal class FromRowConstructor
+    internal class RowMapper
     {
-        private IDictionary<int, FromCellSetter> _cellSettersDictionaryForRead;
+        private IDictionary<int, PropertySetter> _cellSettersDictionaryForRead;
         private object _currentObject;
 
-        public Dictionary<int, object> RowValues { get; set; }
+        private Dictionary<int, object> RowValues { get; set; }
 
         public Dictionary<string, object> RowValuesByColumRef { get; set; } = new Dictionary<string, object>();
 
-        public Type Type { get; set; }
+        public IEnumerable<PropertySetter> Setters { get; set; }
 
-        public IEnumerable<FromCellSetter> Setters { get; set; }
-
-        public bool RowIsPopulated { get; set; }
-
-        public void SetCellSettersDictionaryForRead<T>(string[] headerNames, IExcelToEnumerableOptions<T> options)
-        {
-            if (headerNames == null)
-            {
-                var i = 0;
-                _cellSettersDictionaryForRead = new Dictionary<int, FromCellSetter>();
-                foreach (var item in Setters)
-                {
-                    var columnNumber = options.CustomHeaderNumbers.ContainsKey(item.PropertyName)
-                        ? options.CustomHeaderNumbers[item.PropertyName]
-                        : i;
-                    if (_cellSettersDictionaryForRead.ContainsKey(columnNumber))
-                    {
-                        throw new ExcelToEnumerableConfigException(
-                            $"Trying to map property '{item.PropertyName}' to column '{CellRef.NumberToColumnName(columnNumber + 1)}' but that column is already mapped to property '{_cellSettersDictionaryForRead[columnNumber].PropertyName}'. If you're not using header names then all properties need to be mapped to a column or explicitly ignored.");
-                    }
-
-                    _cellSettersDictionaryForRead.Add(columnNumber, item);
-                    i++;
-                }
-            }
-            else
-            {
-                ValidateColumnNames(headerNames, options);
-
-                var index = 0;
-                _cellSettersDictionaryForRead = new Dictionary<int, FromCellSetter>();
-                foreach (var headerName in headerNames)
-                {
-                    var cellSetter = Setters.Where(x => x.ColumnName != null)
-                        .FirstOrDefault(x => x.ColumnName.ToLowerInvariant() == headerName);
-                    if (cellSetter != null)
-                    {
-                        _cellSettersDictionaryForRead.Add(index, cellSetter);
-                    }
-
-                    index++;
-                }
-            }
-        }
-
-        private void ValidateColumnNames<T>(string[] headerNames, IExcelToEnumerableOptions<T> options)
-        {
-            IEnumerable<string> namesOnSpreadsheet = headerNames;
-            if (options.UnmappedProperties != null)
-            {
-                namesOnSpreadsheet = namesOnSpreadsheet.Except(options.UnmappedProperties.Select(y => y.ToLowerInvariant()));
-            }
-
-            if (options.OptionalProperties != null)
-            {
-                namesOnSpreadsheet =
-                    namesOnSpreadsheet.Except(options.OptionalProperties.Select(y => y.ToLowerInvariant())).OrderBy(y => y);
-            }
-
-            namesOnSpreadsheet = namesOnSpreadsheet.OrderBy(x => x);
-            var namesOnConfig = Setters.Where(x => x.ColumnName != null).Select(x => x.ColumnName.ToLowerInvariant())
-                .OrderBy(y => y);
-            if (options.OptionalProperties != null)
-            {
-                namesOnConfig =
-                    namesOnConfig.Except(options.OptionalProperties.Select(y => y.ToLowerInvariant())).OrderBy(y => y);
-            }
-
-            if (options.IgnoreColumnsWithoutMatchingProperties)
-            {
-                if (namesOnConfig.Except(namesOnSpreadsheet).Count() > 0)
-                {
-                    throw new ExcelToEnumerableInvalidHeaderException(namesOnConfig.Except(namesOnSpreadsheet),
-                        namesOnConfig.Except(namesOnConfig));
-                }
-            }
-            else
-            {
-                if (string.Join(",", namesOnSpreadsheet) != string.Join(",", namesOnConfig))
-                {
-                    throw new ExcelToEnumerableInvalidHeaderException(namesOnConfig.Except(namesOnSpreadsheet),
-                        namesOnSpreadsheet.Except(namesOnConfig));
-                }
-            }
-        }
+        public bool RowIsPopulated { get; private set; }
 
         public void ReadRowValues(SheetReader sheetReader)
         {
@@ -227,11 +143,9 @@ namespace ExcelToEnumerable
         {
             _currentObject = obj;
             var success = true;
-            List<string> fieldsPresentInThisRow = null;
-            if (options.RequiredFields != null && options.RequiredFields.Any())
-            {
-                fieldsPresentInThisRow = new List<string>();
-            }
+            List<string> fieldsPresentInThisRow = (options.RequiredFields != null && options.RequiredFields.Any())
+                ? new List<string>()
+                : null;
 
             foreach (var item in RowValues)
             {
@@ -239,35 +153,25 @@ namespace ExcelToEnumerable
                 var fromCellSetter = _cellSettersDictionaryForRead[item.Key];
                 var isRequiredAlreadyAdded = false;
                 var invalidCast = false;
-                if (fromCellSetter.CustomMapping != null)
+
+                try
                 {
-                    try
-                    {
-                        cellValue = fromCellSetter.CustomMapping(cellValue);
-                        fromCellSetter.Setter(obj, cellValue);
-                    }
-                    catch (Exception e)
-                    {
-                        HandleException(cellValue, fromCellSetter.ColumnName, rowCount, item.Key, options,
-                            exceptionsList, e, null, "Value is invalid");
-                        success = false;
-                        invalidCast = true;
-                    }
+                    cellValue = fromCellSetter.CustomMapping != null
+                        ? fromCellSetter.CustomMapping(cellValue)
+                        : ConvertType(cellValue, fromCellSetter.Type);
+                    fromCellSetter.Setter(obj, cellValue);
                 }
-                else
+                catch (Exception e)
                 {
-                    try
+                    if (fromCellSetter.CustomMapping == null && !(e is InvalidCastException))
                     {
-                        cellValue = ConvertType(cellValue, fromCellSetter.Type);
-                        fromCellSetter.Setter(obj, cellValue);
+                        throw;
                     }
-                    catch (InvalidCastException e)
-                    {
-                        HandleException(cellValue, fromCellSetter.ColumnName, rowCount, item.Key, options,
-                            exceptionsList, e, null, "Value is invalid");
-                        success = false;
-                        invalidCast = true;
-                    }
+
+                    HandleException(cellValue, fromCellSetter.ColumnName, rowCount, item.Key, options,
+                        exceptionsList, e, null, "Value is invalid");
+                    success = false;
+                    invalidCast = true;
                 }
 
                 if (fromCellSetter.Validators != null && !invalidCast)
@@ -331,29 +235,9 @@ namespace ExcelToEnumerable
                 setterKvp.Value.ColumnName, RowValuesByColumRef, msg);
         }
 
-        public void PrepareForRead<T>(string[] headerArray, IExcelToEnumerableOptions<T> options)
+        public void SetCellSettersDictionaryForRead(IDictionary<int, PropertySetter> cellSettersDictionaryForRead)
         {
-            SetCellSettersDictionaryForRead(headerArray, options);
-            if (options.Validations != null)
-            {
-                foreach (var item in options.Validations)
-                {
-                    var cellSetter = _cellSettersDictionaryForRead.Values.FirstOrDefault(x =>
-                        x.ColumnName?.ToLowerInvariant() == item.Key.ToLowerInvariant());
-                    if (cellSetter != null)
-                    {
-                        if (cellSetter.Validators == null)
-                        {
-                            cellSetter.Validators = new List<ExcelCellValidator>();
-                        }
-
-                        foreach (var validator in item.Value)
-                        {
-                            cellSetter.Validators.Add(validator);
-                        }
-                    }
-                }
-            }
+            _cellSettersDictionaryForRead = cellSettersDictionaryForRead;
         }
     }
 }

@@ -2,7 +2,7 @@ namespace ExcelToEnumerable
 {
     internal interface IExcelToEnumerableContext
     {
-        FromRowConstructor SetFromRowConstructor<T>(IExcelToEnumerableOptions<T> options);
-        FromRowConstructor GetFromRowConstructor<T>(IExcelToEnumerableOptions<T> options);
+        RowMapper SetRowMapper<T>(IExcelToEnumerableOptions<T> options);
+        RowMapper GetRowMapper<T>(IExcelToEnumerableOptions<T> options);
     }
 }

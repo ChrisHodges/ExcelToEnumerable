@@ -11,7 +11,7 @@ namespace ExcelToEnumerable.Tests
         {
             var options = new ExcelToEnumerableOptions<TestClass2>();
             ExcelToEnumerableContext.Instance.CreateMapper(options);
-            var fromRowConstructor = ExcelToEnumerableContext.Instance.GetFromRowConstructor(options);
+            var fromRowConstructor = ExcelToEnumerableContext.Instance.GetRowMapper(options);
             fromRowConstructor.Setters.Count().Should().Be(14);
         }
 

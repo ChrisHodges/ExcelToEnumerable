@@ -17,7 +17,7 @@ namespace ExcelToEnumerable
 
         private IExcelToEnumerableOptions<T> _options;
 
-        private IEnumerable<T> HandleCreateEntityBehaviour(SheetReader worksheet, FromRowConstructor fromRowConstructor)
+        private IEnumerable<T> HandleCreateEntityBehaviour(SheetReader worksheet, RowMapper rowMapper)
         {
             var list = new List<T>();
             var rowDiff = worksheet.CurrentRowNumber - worksheet.PreviousRowNumber;
@@ -30,9 +30,9 @@ namespace ExcelToEnumerable
             }
 
             var obj = new T();
-            if (fromRowConstructor.RowIsPopulated)
+            if (rowMapper.RowIsPopulated)
             {
-                fromRowConstructor.AddPropertiesFromRowValues(obj, worksheet.CurrentRowNumber.Value, _options,
+                rowMapper.AddPropertiesFromRowValues(obj, worksheet.CurrentRowNumber.Value, _options,
                     _exceptionList);
             }
 
@@ -40,9 +40,10 @@ namespace ExcelToEnumerable
             return list;
         }
 
-        private IEnumerable<T> MainLoop(SheetReader worksheet, FromRowConstructor fromRowConstructor,
-            IExcelToEnumerableOptions<T> options)
+        private IEnumerable<T> MainLoop(SheetReader worksheet, RowMapper rowMapper,
+            IExcelToEnumerableOptions<T> options, IDictionary<int, PropertySetter> cellSettersDictionaryForRead)
         {
+            rowMapper.SetCellSettersDictionaryForRead(cellSettersDictionaryForRead);
             var list = new List<T>();
             do
             {
@@ -51,16 +52,16 @@ namespace ExcelToEnumerable
                     break;
                 }
 
-                fromRowConstructor.ReadRowValues(worksheet);
+                rowMapper.ReadRowValues(worksheet);
                 var rowNumber = worksheet.CurrentRowNumber.Value;
                 switch (options.BlankRowBehaviour)
                 {
                     case BlankRowBehaviour.CreateEntity:
-                        var newEntities = HandleCreateEntityBehaviour(worksheet, fromRowConstructor);
+                        var newEntities = HandleCreateEntityBehaviour(worksheet, rowMapper);
                         list.AddRange(newEntities);
                         break;
                     case BlankRowBehaviour.Ignore:
-                        var item = HandleIgnoreBehaviour(fromRowConstructor, rowNumber);
+                        var item = HandleIgnoreBehaviour(rowMapper, rowNumber);
                         if (item != null)
                         {
                             list.Add(item);
@@ -69,7 +70,7 @@ namespace ExcelToEnumerable
                         break;
                     case BlankRowBehaviour.StopReading:
                         var continu =
-                            HandleStopReadingOrThrowExceptionBehaviour(worksheet, list, fromRowConstructor);
+                            HandleStopReadingOrThrowExceptionBehaviour(worksheet, list, rowMapper);
                         if (!continu)
                         {
                             return list;
@@ -78,19 +79,19 @@ namespace ExcelToEnumerable
                         break;
                     case BlankRowBehaviour.ThrowException:
                         var addedRow =
-                            HandleStopReadingOrThrowExceptionBehaviour(worksheet, list, fromRowConstructor);
+                            HandleStopReadingOrThrowExceptionBehaviour(worksheet, list, rowMapper);
                         if (!addedRow)
                         {
                             throw new ExcelToEnumerableRowException(
                                 null,
                                 $"Blank row found at row: '{rowNumber}'", rowNumber,
-                                fromRowConstructor.RowValuesByColumRef);
+                                rowMapper.RowValuesByColumRef);
                         }
 
                         break;
                 }
 
-                fromRowConstructor.Clear();
+                rowMapper.Clear();
             } while (worksheet.ReadNext());
 
             return list;
@@ -109,23 +110,24 @@ namespace ExcelToEnumerable
             {
                 worksheet.ReadNext();
             }
-
-            var fromRowConstructor = excelToEnumerableContext.GetFromRowConstructor(_options) ??
-                                     excelToEnumerableContext.SetFromRowConstructor(_options);
-
-            var headerArray = HandleHeader(options, worksheet);
-            fromRowConstructor.PrepareForRead(headerArray, options);
-
+            
             _exceptionList =
                 options.ExceptionHandlingBehaviour == ExceptionHandlingBehaviour.ThrowOnFirstException
                     ? null
                     : new List<Exception>();
 
-            var list = MainLoop(worksheet, fromRowConstructor, options);
+            var rowMapper = excelToEnumerableContext.GetRowMapper(_options) ??
+                                     excelToEnumerableContext.SetRowMapper(_options);
+
+            var headerArray = ReadHeader(options, worksheet);
+            var headerHandler = new HeaderHandler(rowMapper.Setters);
+            var cellSettersDictionaryForRead = headerHandler.GetPropertySetterDictionary(headerArray, options);
+
+            var list = MainLoop(worksheet, rowMapper, options, cellSettersDictionaryForRead);
 
             if (_options.UniqueProperties != null)
             {
-                list = CheckUniqueFields(fromRowConstructor, list);
+                list = CheckUniqueFields(rowMapper, list);
             }
 
             HandleAggregatedExceptions();
@@ -133,12 +135,12 @@ namespace ExcelToEnumerable
             return list;
         }
 
-        private IEnumerable<T> CheckUniqueFields(FromRowConstructor fromRowConstructor, IEnumerable<T> list)
+        private IEnumerable<T> CheckUniqueFields(RowMapper rowMapper, IEnumerable<T> list)
         {
             var itemsToRemove = new List<T>();
             foreach (var uniqueField in _options.UniqueProperties)
             {
-                var getter = fromRowConstructor.Setters.First(x => x.ColumnName == uniqueField.ToLowerInvariant())
+                var getter = rowMapper.Setters.First(x => x.ColumnName == uniqueField.ToLowerInvariant())
                     .Getter;
                 var kvps = list.Select(x => new KeyValuePair<object, T>(getter(x), x));
                 var dupes = kvps.GroupBy(x => x.Key)
@@ -204,17 +206,13 @@ namespace ExcelToEnumerable
             }
         }
 
-        private string[] HandleHeader(IExcelToEnumerableOptions<T> options, SheetReader worksheet)
+        private IDictionary<int, string> ReadHeader(IExcelToEnumerableOptions<T> options, SheetReader worksheet)
         {
-            string[] returnArray = null;
+            IDictionary<int, string> header = null;
             if (options.UseHeaderNames || _options.OnReadingHeaderRowAction != null)
             {
-                var header = GetHeaderRow(worksheet);
+                header = GetHeaderRow(worksheet);
                 _options.OnReadingHeaderRowAction?.Invoke(header);
-                if (_options.UseHeaderNames)
-                {
-                    returnArray = header.Values.Select(x => x.ToLowerInvariant()).ToArray();
-                }
             }
 
             while (worksheet.CurrentRowNumber < options.StartRow)
@@ -222,11 +220,11 @@ namespace ExcelToEnumerable
                 worksheet.ReadNext();
             }
 
-            return returnArray;
+            return header;
         }
 
         private bool HandleStopReadingOrThrowExceptionBehaviour(SheetReader worksheet, List<T> list,
-            FromRowConstructor fromRowConstructor)
+            RowMapper rowMapper)
         {
             var rowDiff = worksheet.CurrentRowNumber - worksheet.PreviousRowNumber;
             if (rowDiff > 1)
@@ -234,10 +232,10 @@ namespace ExcelToEnumerable
                 return false;
             }
 
-            if (fromRowConstructor.RowIsPopulated)
+            if (rowMapper.RowIsPopulated)
             {
                 var obj = new T();
-                if (fromRowConstructor.AddPropertiesFromRowValues(obj, worksheet.CurrentRowNumber.Value, _options,
+                if (rowMapper.AddPropertiesFromRowValues(obj, worksheet.CurrentRowNumber.Value, _options,
                     _exceptionList))
                 {
                     list.Add(obj);
@@ -249,12 +247,12 @@ namespace ExcelToEnumerable
             return false;
         }
 
-        private T HandleIgnoreBehaviour(FromRowConstructor fromRowConstructor, int rowCount)
+        private T HandleIgnoreBehaviour(RowMapper rowMapper, int rowCount)
         {
-            if (fromRowConstructor.RowIsPopulated)
+            if (rowMapper.RowIsPopulated)
             {
                 var obj = new T();
-                if (fromRowConstructor.AddPropertiesFromRowValues(obj, rowCount, _options, _exceptionList))
+                if (rowMapper.AddPropertiesFromRowValues(obj, rowCount, _options, _exceptionList))
                 {
                     return obj;
                 }
@@ -263,7 +261,7 @@ namespace ExcelToEnumerable
             return default;
         }
 
-        private Dictionary<int, string> GetHeaderRow(SheetReader worksheet)
+        private static Dictionary<int, string> GetHeaderRow(SheetReader worksheet)
         {
             var dict = new Dictionary<int, string>();
             var previousColumnNumber = 0;
@@ -274,6 +272,7 @@ namespace ExcelToEnumerable
                 for (var i = previousColumnNumber + 1; i < columnNumber; i++)
                 {
                     dict.Add(i, $"**blank column** ({CellRef.NumberToColumnName(i)})");
+                    //dict.Add(i, null);
                 }
 
                 dict.Add(cellRef.ColumnNumber, worksheet.Value.ToString());
