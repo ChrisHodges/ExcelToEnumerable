@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using ExcelToEnumerable.Exceptions;
@@ -43,24 +44,31 @@ namespace ExcelToEnumerable
             Setters = setters;
         }
 
-        private void GetPropertySetterDictionaryByColumnNumber(Dictionary<string, int> customHeaderNumbers)
+        internal static Dictionary<int, PropertySetter> GetPropertySetterDictionaryByColumnNumber(Dictionary<string, int> customHeaderNumbers, IEnumerable<PropertySetter> setters)
         {
             var i = 0;
-            _cellSettersDictionaryForRead = new Dictionary<int, PropertySetter>();
-            foreach (var item in Setters)
+            var cellSettersDictionaryForRead = new Dictionary<int, PropertySetter>();
+            foreach (var item in setters)
             {
                 var columnNumber = customHeaderNumbers.ContainsKey(item.PropertyName)
                     ? customHeaderNumbers[item.PropertyName]
                     : i;
-                if (_cellSettersDictionaryForRead.ContainsKey(columnNumber))
+                if (cellSettersDictionaryForRead.ContainsKey(columnNumber))
                 {
                     throw new ExcelToEnumerableConfigException(
-                        $"Trying to map property '{item.PropertyName}' to column '{CellRef.NumberToColumnName(columnNumber + 1)}' but that column is already mapped to property '{_cellSettersDictionaryForRead[columnNumber].PropertyName}'. If you're not using header names then all properties need to be mapped to a column or explicitly ignored.");
+                        $"Trying to map property '{item.PropertyName}' to column '{CellRef.NumberToColumnName(columnNumber + 1)}' but that column is already mapped to property '{cellSettersDictionaryForRead[columnNumber].PropertyName}'.");
                 }
 
-                _cellSettersDictionaryForRead.Add(columnNumber, item);
+                cellSettersDictionaryForRead.Add(columnNumber, item);
                 i++;
             }
+
+            if (cellSettersDictionaryForRead.Count < customHeaderNumbers.Count)
+            {
+                throw new ExcelToEnumerableInvalidHeaderException(new[]{""}, new[]{""});
+            }
+
+            return cellSettersDictionaryForRead;
         }
 
         private void GetPropertySetterDictionaryByColumnName(string[] normalisedHeaderNames)
@@ -86,38 +94,40 @@ namespace ExcelToEnumerable
                 .OrderBy(y => y);
         }
 
-        private static void ValidateColumnNames<T>(IExcelToEnumerableOptions<T> options,
-            IEnumerable<string> normalisedColumnNames,
-            IEnumerable<string> normalisedHeaderArray)
+        internal static void ValidateColumnNames(IEnumerable<string> normalisedPropertyNames,
+            IEnumerable<string> normalisedHeaderArray,
+            IEnumerable<string> unmappedProperties,
+            IEnumerable<string> optionalProperties,
+            bool ignoreColumnsWithoutMatchingProperties)
         {
             IEnumerable<string> namesOnSpreadsheet = normalisedHeaderArray;
 
             //Exclude unmapped properties
-            if (options.UnmappedProperties != null)
+            if (unmappedProperties != null)
             {
                 namesOnSpreadsheet =
-                    namesOnSpreadsheet.Except(options.UnmappedProperties.Select(y => y.ToLowerInvariant()));
+                    namesOnSpreadsheet.Except(unmappedProperties.Select(y => y.ToLowerInvariant()));
             }
 
             //Exclude optional properties
-            if (options.OptionalProperties != null)
+            if (optionalProperties != null)
             {
                 namesOnSpreadsheet =
-                    namesOnSpreadsheet.Except(options.OptionalProperties.Select(y => y.ToLowerInvariant()))
+                    namesOnSpreadsheet.Except(optionalProperties.Select(y => y.ToLowerInvariant()))
                         .OrderBy(y => y);
             }
             
             namesOnSpreadsheet = namesOnSpreadsheet.OrderBy(x => x);
 
-            var namesOnConfig = normalisedColumnNames.ToArray();
-            if (options.OptionalProperties != null)
+            var namesOnConfig = normalisedPropertyNames.ToArray();
+            if (optionalProperties != null)
             {
                 namesOnConfig =
-                    namesOnConfig.Except(options.OptionalProperties.Select(y => y.ToLowerInvariant())).OrderBy(y => y)
+                    namesOnConfig.Except(optionalProperties.Select(y => y.ToLowerInvariant())).OrderBy(y => y)
                         .ToArray();
             }
 
-            if (options.IgnoreColumnsWithoutMatchingProperties)
+            if (ignoreColumnsWithoutMatchingProperties)
             {
                 if (namesOnConfig.Except(namesOnSpreadsheet).Any())
                 {
@@ -140,11 +150,11 @@ namespace ExcelToEnumerable
         {
             if (normalisedHeaderArray == null)
             {
-                GetPropertySetterDictionaryByColumnNumber(options.CustomHeaderNumbers);
+                _cellSettersDictionaryForRead = GetPropertySetterDictionaryByColumnNumber(options.CustomHeaderNumbers, Setters);
             }
             else
             {
-                ValidateColumnNames(options, GetNormalisedColumnNames(Setters), normalisedHeaderArray);
+                ValidateColumnNames(GetNormalisedColumnNames(Setters), normalisedHeaderArray, options.UnmappedProperties, options.OptionalProperties, options.IgnoreColumnsWithoutMatchingProperties);
                 GetPropertySetterDictionaryByColumnName(normalisedHeaderArray);
             }
         }

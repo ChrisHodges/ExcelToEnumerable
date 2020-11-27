@@ -1,4 +1,6 @@
-﻿namespace ExcelToEnumerable.Tests
+﻿using ExcelToEnumerable.Tests.TestClasses;
+
+namespace ExcelToEnumerable.Tests
 {
     public class TestClassWithRowNumber : TestClass
     {

@@ -1,6 +1,11 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
 using System.Linq.Expressions;
+using System.Reflection;
+using ExcelToEnumerable.Attributes;
+using SpreadsheetCellRef;
 
 namespace ExcelToEnumerable
 {
@@ -74,6 +79,7 @@ namespace ExcelToEnumerable
         
         public IExcelToEnumerableOptions<T> Build()
         {
+            AddOptionsFromAttributes(this, typeof(T));
             if (_options.AllPropertiesOptionalByDefault)
             {
                 foreach (var propertyInfo in typeof(T).GetProperties())
@@ -93,19 +99,77 @@ namespace ExcelToEnumerable
                     }
                 }
             }
-
+            
             return _options;
         }
-        
-        public IExcelToEnumerableOptionsBuilder<T> IgnoreColumnsWithoutMatchingProperties(bool b)
+
+        internal static void AddOptionsFromAttributes(ExcelToEnumerableOptionsBuilder<T> builder, Type type)
         {
-            _options.IgnoreColumnsWithoutMatchingProperties = b;
+            var attributes = type.CustomAttributes;
+            foreach (var attribute in attributes)
+            {
+                switch (attribute.AttributeType.Name)
+                {
+                    case nameof(AllPropertiesMustBeMappedToColumnsAttribute):
+                        builder.AllPropertiesMustBeMappedToColumns((bool) attribute.ConstructorArguments[0].Value);
+                        break;
+                    case nameof(AllColumnsMustBeMappedToPropertiesAttribute):
+                        builder.AllColumnsMustBeMappedToProperties((bool) attribute.ConstructorArguments[0].Value);
+                        break;
+                    case nameof(UsingHeaderNamesAttribute):
+                        builder.UsingHeaderNames((bool) attribute.ConstructorArguments[0].Value);
+                        break;
+                    case nameof(StartingFromRowAttribute):
+                        var rowNumber = (int)attribute.ConstructorArguments[0].Value;
+                        builder.StartingFromRow(rowNumber);
+                        break;
+                    case nameof(UsingSheetAttribute):
+                        var sheetName = (string) attribute.ConstructorArguments[0].Value;
+                        builder.UsingSheet(sheetName);
+                        break;
+                    case nameof(HeaderOnRowAttribute):
+                        var headerOnRowNumber = (int)attribute.ConstructorArguments[0].Value;
+                        builder.HeaderOnRow(headerOnRowNumber);
+                        break;
+                }
+
+                foreach (var property in type.GetProperties())
+                {
+                    var propertyAttributes = property.CustomAttributes;
+                    foreach (var propertyAttribute in propertyAttributes)
+                    {
+                        switch (propertyAttribute.AttributeType.Name)
+                        {
+                            case nameof(UsesColumnNumberAttribute):
+                                var columnNumber = (int)propertyAttribute.ConstructorArguments[0].Value;
+                                ExcelPropertyConfiguration.UsesColumnNumber(columnNumber, property.Name, builder._options);
+                                break;
+                            case nameof(UsesColumnLetterAttribute):
+                                var columnLetter = (string)propertyAttribute.ConstructorArguments[0].Value;
+                                ExcelPropertyConfiguration.UsesColumnNumber(CellRef.ColumnNameToNumber(columnLetter), property.Name, builder._options);
+                                break;
+                            case nameof(OptionalAttribute):
+                                ExcelPropertyConfiguration.Optional(true, property.Name, builder._options);
+                                break;
+                            case nameof(MapFromColumnsAttribute):
+                                var columnNames = ((ReadOnlyCollection<CustomAttributeTypedArgument>)propertyAttribute.ConstructorArguments[0].Value).Select(x => x.Value.ToString());
+                                ExcelPropertyConfiguration.MapFromColumns(columnNames, property.Name, builder._options);
+                                break;
+                        }
+                    }
+                }
+            }
+        }
+
+        public IExcelToEnumerableOptionsBuilder<T> AllColumnsMustBeMappedToProperties(bool b)
+        {
+            _options.IgnoreColumnsWithoutMatchingProperties = !b;
             return this;
         }
         
-        public IExcelToEnumerableOptionsBuilder<T> IgnorePropertiesWithoutMatchingColumns(bool b)
+        public IExcelToEnumerableOptionsBuilder<T> AllPropertiesMustBeMappedToColumns(bool b)
         {
-            _options.AllPropertiesOptionalByDefault = b;
+            _options.AllPropertiesOptionalByDefault = !b;
             return this;
         }
         

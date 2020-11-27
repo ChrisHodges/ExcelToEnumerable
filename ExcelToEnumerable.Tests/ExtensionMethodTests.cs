@@ -13,8 +13,6 @@ namespace ExcelToEnumerable.Tests
 {
     public class ExtensionMethodTests
     {
-        private ComplexExampleWithCustomMappingTestClass result2;
-
         [Fact]
         public void AggregateExceptionHandlingWorks()
         {
@@ -30,17 +28,81 @@ namespace ExcelToEnumerable.Tests
         }
 
         [Fact]
-        public void IgnorePropertyNamesWorks()
+        public void AllPropertiesMustBeMappedToColumnsTrueWorks()
         {
-            var testSpreadsheetLocation = TestHelper.TestsheetPath("PropertyNamesIgnoreAndWhitespaceTests.xlsx");
-            var result = testSpreadsheetLocation.ExcelToEnumerable<IgnorePropertyNamesTestClass>(x => x
-                .IgnoreColumnsWithoutMatchingProperties(true)
-                .Property(y => y.NotOnSpreadsheet).Ignore()
-                .Property(y => y.ColumnA).MapFromColumns("A", "B")
-                .Property(y => y.ColumnA).UsesColumnNamed("Column A")
-            );
-            result.First().ColumnA.Should().Be("a");
-            result.First().ColumnB.Should().Be("b");
+            Action action = () =>
+            {
+                var testSpreadsheetLocation = TestHelper.TestsheetPath("IgnorePropertyNames.xlsx");
+                testSpreadsheetLocation.ExcelToEnumerable<AllPropertiesMustBeMappedToColumnsTestClass>(x => x
+                    .AllPropertiesMustBeMappedToColumns(true)
+                );
+            };
+            action.Should().ThrowExactly<ExcelToEnumerableInvalidHeaderException>().WithMessage("Missing headers: 'notonspreadsheet'. ");
+        }
+        
+        [Fact]
+        public void AllPropertiesMustBeMappedToColumns_Attribute_Works()
+        {
+            Action action = () =>
+            {
+                var testSpreadsheetLocation = TestHelper.TestsheetPath("IgnorePropertyNames.xlsx");
+                testSpreadsheetLocation.ExcelToEnumerable<AllPropertiesMustBeMappedToColumnsAttributeTestClass>();
+            };
+            action.Should().Throw<ExcelToEnumerableInvalidHeaderException>()
+                .WithMessage("Missing headers: 'notonspreadsheet'. ");
+        }
+
+        [Fact]
+        public void AllPropertiesMustBeMappedToColumns_False_Works()
+        {
+
+            var testSpreadsheetLocation = TestHelper.TestsheetPath("IgnorePropertyNames.xlsx");
+            var results = testSpreadsheetLocation.ExcelToEnumerable<AllPropertiesMustBeMappedToColumnsTestClass>(x => x
+                .AllPropertiesMustBeMappedToColumns(false)
+            ).ToArray();
+            results.Length.Should().Be(1);
+            var result = results.First();
+            result.ColumnA.Should().Be("a");
+            result.ColumnB.Should().Be("b");
+            result.NotOnSpreadsheet.Should().BeNull();
+        }
+        
+        [Fact]
+        public void AllColumnsMustBeMappedToProperties_True_Works()
+        {
+            Action action = () =>
+            {
+                var testSpreadsheetLocation = TestHelper.TestsheetPath("IgnoreColumns.xlsx");
+                testSpreadsheetLocation.ExcelToEnumerable<AllColumnsMustBeMappedToPropertiesTestClass>(x => x
+                    .AllColumnsMustBeMappedToProperties(true)
+                );
+            };
+            action.Should().ThrowExactly<ExcelToEnumerableInvalidHeaderException>().WithMessage("Missing properties: 'notonclass'.");
+        }
+        
+        [Fact]
+        public void AllColumnsMustBeMappedToProperties_Attribute_Works()
+        {
+            Action action = () =>
+            {
+                var testSpreadsheetLocation = TestHelper.TestsheetPath("IgnoreColumns.xlsx");
+                testSpreadsheetLocation
+                    .ExcelToEnumerable<AllColumnsMustBeMappedToPropertiesAttributeTestClass>();
+            };
+            action.Should().ThrowExactly<ExcelToEnumerableInvalidHeaderException>().WithMessage("Missing properties: 'notonclass'.");
+        }
+        
+        [Fact]
+        public void AllColumnsMustBeMappedToPropertiesFalseWorks()
+        {
+            var testSpreadsheetLocation = TestHelper.TestsheetPath("IgnoreColumns.xlsx");
+            var results = testSpreadsheetLocation.ExcelToEnumerable<AllColumnsMustBeMappedToPropertiesTestClass>(x => x
+                .AllColumnsMustBeMappedToProperties(false)
+            ).ToArray();
+            results.Length.Should().Be(1);
+            var result = results[0];
+            result.ColumnA.Should().Be("a");
+            result.ColumnB.Should().Be("b");
         }
 
         [Fact]
@@ -49,7 +111,28 @@ namespace ExcelToEnumerable.Tests
             var testSpreadsheetLocation = TestHelper.TestsheetPath("NoHeaderTests.xlsx");
             var result = testSpreadsheetLocation.ExcelToEnumerable<NoHeaderTestClass>(
                 x => x.UsingHeaderNames(false)
+            ).ToArray();
+            result.First().ColumnA.Should().Be("Value1");
+            result.First().ColumnB.Should().Be(1234);
+            result.Last().ColumnA.Should().Be("Value2");
+            result.Last().ColumnB.Should().Be(3456);
+        }
+        
+        [Fact]
+        public void UsingHeaderNames_True_Works()
+        {
+            var testSpreadsheetLocation = TestHelper.TestsheetPath("NoHeaderTests.xlsx");
+            var result = testSpreadsheetLocation.ExcelToEnumerable<NoHeaderTestClass>(
+                x => x.UsingHeaderNames(true)
             );
+            result.Count().Should().Be(0);
+        }
+        
+        [Fact]
+        public void UsingHeaderNames_False_Attribute_Works()
+        {
+            var testSpreadsheetLocation = TestHelper.TestsheetPath("NoHeaderTests.xlsx");
+            var result = testSpreadsheetLocation.ExcelToEnumerable<NoHeaderAttributeTestClass>().ToArray();
             result.First().ColumnA.Should().Be("Value1");
             result.First().ColumnB.Should().Be(1234);
             result.Last().ColumnA.Should().Be("Value2");
@@ -65,7 +148,7 @@ namespace ExcelToEnumerable.Tests
                     .UsingSheet("Numbered Columns")
                     .Property(y => y.ColumnA).UsesColumnNumber(2)
                     .Property(y => y.ColumnB).UsesColumnNumber(1)
-            );
+            ).ToArray();
             result.First().ColumnA.Should().Be("Value1");
             result.First().ColumnB.Should().Be(1234);
             result.Last().ColumnA.Should().Be("Value2");
@@ -84,8 +167,22 @@ namespace ExcelToEnumerable.Tests
                     .Property(y => y.ColumnC).UsesColumnNumber(3)
                     .Property(y => y.ColumnAA).Ignore()
                     .Property(y => y.IgnoreThisProperty).Ignore()
-            );
+            ).ToArray();
             result.Count().Should().Be(2);
+            result.First().ColumnA.Should().Be("A");
+            result.First().ColumnB.Should().Be("B");
+            result.First().ColumnC.Should().Be("C");
+            result.Last().ColumnA.Should().Be("Z");
+            result.Last().ColumnB.Should().Be("Y");
+            result.Last().ColumnC.Should().Be("X");
+        }
+        
+        [Fact]
+        public void UsesColumnNumber_Attribute_Works()
+        {
+            var testSpreadsheetLocation = TestHelper.TestsheetPath("OrdinalPropertiesAttributeTest.xlsx");
+            var result = testSpreadsheetLocation.ExcelToEnumerable<OrdinalPropertiesAttributeTestClass>().ToArray();
+            result.Length.Should().Be(2);
             result.First().ColumnA.Should().Be("A");
             result.First().ColumnB.Should().Be("B");
             result.First().ColumnC.Should().Be("C");
@@ -107,8 +204,8 @@ namespace ExcelToEnumerable.Tests
                     .Property(y => y.ColumnAA).UsesColumnLetter("AA")
                     .Property(y => y.Row).MapsToRowNumber()
                     .Property(y => y.IgnoreThisProperty).Ignore()
-            );
-            result.Count().Should().Be(2);
+            ).ToArray();
+            result.Length.Should().Be(2);
             result.First().ColumnA.Should().Be("A");
             result.First().ColumnB.Should().Be("B");
             result.First().ColumnC.Should().Be("C");
@@ -118,6 +215,20 @@ namespace ExcelToEnumerable.Tests
             result.Last().ColumnB.Should().Be("Y");
             result.Last().ColumnC.Should().Be("X");
             result.Last().ColumnAA.Should().BeNull();
+        }
+        
+        [Fact]
+        public void UsesColumnLetterAttributeWorks()
+        {
+            var testSpreadsheetLocation = TestHelper.TestsheetPath("OrdinalPropertiesAttributeTest.xlsx");
+            var result = testSpreadsheetLocation.ExcelToEnumerable<OrdinalPropertiesColumnLetterAttributeTestClass>().ToArray();
+            result.Length.Should().Be(2);
+            result.First().ColumnA.Should().Be("A");
+            result.First().ColumnB.Should().Be("B");
+            result.First().ColumnC.Should().Be("C");
+            result.Last().ColumnA.Should().Be("Z");
+            result.Last().ColumnB.Should().Be("Y");
+            result.Last().ColumnC.Should().Be("X");
         }
 
         [Fact]
@@ -142,7 +253,7 @@ namespace ExcelToEnumerable.Tests
             exception.Should().NotBeNull();
             exception.Message.Should()
                 .Be(
-                    "Trying to map property 'ColumnB' to column 'C' but that column is already mapped to property 'ColumnC'. If you're not using header names then all properties need to be mapped to a column or explicitly ignored.");
+                    "Trying to map property 'ColumnB' to column 'C' but that column is already mapped to property 'ColumnC'.");
         }
 
         [Fact]
@@ -177,11 +288,7 @@ namespace ExcelToEnumerable.Tests
             var testSpreadsheetLocation = TestHelper.TestsheetPath("OptionalColumns.xlsx");
             var result1 = testSpreadsheetLocation.ExcelToEnumerable<OptionalParametersTestClass>(x => x
                 .UsingSheet("2Columns")
-                .IgnoreColumnsWithoutMatchingProperties(true)
-                .Property(y => y.Fee1).Optional()
-                .Property(y => y.Fee2).Optional()
-                .Property(y => y.Fee3).Optional()
-            );
+            ).ToArray();
             result1.Count().Should().Be(2);
             var first = result1.First();
             first.Name.Should().Be("Chris");
@@ -198,12 +305,8 @@ namespace ExcelToEnumerable.Tests
         {
             var testSpreadsheetLocation = TestHelper.TestsheetPath("OptionalColumns.xlsx");
             var result1 = testSpreadsheetLocation.ExcelToEnumerable<OptionalParametersTestClass>(x => x
-                .IgnoreColumnsWithoutMatchingProperties(true)
                 .UsingSheet("4Columns")
-                .Property(y => y.Fee1).Optional()
-                .Property(y => y.Fee2).Optional()
-                .Property(y => y.Fee3).Optional()
-            );
+            ).ToArray();
             result1.Count().Should().Be(2);
             var first = result1.First();
             first.Name.Should().Be("Chris");
@@ -225,7 +328,7 @@ namespace ExcelToEnumerable.Tests
             {
                 testSpreadsheetLocation.ExcelToEnumerable<OptionalParametersTestClass>(x => x
                         .UsingSheet("2Columns")
-                        .IgnoreColumnsWithoutMatchingProperties(true)
+                        .AllColumnsMustBeMappedToProperties(true)
                         .Property(y => y.Fee3).Optional(false) //In this example Fee3 is now a mandatory column
                 );
             });
@@ -238,9 +341,9 @@ namespace ExcelToEnumerable.Tests
             var testSpreadsheetLocation = TestHelper.TestsheetPath("OptionalColumns.xlsx");
             var result1 = testSpreadsheetLocation.ExcelToEnumerable<OptionalParametersTestClass>(x => x
                 .UsingSheet("4Columns")
-                .IgnoreColumnsWithoutMatchingProperties(true)
-                .IgnorePropertiesWithoutMatchingColumns(true)
-            );
+                .AllColumnsMustBeMappedToProperties(false)
+                .AllPropertiesMustBeMappedToColumns(false)
+            ).ToArray();
             result1.Count().Should().Be(2);
             var first = result1.First();
             first.Name.Should().Be("Chris");
@@ -262,21 +365,31 @@ namespace ExcelToEnumerable.Tests
             {
                 testSpreadsheetLocation.ExcelToEnumerable<OptionalParametersTestClass>(x => x
                     .UsingSheet("2Columns")
-                    .IgnoreColumnsWithoutMatchingProperties(true)
-                    .IgnorePropertiesWithoutMatchingColumns(true)
-                    .Property(y => y.Fee3).Optional()
-                    .Property(y => y.Fee3).Optional(false)
+                    .AllPropertiesMustBeMappedToColumns(true)
+                    .Property(y => y.Fee2).Optional()
                 );
             });
-            action.Should().Throw<ExcelToEnumerableInvalidHeaderException>(
-                "Property Fee3 is not optional and the spreadsheet 2Columns does not contain it");
+            action.Should().Throw<ExcelToEnumerableInvalidHeaderException>()
+                .WithMessage("Missing headers: 'fee3'. ");
+        }
+        
+        [Fact]
+        public void OptionalColumnsAttribute()
+        {
+            var testSpreadsheetLocation = TestHelper.TestsheetPath("OptionalColumns.xlsx");
+            var action = new Action(() =>
+            {
+                testSpreadsheetLocation.ExcelToEnumerable<OptionalParametersAttributeTestClass>();
+            });
+            action.Should().Throw<ExcelToEnumerableInvalidHeaderException>()
+                .WithMessage("Missing headers: 'fee3'. ");
         }
 
         [Fact]
         public void BooleansWork()
         {
             var testSpreadsheetLocation = TestHelper.TestsheetPath("Booleans.xlsx");
-            var results = testSpreadsheetLocation.ExcelToEnumerable<BooleansTestClass>();
+            var results = testSpreadsheetLocation.ExcelToEnumerable<BooleansTestClass>().ToArray();
             results.Count().Should().Be(2);
             var r1 = results.First();
             r1.BoolAsInt.Should().BeFalse();
@@ -322,12 +435,23 @@ namespace ExcelToEnumerable.Tests
             var result = testSpreadsheetLocation.ExcelToEnumerable<CollectionTestClass>(
                 x => x.StartingFromRow(1)
                     .UsingSheet("Sheet3CollectionExample")
-                    .UsingHeaderNames(true)
-                    .Property(y => y.Collection)
-                    .MapFromColumns("CollectionColumn1", "CollectionColumn2")
-            );
+                    .Property(y => y.Collection).MapFromColumns("CollectionColumn1", "CollectionColumn2")
+            ).ToArray();
             var firstResult = result.FirstOrDefault();
             firstResult.Should().NotBeNull();
+            // ReSharper disable once PossibleNullReferenceException
+            firstResult.Collection.Should().NotBeNull();
+            firstResult.Collection.First().Should().Be("a");
+        }
+        
+        [Fact]
+        public void CollectionConfigurationAttributeWorks()
+        {
+            var testSpreadsheetLocation = TestHelper.TestsheetPath("TestSpreadsheet1.xlsx");
+            var result = testSpreadsheetLocation.ExcelToEnumerable<CollectionAttributeTestClass>().ToArray();
+            var firstResult = result.FirstOrDefault();
+            firstResult.Should().NotBeNull();
+            // ReSharper disable once PossibleNullReferenceException
             firstResult.Collection.Should().NotBeNull();
             firstResult.Collection.First().Should().Be("a");
         }
@@ -337,12 +461,22 @@ namespace ExcelToEnumerable.Tests
         {
             var testSpreadsheetLocation = TestHelper.TestsheetPath("TestSpreadsheet1.xlsx");
             var result = testSpreadsheetLocation.ExcelToEnumerable<TestClass>(
-                x => x.UsingSheet("HeaderOnRow2")
-                    .UsingHeaderNames(true)
+                x => x
+                    .UsingSheet("HeaderOnRow2")
                     .HeaderOnRow(2)
                     .StartingFromRow(4)
-            );
-            result.Count().Should().Be(3);
+            ).ToArray();
+            result.Length.Should().Be(3);
+            result.First().String.Should().Be("abc123");
+            result.Last().String.Should().Be("zxy123");
+        }
+        
+        [Fact]
+        public void HeaderInRowAttributeWorks()
+        {
+            var testSpreadsheetLocation = TestHelper.TestsheetPath("TestSpreadsheet1.xlsx");
+            var result = testSpreadsheetLocation.ExcelToEnumerable<TestHeaderInRowAttributeClass>().ToArray();
+            result.Length.Should().Be(3);
             result.First().String.Should().Be("abc123");
             result.Last().String.Should().Be("zxy123");
         }
@@ -441,7 +575,7 @@ namespace ExcelToEnumerable.Tests
 
             var result1 = result.First();
             result1.MeasureId.Should().Be(1);
-            result2 = result.Last();
+            var result2 = result.Last();
             result2.MeasureId.Should().Be(1);
         }
 
@@ -793,7 +927,7 @@ namespace ExcelToEnumerable.Tests
             {
                 testSpreadsheetLocation.ExcelToEnumerable<TestClass>(x => x
                     .StartingFromRow(1)
-                    .IgnoreColumnsWithoutMatchingProperties(false)
+                    .AllColumnsMustBeMappedToProperties(true)
                     .UsingSheet("BadHeaderNames")
                     .UsingHeaderNames(true)
                     .AggregateExceptions()
@@ -816,7 +950,7 @@ namespace ExcelToEnumerable.Tests
             {
                 testSpreadsheetLocation.ExcelToEnumerable<TestClass>(x => x
                     .StartingFromRow(1)
-                    .IgnoreColumnsWithoutMatchingProperties(false)
+                    .AllColumnsMustBeMappedToProperties(true)
                     .UsingSheet("EmptyColumnNames")
                     .UsingHeaderNames(true)
                     .AggregateExceptions()
@@ -1210,8 +1344,8 @@ namespace ExcelToEnumerable.Tests
             var testSpreadsheetLocation = TestHelper.TestsheetPath("FuzzyMatchHeaderNames.xlsx");
             var results = testSpreadsheetLocation.ExcelToEnumerable<FuzzyMatchHeaderNamesTestClass>(
                 x => x
-                    .IgnoreColumnsWithoutMatchingProperties(false)
-                    .IgnorePropertiesWithoutMatchingColumns(false)).ToArray();
+                    .AllColumnsMustBeMappedToProperties(false)
+                    .AllPropertiesMustBeMappedToColumns(false)).ToArray();
             results.Length.Should().Be(1);
             var result = results.First();
             result.FlatCase.Should().Be(1);
@@ -1225,6 +1359,22 @@ namespace ExcelToEnumerable.Tests
             result.CobolCase.Should().Be(1);
             result.TrainCase.Should().Be(1);
             result.WhiteSpace.Should().Be(1);
+        }
+
+        [Fact]
+        public void ColumnsMappedByNumberButWithUnmappedColumnsWorks()
+        {
+            var testSpreadsheetLocation = TestHelper.TestsheetPath("ColumnsMappedByNumberButWithUnmappedColumns.xlsx");
+            var result =
+                testSpreadsheetLocation.ExcelToEnumerable<ColumnsMappedByNumberButWithUnmappedColumnsTestClass>(x => x
+                    .StartingFromRow(2)
+                    .UsingHeaderNames(false)
+                    .Property(y => y.PropertyA).UsesColumnNumber(1)
+                    .Property(y => y.PropertyB).UsesColumnNumber(2)
+                ).ToArray();
+            result.Length.Should().Be(1);
+            result[0].PropertyA.Should().Be("A");
+            result[0].PropertyB.Should().Be("B");
         }
     }
 }

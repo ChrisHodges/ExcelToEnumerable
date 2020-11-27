@@ -1,8 +1,9 @@
-using System;
+using ExcelToEnumerable.Attributes;
 
 namespace ExcelToEnumerable.Tests
 {
-    public class NoHeaderTestClass
+    [UsingHeaderNames(false)]
+    public class NoHeaderAttributeTestClass
     {
         public string ColumnA { get; set; }
         public int ColumnB { get; set; }

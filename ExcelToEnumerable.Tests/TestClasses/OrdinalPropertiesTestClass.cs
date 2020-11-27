@@ -1,9 +1,11 @@
+using System;
+
 namespace ExcelToEnumerable.Tests
 {
     public class OrdinalPropertiesTestClass
     {
         /// <summary>
-        ///     CSH 28041890 Deliberately putting the columns here in a different order to how the appear on the spreadsheet
+        ///     CSH 28042020 Deliberately putting the columns here in a different order to how the appear on the spreadsheet
         ///     to properly test the property=>UseColumnNumber option
         /// </summary>
         public string ColumnC { get; set; }

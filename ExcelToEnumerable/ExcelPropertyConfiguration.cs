@@ -6,6 +6,50 @@ using SpreadsheetCellRef;
 
 namespace ExcelToEnumerable
 {
+    internal static class ExcelPropertyConfiguration
+    {
+        internal static void UsesColumnNumber<T>(int i, string propertyName, IExcelToEnumerableOptions<T> options)
+        {
+            if (i < 1)
+            {
+                throw new ExcelToEnumerableConfigException(
+                    $"Unable to map '{propertyName}' to column {i}. UsesColumnNumber expects a 1-based column number");
+            }
+
+            options.CustomHeaderNumbers[propertyName] = i - 1;
+        }
+        
+        internal static void Optional<T>(bool isOptional, string propertyName, IExcelToEnumerableOptions<T> options)
+        {
+            if (isOptional)
+            {
+                options.OptionalProperties.Add(propertyName);
+                options.ExplicitlyRequiredProperties.Remove(propertyName);
+            }
+            else
+            {
+                options.OptionalProperties.Remove(propertyName);
+                options.ExplicitlyRequiredProperties.Add(propertyName);
+            }
+        }
+
+        internal static void MapFromColumns<T>(IEnumerable<string> columnNames, string propertyName, IExcelToEnumerableOptions<T> options)
+        {
+            if (options.CollectionConfigurations == null)
+            {
+                options.CollectionConfigurations = new Dictionary<string, ExcelToEnumerableCollectionConfiguration>();
+            }
+
+            var configuration = new ExcelToEnumerableCollectionConfiguration
+            {
+                PropertyName = propertyName,
+                ColumnNames = columnNames
+            };
+
+            options.CollectionConfigurations.Add(propertyName, configuration);
+        }
+    }
+    
     internal class ExcelPropertyConfiguration<T, TProperty> : IExcelPropertyConfiguration<T, TProperty>
     {
         private readonly IExcelToEnumerableOptions<T> _options;
@@ -48,18 +92,7 @@ namespace ExcelToEnumerable
 
         public IExcelToEnumerableOptionsBuilder<T> MapFromColumns(IEnumerable<string> columnNames)
         {
-            if (_options.CollectionConfigurations == null)
-            {
-                _options.CollectionConfigurations = new Dictionary<string, ExcelToEnumerableCollectionConfiguration>();
-            }
-
-            var configuration = new ExcelToEnumerableCollectionConfiguration
-            {
-                PropertyName = _propertyName,
-                ColumnNames = columnNames
-            };
-
-            _options.CollectionConfigurations.Add(_propertyName, configuration);
+            ExcelPropertyConfiguration.MapFromColumns(columnNames, _propertyName, _options);
             return _optionsBuilder;
         }
 
@@ -120,7 +153,6 @@ namespace ExcelToEnumerable
                 _options.OptionalProperties.Remove(_propertyName);
                 _options.ExplicitlyRequiredProperties.Add(_propertyName);
             }
-
             return _optionsBuilder;
         }
 
@@ -143,13 +175,7 @@ namespace ExcelToEnumerable
 
         public IExcelToEnumerableOptionsBuilder<T> UsesColumnNumber(int i)
         {
-            if (i < 1)
-            {
-                throw new ExcelToEnumerableConfigException(
-                    $"Unable to map '{_propertyName}' to column {i}. UsesColumnNumber expects a 1-based column number");
-            }
-
-            _options.CustomHeaderNumbers[_propertyName] = i - 1;
+            ExcelPropertyConfiguration.UsesColumnNumber(i, _propertyName, _options);
             return _optionsBuilder;
         }
 

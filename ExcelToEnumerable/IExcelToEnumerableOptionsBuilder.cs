@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
+using ExcelToEnumerable.Exceptions;
 
 namespace ExcelToEnumerable
 {
@@ -182,25 +183,26 @@ namespace ExcelToEnumerable
         /// <example>
         /// <code>
         /// IEnumerable&lt;MyClass&gt; results = excelStream.ExcelToEnumerable&lt;MyClass&gt;(x => x
-        ///     .IgnoreColumnsWithoutMatchingProperties()
+        ///     .AllColumnsMustBeMappedToProperties()
         /// );
         /// </code>
         /// </example>
         /// <returns></returns>
-        IExcelToEnumerableOptionsBuilder<T> IgnoreColumnsWithoutMatchingProperties(bool b);
+        IExcelToEnumerableOptionsBuilder<T> AllColumnsMustBeMappedToProperties(bool b);
 
         /// <summary>
-        /// Makes all properties of the mapped class as optional. To mark a specific property as required,
-        /// use Property(y => y.MyProperty).Optional(false)
+        /// Throws an <see cref="ExcelToEnumerableInvalidHeaderException"/> if there are properties that are not
+        /// mapped to a header on the spreadsheet. To override for a specific property use
+        /// <c>Property(x => x.MyProperty).Optional()</c>
         /// </summary>
         /// <example>
         /// <code>
         /// IEnumerable&lt;MyClass&gt; results = excelStream.ExcelToEnumerable&lt;MyClass&gt;(x => x
-        ///     .IgnorePropertiesWithoutMatchingColumns()
+        ///     .AllPropertiesMustBeMappedToColumns()
         /// );
         /// </code>
         /// </example>
         /// <returns></returns>
-        IExcelToEnumerableOptionsBuilder<T> IgnorePropertiesWithoutMatchingColumns(bool b);
+        IExcelToEnumerableOptionsBuilder<T> AllPropertiesMustBeMappedToColumns(bool b);
     }
 }

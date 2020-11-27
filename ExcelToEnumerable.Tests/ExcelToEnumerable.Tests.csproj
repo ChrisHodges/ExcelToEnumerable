@@ -30,6 +30,9 @@
       <Content Include="TestSpreadsheets\Booleans.xlsx">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </Content>
+      <Content Include="TestSpreadsheets\ColumnsMappedByNumberButWithUnmappedColumns.xlsx">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
       <Content Include="TestSpreadsheets\CustomValidator.xlsx">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </Content>
@@ -45,10 +48,19 @@
       <Content Include="TestSpreadsheets\GermanDecimals.xlsx">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </Content>
+      <Content Include="TestSpreadsheets\IgnoreColumns.xlsx">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <Content Include="TestSpreadsheets\IgnorePropertyNames.xlsx">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
       <Content Include="TestSpreadsheets\NoHeaderTests.xlsx">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </Content>
       <Content Include="TestSpreadsheets\OptionalColumns.xlsx">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <Content Include="TestSpreadsheets\OrdinalPropertiesAttributeTest.xlsx">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </Content>
       <Content Include="TestSpreadsheets\OrdinalPropertiesTest.xlsx">

@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using ExcelToEnumerable.Tests.TestClasses;
 using FluentAssertions;
 using Xunit;
 
@@ -39,6 +40,32 @@ namespace ExcelToEnumerable.Tests
             _subject.StartingFromRow(2);
             var result = _subject.Build();
             result.StartRow.Should().Be(2);
+        }
+
+        [Fact]
+        public void AddsAllPropertiesMustBeMappedToColumnsAttributeTestClassAttribute()
+        {
+            var builder = new ExcelToEnumerableOptionsBuilder<AllPropertiesMustBeMappedToColumnsAttributeTestClass>();
+            var result = builder.Build();
+            result.AllPropertiesOptionalByDefault.Should().BeFalse();
+        }
+        
+        [Fact]
+        public void Adds_AllColumnsMustBeMappedToProperties_Attribute()
+        {
+            var builder = new ExcelToEnumerableOptionsBuilder<AllColumnsMustBeMappedToPropertiesAttributeTestClass>();
+            var result = builder.Build();
+            result.IgnoreColumnsWithoutMatchingProperties.Should().BeFalse();
+        }
+        
+        [Fact]
+        public void Adds_UsesColumnNumber_Attribute()
+        {
+            var builder = new ExcelToEnumerableOptionsBuilder<OrdinalPropertiesAttributeTestClass>();
+            var result = builder.Build();
+            result.CustomHeaderNumbers["ColumnA"].Should().Be(0);
+            result.CustomHeaderNumbers["ColumnB"].Should().Be(1);
+            result.CustomHeaderNumbers["ColumnC"].Should().Be(2);
         }
     }
 }

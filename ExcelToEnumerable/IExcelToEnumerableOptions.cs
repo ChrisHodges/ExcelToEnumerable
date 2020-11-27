@@ -52,5 +52,7 @@ namespace ExcelToEnumerable
         bool IgnoreColumnsWithoutMatchingProperties { get; set; }
         
         List<string> ExplicitlyRequiredProperties { get; set; }
+        
+        bool AllPropertiesOptionalByDefault { get; set; }
     }
 }

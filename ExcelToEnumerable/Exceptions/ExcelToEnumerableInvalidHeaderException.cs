@@ -11,7 +11,7 @@ namespace ExcelToEnumerable.Exceptions
     /// </c>
     /// To ignore columns without matching properties use:
     /// <c>
-    /// optionsBuilder.IgnoreColumnsWithoutMatchingProperties()
+    /// optionsBuilder.AllColumnsMustBeMappedToProperties()
     /// </c>
     /// </summary>
     public class ExcelToEnumerableInvalidHeaderException : ExcelToEnumerableSheetException

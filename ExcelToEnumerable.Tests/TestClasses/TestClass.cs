@@ -1,8 +1,20 @@
 using System;
+using ExcelToEnumerable.Attributes;
 
-namespace ExcelToEnumerable.Tests
+namespace ExcelToEnumerable.Tests.TestClasses
 {
     public class TestClass
+    {
+        public string String { get; set; }
+        public int? Int { get; set; }
+        public DateTime? DateTime { get; set; }
+        public double? Decimal { get; set; }
+    }
+
+    [HeaderOnRow(2)]
+    [StartingFromRow(4)]
+    [UsingSheet("HeaderOnRow2")]
+    public class TestHeaderInRowAttributeClass
     {
         public string String { get; set; }
         public int? Int { get; set; }

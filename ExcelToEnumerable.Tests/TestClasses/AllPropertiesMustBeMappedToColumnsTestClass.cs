@@ -1,6 +1,6 @@
-namespace ExcelToEnumerable.Tests
+namespace ExcelToEnumerable.Tests.TestClasses
 {
-    public class IgnorePropertyNamesTestClass
+    public class AllPropertiesMustBeMappedToColumnsTestClass
     {
         public string ColumnA { get; set; }
         public string ColumnB { get; set; }
