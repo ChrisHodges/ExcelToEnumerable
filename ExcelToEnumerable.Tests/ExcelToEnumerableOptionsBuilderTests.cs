@@ -67,5 +67,13 @@ namespace ExcelToEnumerable.Tests
             result.CustomHeaderNumbers["ColumnB"].Should().Be(1);
             result.CustomHeaderNumbers["ColumnC"].Should().Be(2);
         }
+        
+        [Fact]
+        public void Adds_Unique_AttributeJustOnce()
+        {
+            var builder = new ExcelToEnumerableOptionsBuilder<UniqueAttributeTestClass>();
+            var result = builder.Build();
+            result.UniqueProperties.Count.Should().Be(2);
+        }
     }
 }

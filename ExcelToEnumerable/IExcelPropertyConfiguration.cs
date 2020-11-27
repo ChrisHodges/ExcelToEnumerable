@@ -88,9 +88,9 @@ namespace ExcelToEnumerable
         /// );
         /// </code>
         /// </example>
-        /// <param name="permissiableValues"></param>
+        /// <param name="permissableValues"></param>
         /// <returns></returns>
-        IExcelToEnumerableOptionsBuilder<T> ShouldBeOneOf(params TProperty[] permissiableValues);
+        IExcelToEnumerableOptionsBuilder<T> ShouldBeOneOf(params TProperty[] permissableValues);
         
         /// <summary>
         /// Maps an IEnumerable property to a set of one or more columns.

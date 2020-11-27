@@ -1,8 +1,12 @@
 using System;
+using ExcelToEnumerable.Attributes;
 
 namespace ExcelToEnumerable.Tests.TestClasses
 {
-    public class TestClass
+    [HeaderOnRow(2)]
+    [StartingFromRow(4)]
+    [UsingSheet("HeaderOnRow2")]
+    public class TestHeaderInRowAttributeClass
     {
         public string String { get; set; }
         public int? Int { get; set; }

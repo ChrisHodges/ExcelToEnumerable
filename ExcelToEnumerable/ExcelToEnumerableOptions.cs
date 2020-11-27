@@ -12,6 +12,8 @@ namespace ExcelToEnumerable
         private IEnumerable<string> _loweredRequiredColumns;
         private List<string> _requiredFields = new List<string>();
         private string _rowNumberColumn;
+        private Lazy<MemberInitializingDictionary<string, List<ExcelCellValidator>>> _validations = new Lazy<MemberInitializingDictionary<string, List<ExcelCellValidator>>>();
+        private Lazy<List<string>> _uniqueProperties = new Lazy<List<string>>();
 
         public ExcelToEnumerableOptions()
         {
@@ -23,7 +25,15 @@ namespace ExcelToEnumerable
 
         public bool AllPropertiesOptionalByDefault { get; set; }
 
-        public Dictionary<string, List<ExcelCellValidator>> Validations { get; set; }
+        public MemberInitializingDictionary<string, List<ExcelCellValidator>> Validations
+        {
+            get => _validations.Value;
+        }
+        
+        public List<string> UniqueProperties
+        {
+            get => _uniqueProperties.Value;
+        }
 
         public bool UseHeaderNames { get; set; }
 
@@ -59,7 +69,7 @@ namespace ExcelToEnumerable
         public string WorksheetName { get; set; }
 
         public int? WorksheetNumber { get; set; }
-        public List<string> UniqueProperties { get; set; }
+
         public int? EndRow { get; internal set; }
         public int HeaderRow { get; internal set; }
         public Action<IDictionary<int, string>> OnReadingHeaderRowAction { get; internal set; }

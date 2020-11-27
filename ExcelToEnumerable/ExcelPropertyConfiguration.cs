@@ -48,6 +48,54 @@ namespace ExcelToEnumerable
 
             options.CollectionConfigurations.Add(propertyName, configuration);
         }
+
+        public static void UsesColumnNamed<T>(string columnName, string propertyName, IExcelToEnumerableOptions<T> options)
+        {
+            options.CustomHeaderNames[propertyName] = columnName;
+        }
+
+        public static void Ignore<T>(string propertyName, IExcelToEnumerableOptions<T> options)
+        {
+            if (options.UnmappedProperties == null)
+            {
+                options.UnmappedProperties = new List<string>();
+            }
+
+            options.UnmappedProperties.Add(propertyName);
+        }
+
+        public static void MapsToRowNumber<T>(string propertyName, IExcelToEnumerableOptions<T> options)
+        {
+            options.RowNumberProperty = propertyName;
+        }
+
+        public static void ShouldBeLessThan<T>(double maxValue, string propertyName, IExcelToEnumerableOptions<T> options)
+        {
+            if (!options.Validations.ContainsKey(propertyName))
+            {
+                options.Validations[propertyName] = new List<ExcelCellValidator>();
+            }
+            options.Validations[propertyName].Add(ExcelCellValidatorFactory.CreateLessThan(maxValue));
+        }
+
+        public static void ShouldBeGreaterThan<T>(double minValue, string propertyName, IExcelToEnumerableOptions<T> options)
+        {
+            if (!options.Validations.ContainsKey(propertyName))
+            {
+                options.Validations[propertyName] = new List<ExcelCellValidator>();
+            }
+            options.Validations[propertyName].Add(ExcelCellValidatorFactory.CreateGreaterThan(minValue));
+        }
+
+        public static void Required<T>(string propertyName, IExcelToEnumerableOptions<T> options)
+        {
+            options.RequiredFields.Add(propertyName);
+        }
+
+        public static void Unique<T>(string propertyName, IExcelToEnumerableOptions<T> options)
+        {
+            options.UniqueProperties.Add(propertyName);
+        }
     }
     
     internal class ExcelPropertyConfiguration<T, TProperty> : IExcelPropertyConfiguration<T, TProperty>
@@ -62,19 +110,18 @@ namespace ExcelToEnumerable
             _options = options;
             _optionsBuilder = optionsBuilder;
             _propertyName = propertyName;
-            CreateDictionaryIfNotExists();
             CreateEntryIfNotExists();
         }
 
         public IExcelToEnumerableOptionsBuilder<T> ShouldBeGreaterThan(double minValue)
         {
-            _options.Validations[_propertyName].Add(ExcelCellValidatorFactory.CreateGreaterThan(minValue));
+            ExcelPropertyConfiguration.ShouldBeGreaterThan(minValue, _propertyName, _options);
             return _optionsBuilder;
         }
 
         public IExcelToEnumerableOptionsBuilder<T> ShouldBeLessThan(double maxValue)
         {
-            _options.Validations[_propertyName].Add(ExcelCellValidatorFactory.CreateLessThan(maxValue));
+            ExcelPropertyConfiguration.ShouldBeLessThan(maxValue, _propertyName, _options);
             return _optionsBuilder;
         }
 
@@ -84,9 +131,9 @@ namespace ExcelToEnumerable
             return _optionsBuilder;
         }
 
-        public IExcelToEnumerableOptionsBuilder<T> ShouldBeOneOf(params TProperty[] permissiableValues)
+        public IExcelToEnumerableOptionsBuilder<T> ShouldBeOneOf(params TProperty[] permissableValues)
         {
-            _options.Validations[_propertyName].Add(ExcelCellValidatorFactory.CreateShouldBeOneOf(permissiableValues));
+            _options.Validations[_propertyName].Add(ExcelCellValidatorFactory.CreateShouldBeOneOf(permissableValues));
             return _optionsBuilder;
         }
 
@@ -103,18 +150,13 @@ namespace ExcelToEnumerable
 
         public IExcelToEnumerableOptionsBuilder<T> ShouldBeUnique()
         {
-            if (_options.UniqueProperties == null)
-            {
-                _options.UniqueProperties = new List<string>();
-            }
-
-            _options.UniqueProperties.Add(_propertyName);
+            ExcelPropertyConfiguration.Unique(_propertyName, _options);
             return _optionsBuilder;
         }
 
         public IExcelToEnumerableOptionsBuilder<T> IsRequired()
         {
-            _options.RequiredFields.Add(_propertyName);
+            ExcelPropertyConfiguration.Required(_propertyName, _options);
             return _optionsBuilder;
         }
 
@@ -126,18 +168,13 @@ namespace ExcelToEnumerable
 
         public IExcelToEnumerableOptionsBuilder<T> UsesColumnNamed(string columnName)
         {
-            _options.CustomHeaderNames[_propertyName] = columnName;
+            ExcelPropertyConfiguration.UsesColumnNamed(columnName, _propertyName, _options);
             return _optionsBuilder;
         }
 
         public IExcelToEnumerableOptionsBuilder<T> Ignore()
         {
-            if (_options.UnmappedProperties == null)
-            {
-                _options.UnmappedProperties = new List<string>();
-            }
-
-            _options.UnmappedProperties.Add(_propertyName);
+            ExcelPropertyConfiguration.Ignore(_propertyName, _options);
             return _optionsBuilder;
         }
 
@@ -169,7 +206,7 @@ namespace ExcelToEnumerable
 
         public IExcelToEnumerableOptionsBuilder<T> MapsToRowNumber()
         {
-            _options.RowNumberProperty = _propertyName;
+            ExcelPropertyConfiguration.MapsToRowNumber(_propertyName, _options);
             return _optionsBuilder;
         }
 
@@ -190,14 +227,6 @@ namespace ExcelToEnumerable
             if (!_options.Validations.ContainsKey(_propertyName))
             {
                 _options.Validations[_propertyName] = new List<ExcelCellValidator>();
-            }
-        }
-
-        private void CreateDictionaryIfNotExists()
-        {
-            if (_options.Validations == null)
-            {
-                _options.Validations = new Dictionary<string, List<ExcelCellValidator>>();
             }
         }
     }

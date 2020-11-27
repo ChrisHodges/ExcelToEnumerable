@@ -489,10 +489,16 @@ namespace ExcelToEnumerable.Tests
                 x => x.StartingFromRow(2)
                     .EndingWithRow(2)
                     .UsingSheet("CustomColumnName")
-                    .UsingHeaderNames(true)
-                    .Property(y => y.Int).IsRequired()
                     .Property(y => y.Int).UsesColumnNamed("IntCustomName")
             );
+            result.First().Int.Should().Be(1);
+        }
+        
+        [Fact]
+        public void CustomColumnNameAttributeWorks()
+        {
+            var testSpreadsheetLocation = TestHelper.TestsheetPath("TestSpreadsheet1.xlsx");
+            var result = testSpreadsheetLocation.ExcelToEnumerable<CustomColumnNameAttributeTestClass>();
             result.First().Int.Should().Be(1);
         }
 
@@ -503,8 +509,31 @@ namespace ExcelToEnumerable.Tests
             var result = testSpreadsheetLocation.ExcelToEnumerable<TestClass>(x =>
                 x.StartingFromRow(2)
                     .Property(y => y.String).Ignore()
-            );
-            result.Count().Should().Be(3);
+            ).ToArray();
+            result.Length.Should().Be(3);
+            var row1 = result.First();
+            row1.String.Should().Be(null);
+            row1.Int.Should().Be(1);
+            row1.DateTime.Should().Be(new DateTime(2012, 12, 31));
+            row1.Decimal.Should().Be(1.234);
+            var row2 = result.Skip(1).First();
+            row2.String.Should().Be(null);
+            row2.Int.Should().Be(2);
+            row2.DateTime.Should().Be(new DateTime(2015, 10, 9));
+            row2.Decimal.Should().Be(9.876);
+            var row3 = result.Skip(2).First();
+            row3.String.Should().BeNull();
+            row3.Int.Should().BeNull();
+            row3.DateTime.Should().BeNull();
+            row3.Decimal.Should().Be(5);
+        }
+        
+        [Fact]
+        public void OptionalColumnAttributeWorks()
+        {
+            var testSpreadsheetLocation = TestHelper.TestsheetPath("TestSpreadsheet1.xlsx");
+            var result = testSpreadsheetLocation.ExcelToEnumerable<OptionalColumnAttributeTestClass>().ToArray();
+            result.Length.Should().Be(3);
             var row1 = result.First();
             row1.String.Should().Be(null);
             row1.Int.Should().Be(1);
@@ -639,7 +668,7 @@ namespace ExcelToEnumerable.Tests
             var testSpreadsheetLocation = TestHelper.TestsheetPath("GermanDecimals.xlsx");
             var results = testSpreadsheetLocation.ExcelToEnumerable<GermanDecimals>(x => x
                 .Property(y => y.GermanDecimalAsText).UsesCustomMapping(cellValueObject =>
-                    Convert.ToDouble(cellValueObject, new CultureInfo("de-DE"))));
+                    Convert.ToDouble(cellValueObject, new CultureInfo("de-DE")))).ToArray();
             results.Count().Should().Be(2);
             results.First().GermanDecimal.Should().Be(1.234);
             results.First().UkDecimal.Should().Be(1.234);
@@ -667,7 +696,7 @@ namespace ExcelToEnumerable.Tests
             var testSpreadsheetLocation = TestHelper.TestsheetPath("Exceptions.xlsx");
             try
             {
-                var results = testSpreadsheetLocation.ExcelToEnumerable<DoubleTestClass>();
+                testSpreadsheetLocation.ExcelToEnumerable<DoubleTestClass>();
             }
             catch (ExcelToEnumerableCellException e)
             {
@@ -834,11 +863,10 @@ namespace ExcelToEnumerable.Tests
             var result = fileStream.ExcelToEnumerable<CollectionTestClass>(x =>
                 x
                     .StartingFromRow(1)
-                    .UsingHeaderNames(true)
                     .UsingSheet("Sheet3CollectionExample")
                     .Property(y => y.Collection).MapFromColumns("CollectionColumn1", "CollectionColumn2")
                     .Property(y => y.Collection).UsesCustomMapping(z => { return z.ToString().ToUpperInvariant(); })
-            );
+            ).ToArray();
             result.Count().Should().Be(2);
             result.First().Collection.First().Should().Be("A");
         }
@@ -847,8 +875,8 @@ namespace ExcelToEnumerable.Tests
         public void FromStringWorks()
         {
             var testSpreadsheetLocation = TestHelper.TestsheetPath("TestSpreadsheet1.xlsx");
-            var result = testSpreadsheetLocation.ExcelToEnumerable<TestClass>(x => x.StartingFromRow(2));
-            result.Count().Should().Be(3);
+            var result = testSpreadsheetLocation.ExcelToEnumerable<TestClass>(x => x.StartingFromRow(2)).ToArray();
+            result.Length.Should().Be(3);
             var row1 = result.First();
             row1.String.Should().Be("abc123");
             row1.Int.Should().Be(1);
@@ -870,8 +898,9 @@ namespace ExcelToEnumerable.Tests
         public void InternalSettersWorks()
         {
             var testSpreadsheetLocation = TestHelper.TestsheetPath("TestSpreadsheet1.xlsx");
-            var result = testSpreadsheetLocation.ExcelToEnumerable<InternalSetterTestClass>(x => x.StartingFromRow(2));
-            result.Count().Should().Be(3);
+            var result = testSpreadsheetLocation.ExcelToEnumerable<InternalSetterTestClass>(x => x.StartingFromRow(2))
+                .ToArray();
+            result.Length.Should().Be(3);
             var row1 = result.First();
             row1.String.Should().Be("abc123");
             row1.Int.Should().Be(1);
@@ -896,8 +925,8 @@ namespace ExcelToEnumerable.Tests
             var result = testSpreadsheetLocation.ExcelToEnumerable<TestClassWithRowNumber>(
                 x => x.StartingFromRow(2)
                     .Property(y => y.Row).MapsToRowNumber()
-            );
-            result.Count().Should().Be(3);
+            ).ToArray();
+            result.Length.Should().Be(3);
             var row1 = result.First();
             row1.String.Should().Be("abc123");
             row1.Int.Should().Be(1);
@@ -917,6 +946,20 @@ namespace ExcelToEnumerable.Tests
             row3.Decimal.Should().Be(5);
             row3.Row.Should().Be(4);
         }
+        
+        [Fact]
+        public void MapRowNumberAttributeWorks()
+        {
+            var testSpreadsheetLocation = TestHelper.TestsheetPath("TestSpreadsheet1.xlsx");
+            var result = testSpreadsheetLocation.ExcelToEnumerable<AttributeTestClassWithRowNumber>().ToArray();
+            result.Length.Should().Be(3);
+            var row1 = result.First();
+            row1.Row.Should().Be(2);
+            var row2 = result.Skip(1).First();
+            row2.Row.Should().Be(3);
+            var row3 = result.Skip(2).First();
+            row3.Row.Should().Be(4);
+        }
 
         [Fact]
         public void ValidateHeaderWorks()
@@ -929,7 +972,6 @@ namespace ExcelToEnumerable.Tests
                     .StartingFromRow(1)
                     .AllColumnsMustBeMappedToProperties(true)
                     .UsingSheet("BadHeaderNames")
-                    .UsingHeaderNames(true)
                     .AggregateExceptions()
                 );
             }
@@ -952,7 +994,6 @@ namespace ExcelToEnumerable.Tests
                     .StartingFromRow(1)
                     .AllColumnsMustBeMappedToProperties(true)
                     .UsingSheet("EmptyColumnNames")
-                    .UsingHeaderNames(true)
                     .AggregateExceptions()
                 );
             }
@@ -961,9 +1002,12 @@ namespace ExcelToEnumerable.Tests
                 sheetException = e;
             }
 
+            // ReSharper disable once PossibleNullReferenceException
             sheetException.MissingProperties.Count().Should().Be(2);
+            // ReSharper disable ReturnValueOfPureMethodIsNotUsed
             sheetException.MissingProperties.Single(x => x == "**blankcolumn**(b)");
             sheetException.MissingProperties.Single(x => x == "**blankcolumn**(c)");
+            // ReSharper restore ReturnValueOfPureMethodIsNotUsed
         }
 
         [Fact]
@@ -980,6 +1024,26 @@ namespace ExcelToEnumerable.Tests
             var firstException = (ExcelToEnumerableCellException) list.First();
             firstException.Column.Should().Be("B");
             firstException.RowNumber.Should().Be(3);
+        }
+        
+        [Fact]
+        public void MaximumValueAttributeWorks()
+        {
+            var testSpreadsheetLocation = TestHelper.TestsheetPath("TestSpreadsheet1.xlsx");
+            ExcelToEnumerableCellException exception = null;
+            try
+            {
+                testSpreadsheetLocation.ExcelToEnumerable<ShouldBeLessThanAttributeTestClass>();
+            }
+            catch (ExcelToEnumerableCellException e)
+            {
+                exception = e;
+            }
+
+            exception.Should().NotBeNull();
+            // ReSharper disable once PossibleNullReferenceException
+            exception.Column.Should().Be("B");
+            exception.RowNumber.Should().Be(3);
         }
 
         [Fact]
@@ -1012,6 +1076,26 @@ namespace ExcelToEnumerable.Tests
             firstException.Column.Should().Be("B");
             firstException.RowNumber.Should().Be(2);
         }
+        
+        [Fact]
+        public void MinimumValueAttributeValidationWorks()
+        {
+            var testSpreadsheetLocation = TestHelper.TestsheetPath("TestSpreadsheet1.xlsx");
+            ExcelToEnumerableCellException exception = null;
+            try
+            {
+                testSpreadsheetLocation.ExcelToEnumerable<ShouldBeGreaterThanAttributeTestClass>();
+            }
+            catch (ExcelToEnumerableCellException e)
+            {
+                exception = e;
+            }
+
+            exception.Should().NotBeNull();
+            // ReSharper disable once PossibleNullReferenceException
+            exception.Column.Should().Be("B");
+            exception.RowNumber.Should().Be(2);
+        }
 
         [Fact]
         public void OutputExceptionsWorks()
@@ -1024,13 +1108,12 @@ namespace ExcelToEnumerable.Tests
         }
 
         [Fact]
-        public void RequiredColumnWorks()
+        public void RequiredPropertiesWorks()
         {
             var exceptionList = new List<Exception>();
             var testSpreadsheetLocation = TestHelper.TestsheetPath("TestSpreadsheet1.xlsx");
             var result = testSpreadsheetLocation.ExcelToEnumerable<TestClass>(x =>
                 x.StartingFromRow(2)
-                    .UsingHeaderNames(true)
                     .Property(y => y.String).IsRequired()
                     .Property(y => y.Int).IsRequired()
                     .Property(y => y.DateTime).IsRequired()
@@ -1038,6 +1121,29 @@ namespace ExcelToEnumerable.Tests
             result.Count().Should().Be(2);
             exceptionList.Count.Should().Be(3);
             var firstException = (ExcelToEnumerableCellException) exceptionList.First();
+            firstException.Column.Should().Be("A");
+            firstException.RowNumber.Should().Be(4);
+        }
+        
+        [Fact]
+        public void RequiredPropertiesAttributeWorks()
+        {
+            AggregateException exception = null;
+            try
+            {
+                var testSpreadsheetLocation = TestHelper.TestsheetPath("TestSpreadsheet1.xlsx");
+                testSpreadsheetLocation.ExcelToEnumerable<RequiredAttributeTestClass>();
+            }
+            catch (AggregateException e)
+            {
+                exception = e;
+            }
+
+            exception.Should().NotBeNull();
+            // ReSharper disable once PossibleNullReferenceException
+            var exceptions = exception.InnerExceptions;
+            exceptions.Count.Should().Be(3);
+            var firstException = (ExcelToEnumerableCellException) exceptions.First();
             firstException.Column.Should().Be("A");
             firstException.RowNumber.Should().Be(4);
         }
@@ -1093,6 +1199,16 @@ namespace ExcelToEnumerable.Tests
             var row1 = result.First();
             row1.String.Should().Be("abc123sheet2");
         }
+        
+        [Fact]
+        public void SelectWorksheetByNumberAttributeWorks()
+        {
+            var testSpreadsheetLocation = TestHelper.TestsheetPath("TestSpreadsheet1.xlsx");
+            var result = testSpreadsheetLocation.ExcelToEnumerable<WorksheetByNumberAttributeTestClass>().ToArray();
+            result.Length.Should().Be(3);
+            var row1 = result.First();
+            row1.String.Should().Be("abc123sheet2");
+        }
 
         [Fact]
         public void ShouldBeOneOfValidationWorks()
@@ -1108,6 +1224,26 @@ namespace ExcelToEnumerable.Tests
             var firstException = (ExcelToEnumerableCellException) list.First();
             firstException.Column.Should().Be("A");
             firstException.RowNumber.Should().Be(3);
+        }
+        
+        [Fact]
+        public void ShouldBeOneOfAttributeValidationWorks()
+        {
+            ExcelToEnumerableCellException exception = null;
+            var testSpreadsheetLocation = TestHelper.TestsheetPath("TestSpreadsheet1.xlsx");
+            try
+            {
+                testSpreadsheetLocation.ExcelToEnumerable<ShouldBeOneOfAttributeTestClass>();
+            }
+            catch (ExcelToEnumerableCellException e)
+            {
+                exception = e;
+            }
+
+            exception.Should().NotBeNull();
+            // ReSharper disable once PossibleNullReferenceException
+            exception.Column.Should().Be("A");
+            exception.RowNumber.Should().Be(3);
         }
 
         [Fact]
@@ -1136,6 +1272,14 @@ namespace ExcelToEnumerable.Tests
             );
             result.Count().Should().Be(1);
         }
+        
+        [Fact]
+        public void BlankRowBehaviourAttributeWorks()
+        {
+            var testSpreadsheetLocation = TestHelper.TestsheetPath("TestSpreadsheet2.xlsx");
+            var result = testSpreadsheetLocation.ExcelToEnumerable<BlankRowBehaviourAttributeTest>();
+            result.Count().Should().Be(1);
+        }
 
         [Fact]
         public void ThrowExceptionOnBlankRowOptionsWorks()
@@ -1156,8 +1300,9 @@ namespace ExcelToEnumerable.Tests
         {
             var testSpreadsheetLocation = TestHelper.TestsheetPath("TestSpreadsheet3DifferentColumnOrder.xlsx");
             var result =
-                testSpreadsheetLocation.ExcelToEnumerable<TestClass>(x => x.StartingFromRow(1).UsingHeaderNames(true));
-            result.Count().Should().Be(3);
+                testSpreadsheetLocation.ExcelToEnumerable<TestClass>(x => x.StartingFromRow(1).UsingHeaderNames(true))
+                    .ToArray();
+            result.Length.Should().Be(3);
             var row1 = result.First();
             row1.String.Should().Be("abc123");
             row1.Int.Should().Be(1);
@@ -1187,8 +1332,28 @@ namespace ExcelToEnumerable.Tests
                     .Property(y => y.Int).ShouldBeUnique()
                     .OutputExceptionsTo(exceptionList)
             );
-            exceptionList.Count().Should().Be(2);
+            exceptionList.Count.Should().Be(2);
             result.Count().Should().Be(1);
+        }
+        
+        [Fact]
+        public void ShouldBeUniqueAttributeWorks()
+        {
+            AggregateException exception = null;
+            try
+            {
+                var testSpreadsheetLocation = TestHelper.TestsheetPath("TestSpreadsheet1.xlsx");
+                testSpreadsheetLocation.ExcelToEnumerable<UniqueAttributeTestClass>();
+            }
+            catch (AggregateException e)
+            {
+                exception = e;
+            }
+
+            exception.Should().NotBeNull();
+            // ReSharper disable once PossibleNullReferenceException
+            var exceptionList = exception.InnerExceptions;
+            exceptionList.Count.Should().Be(2);
         }
 
         [Fact]
@@ -1362,7 +1527,7 @@ namespace ExcelToEnumerable.Tests
         }
 
         [Fact]
-        public void ColumnsMappedByNumberButWithUnmappedColumnsWorks()
+        public void ColumnsMappedByNumberButAlsoWithUnmappedColumnsWorks()
         {
             var testSpreadsheetLocation = TestHelper.TestsheetPath("ColumnsMappedByNumberButWithUnmappedColumns.xlsx");
             var result =

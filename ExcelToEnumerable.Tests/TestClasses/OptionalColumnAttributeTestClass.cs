@@ -1,9 +1,12 @@
 using System;
+using ExcelToEnumerable.Attributes;
 
 namespace ExcelToEnumerable.Tests.TestClasses
 {
-    public class TestClass
+    [StartingFromRow(2)]
+    public class OptionalColumnAttributeTestClass
     {
+        [Ignore]
         public string String { get; set; }
         public int? Int { get; set; }
         public DateTime? DateTime { get; set; }

@@ -1,8 +1,11 @@
 using System;
+using ExcelToEnumerable.Attributes;
 
 namespace ExcelToEnumerable.Tests.TestClasses
 {
-    public class TestClass
+    [StartingFromRow(2)]
+    [UsingSheet(1)]
+    public class WorksheetByNumberAttributeTestClass
     {
         public string String { get; set; }
         public int? Int { get; set; }

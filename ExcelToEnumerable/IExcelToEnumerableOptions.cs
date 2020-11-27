@@ -25,13 +25,13 @@ namespace ExcelToEnumerable
         
         ExceptionHandlingBehaviour ExceptionHandlingBehaviour { get; }
         
-        Dictionary<string, List<ExcelCellValidator>> Validations { get; set; }
+        MemberInitializingDictionary<string, List<ExcelCellValidator>> Validations { get;  }
         
         IEnumerable<string> LoweredRequiredColumns { get; }
         
         Dictionary<string, ExcelToEnumerableCollectionConfiguration> CollectionConfigurations { get; set; }
         
-        List<string> UniqueProperties { get; set; }
+        List<string> UniqueProperties { get; }
         
         Action<IDictionary<int, string>> OnReadingHeaderRowAction { get; }
         

@@ -3,10 +3,10 @@ using System;
 namespace ExcelToEnumerable.Attributes
 {
     /// <summary>
-    /// Prevents an exception from being thrown if the property does not have a matching column in the spreadsheet. Overrides the
-    /// behaviour of the class level <see cref="AllPropertiesMustBeMappedToColumnsAttribute"/>
+    /// Prevents the mapper form mapping this property, even if a corresponding column is present in the worksheet
     /// </summary>
     [AttributeUsage(AttributeTargets.Property)]
+    // ReSharper disable once ClassNeverInstantiated.Global
     public class IgnoreAttribute : Attribute
     {
     }

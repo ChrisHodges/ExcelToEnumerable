@@ -3,18 +3,18 @@ using System;
 namespace ExcelToEnumerable.Attributes
 {
     /// <summary>
-    /// Maps from a column at the specified numeric index.
+    /// Maps from the column with the specified header name
     /// </summary>
     [AttributeUsage(AttributeTargets.Property)]
     // ReSharper disable once ClassNeverInstantiated.Global
-    public class UsesColumnNumberAttribute : Attribute
+    public class UsesColumnNamedAttribute : Attribute
     {
         /// <summary>
-        /// Pass the 1-based column number you want to map from.
+        /// Maps from the column with the specified header name
         /// </summary>
-        /// <param name="i"></param>
+        /// <param name="columnName"></param>
         // ReSharper disable once UnusedParameter.Local
-        public UsesColumnNumberAttribute(int i)
+        public UsesColumnNamedAttribute(string columnName)
         {
         }
     }

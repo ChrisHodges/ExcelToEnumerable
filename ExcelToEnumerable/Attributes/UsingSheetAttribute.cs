@@ -10,10 +10,18 @@ namespace ExcelToEnumerable.Attributes
         /// <summary>
         /// Maps the class to the spreadsheet with the given name
         /// </summary>
-        /// <param name="columns"></param>
+        /// <param name="column"></param>
         /// <exception cref="NotImplementedException"></exception>
         // ReSharper disable once UnusedParameter.Local
-        public UsingSheetAttribute(string columns)
+        public UsingSheetAttribute(string column)
+        {
+        }
+        
+        /// <summary>
+        /// Maps the class to the spreadsheet at the given zero-based index
+        /// </summary>
+        /// <param name="column"></param>
+        public UsingSheetAttribute(int column)
         {
         }
     }

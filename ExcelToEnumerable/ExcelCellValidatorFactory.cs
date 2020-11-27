@@ -36,6 +36,16 @@ namespace ExcelToEnumerable
                 ExcelToEnumerableValidationCode = ExcelToEnumerableValidationCode.OneOf
             };
         }
+        
+        internal static ExcelCellValidator CreateShouldBeOneOf(object[] oneOfArray)
+        {
+            return new ExcelCellValidator
+            {
+                Message = $"Should be one of {string.Join(", ", oneOfArray.Select(y => y.ToString()))}",
+                Validator = o => oneOfArray.Contains(o),
+                ExcelToEnumerableValidationCode = ExcelToEnumerableValidationCode.OneOf
+            };
+        }
 
         internal static ExcelCellValidator CreateRequired()
         {
