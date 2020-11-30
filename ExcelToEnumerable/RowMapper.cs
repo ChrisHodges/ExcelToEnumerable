@@ -135,6 +135,11 @@ namespace ExcelToEnumerable
                 cellValue = Convert.ToInt32(cellValue);
             }
 
+            if (type == typeof(long?) || type == typeof(long) && cellValue is double)
+            {
+                cellValue = Convert.ToInt64(cellValue);
+            }
+
             return cellValue;
         }
 
@@ -159,15 +164,7 @@ namespace ExcelToEnumerable
                     cellValue = fromCellSetter.CustomMapping != null
                         ? fromCellSetter.CustomMapping(cellValue)
                         : ConvertType(cellValue, fromCellSetter.Type);
-                    if (fromCellSetter.Type == typeof(long))
-                    {
-                        long lng = Convert.ToInt64(cellValue);
-                        fromCellSetter.Setter(obj, lng);
-                    }
-                    else
-                    {
-                        fromCellSetter.Setter(obj, cellValue);
-                    }
+                    fromCellSetter.Setter(obj, cellValue);
                 }
                 catch (Exception e)
                 {
