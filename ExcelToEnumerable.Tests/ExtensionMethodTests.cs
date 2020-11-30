@@ -1541,5 +1541,21 @@ namespace ExcelToEnumerable.Tests
             result[0].PropertyA.Should().Be("A");
             result[0].PropertyB.Should().Be("B");
         }
+
+        [Fact]
+        public void AllNumericFormatsTest()
+        {
+            var testSpreadsheetLocation = TestHelper.TestsheetPath("AllNumericFormats.xlsx");
+            var result = testSpreadsheetLocation.ExcelToEnumerable<AllNumericFormatsTestClass>().ToArray();
+            result.Length.Should().Be(2);
+            result[0].Int.Should().Be(1);
+            result[0].Long.Should().Be(4294967296);
+            result[0].Double.Should().Be(4294967296);
+            result[0].Decimal.Should().Be(23.0123456789012M);
+            result[1].Int.Should().Be(-1);
+            result[1].Long.Should().Be(-4294967296);
+            result[1].Double.Should().Be(-4294967296);
+            result[1].Decimal.Should().Be(-23.0123456789012M);
+        }
     }
 }

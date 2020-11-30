@@ -159,7 +159,15 @@ namespace ExcelToEnumerable
                     cellValue = fromCellSetter.CustomMapping != null
                         ? fromCellSetter.CustomMapping(cellValue)
                         : ConvertType(cellValue, fromCellSetter.Type);
-                    fromCellSetter.Setter(obj, cellValue);
+                    if (fromCellSetter.Type == typeof(long))
+                    {
+                        long lng = Convert.ToInt64(cellValue);
+                        fromCellSetter.Setter(obj, lng);
+                    }
+                    else
+                    {
+                        fromCellSetter.Setter(obj, cellValue);
+                    }
                 }
                 catch (Exception e)
                 {

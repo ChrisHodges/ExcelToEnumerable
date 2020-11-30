@@ -1,3 +1,5 @@
+using System.Runtime.InteropServices;
+
 namespace ExcelToEnumerable.Tests
 {
     public class ColumnsMappedByNumberButWithUnmappedColumnsTestClass
