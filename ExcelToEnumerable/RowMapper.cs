@@ -112,11 +112,16 @@ namespace ExcelToEnumerable
             }
         }
 
-        private object ConvertType(object cellValue, Type type)
+        private object ConvertType(object cellValue, Type type, bool relaxedNumberMatching)
         {
             if (type == typeof(string) && !(cellValue is string))
             {
                 cellValue = cellValue.ToString();
+            }
+
+            if (cellValue is string && relaxedNumberMatching)
+            {
+                cellValue = RelaxedNumericConvert.ToDouble(cellValue.ToString());
             }
 
             if ((type == typeof(decimal) || type == typeof(decimal?)) && cellValue is double)
@@ -163,7 +168,7 @@ namespace ExcelToEnumerable
                 {
                     cellValue = fromCellSetter.CustomMapping != null
                         ? fromCellSetter.CustomMapping(cellValue)
-                        : ConvertType(cellValue, fromCellSetter.Type);
+                        : ConvertType(cellValue, fromCellSetter.Type, fromCellSetter.RelaxedNumberMatching);
                     fromCellSetter.Setter(obj, cellValue);
                 }
                 catch (Exception e)
@@ -226,8 +231,7 @@ namespace ExcelToEnumerable
 
         private ExcelToEnumerableCellException CreateExceptionForMissingField(string missingField, int rowCount)
         {
-            if (!_cellSettersDictionaryForRead.Any(x =>
-                x.Value.ColumnName.ToLowerInvariant() == missingField.ToLowerInvariant()))
+            if (_cellSettersDictionaryForRead.All(x => x.Value.ColumnName.ToLowerInvariant() != missingField.ToLowerInvariant()))
             {
                 throw new Exception($"Unable to map {missingField} to cell setter");
             }

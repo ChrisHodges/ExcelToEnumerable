@@ -150,6 +150,9 @@ namespace ExcelToEnumerable
                     case nameof(WithBlankRowBehaviourAttribute):
                         builder.BlankRowBehaviour((BlankRowBehaviour) attribute.ConstructorArguments[0].Value);
                         break;
+                    case nameof(RelaxedNumberMatchingAttribute):
+                        builder.RelaxedNumberMatching((bool)attribute.ConstructorArguments[0].Value);
+                        break;
                 }
             }
         }
@@ -231,6 +234,12 @@ namespace ExcelToEnumerable
         public IExcelToEnumerableOptionsBuilder<T> AllPropertiesMustBeMappedToColumns(bool b)
         {
             _options.AllPropertiesOptionalByDefault = !b;
+            return this;
+        }
+
+        public IExcelToEnumerableOptionsBuilder<T> RelaxedNumberMatching(bool b)
+        {
+            _options.RelaxedNumberMatching = b;
             return this;
         }
 

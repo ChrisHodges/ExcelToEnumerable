@@ -16,4 +16,19 @@ namespace ExcelToEnumerable.Attributes
         {
         }
     }
+    
+    /// <summary>
+    /// Using this attribute causes cells that are strings, but that contain numeric values, to map to numeric properties. For example,
+    /// a string containing the "1,512kg" would map to an integer property with a value of 1512.
+    /// </summary>
+    [AttributeUsage(AttributeTargets.Class)]
+    public class RelaxedNumberMatchingAttribute : Attribute
+    {
+        /// <summary>
+        /// Pass <c>true</c> (default) to enable relaxed number matching or false to disable.
+        /// </summary>
+        public RelaxedNumberMatchingAttribute(bool b = true)
+        {
+        }
+    }
 }

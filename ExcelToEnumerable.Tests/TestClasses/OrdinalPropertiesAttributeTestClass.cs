@@ -16,4 +16,10 @@ namespace ExcelToEnumerable.Tests.TestClasses
         [UsesColumnNumber(2)]
         public string ColumnB { get; set; }
     }
+
+    [RelaxedNumberMatching(true)]
+    public class RelaxedNumberMatchingAttributeTestClass
+    {
+        public int Int { get; set; }
+    }
 }

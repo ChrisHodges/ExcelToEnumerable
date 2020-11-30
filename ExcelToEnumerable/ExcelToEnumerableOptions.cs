@@ -117,6 +117,7 @@ namespace ExcelToEnumerable
         public List<string> OptionalProperties { get; set; } = new List<string>();
         public bool IgnoreColumnsWithoutMatchingProperties { get; set; }
         public List<string> ExplicitlyRequiredProperties { get; set; } = new List<string>();
+        public bool RelaxedNumberMatching { get; set; }
 
         private IEnumerable<string> CreateLoweredRequiredColumns()
         {

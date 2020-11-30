@@ -75,5 +75,13 @@ namespace ExcelToEnumerable.Tests
             var result = builder.Build();
             result.UniqueProperties.Count.Should().Be(2);
         }
+        
+        [Fact]
+        public void Adds_RelaxedNumericMatching_Attribute()
+        {
+            var builder = new ExcelToEnumerableOptionsBuilder<RelaxedNumberMatchingAttributeTestClass>();
+            var result = builder.Build();
+            result.RelaxedNumberMatching.Should().BeTrue();
+        }
     }
 }

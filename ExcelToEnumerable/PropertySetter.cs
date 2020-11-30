@@ -21,5 +21,6 @@ namespace ExcelToEnumerable
         public Func<object, object> Getter { get; set; }
 
         public Func<object, object> CustomMapping { get; internal set; }
+        public bool RelaxedNumberMatching { get; set; }
     }
 }

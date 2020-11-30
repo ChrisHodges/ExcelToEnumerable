@@ -49,17 +49,17 @@ namespace ExcelToEnumerable
         private IEnumerable<PropertySetter> GetSetters<T>(Type type, IExcelToEnumerableOptions<T> options)
         {
             var propertyDescriptorCollection = TypeDescriptor.GetProperties(type);
-            var list = propertyDescriptorCollection.Cast<PropertyDescriptor>();
+            var propertyDescriptors = propertyDescriptorCollection.Cast<PropertyDescriptor>().ToArray();
             if (options.UnmappedProperties != null)
             {
-                list = list.Where(x => !options.UnmappedProperties.Contains(x.Name));
+                propertyDescriptors = propertyDescriptors.Where(x => !options.UnmappedProperties.Contains(x.Name)).ToArray();
             }
 
-            return list.Select(x =>
-                    GetSettersForProperty(type.GetProperty(x.Name), Array.IndexOf(list.ToArray(), x), options))
+            return propertyDescriptors.Select(x =>
+                    GetSettersForProperty(type.GetProperty(x.Name), Array.IndexOf(propertyDescriptors.ToArray(), x), options))
                 .SelectMany(y => y).ToArray();
         }
-        
+
         private IEnumerable<PropertySetter> GetSettersForProperty<T>(PropertyInfo propertyInfo, int index,
             IExcelToEnumerableOptions<T> options)
         {
@@ -93,7 +93,8 @@ namespace ExcelToEnumerable
                     ? options.CustomMappings[propertyInfo.Name]
                     : DefaultTypeMappers.Dictionary.ContainsKey(propertyInfo.PropertyType)
                         ? DefaultTypeMappers.Dictionary[propertyInfo.PropertyType]
-                        : null
+                        : null,
+                RelaxedNumberMatching = options.RelaxedNumberMatching && propertyInfo.PropertyType.IsNumeric()
             };
             if (propertyInfo.Name == options.RowNumberProperty)
             {
@@ -131,7 +132,7 @@ namespace ExcelToEnumerable
             return fromCellSetters;
         }
 
-        internal RowMapper CreateRowMapperFromPropertyDescriptorCollection<T>(
+        private RowMapper CreateRowMapperFromPropertyDescriptorCollection<T>(
             IExcelToEnumerableOptions<T> options)
         {
             var type = typeof(T);

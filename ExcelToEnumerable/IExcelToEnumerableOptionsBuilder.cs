@@ -204,5 +204,20 @@ namespace ExcelToEnumerable
         /// </example>
         /// <returns></returns>
         IExcelToEnumerableOptionsBuilder<T> AllPropertiesMustBeMappedToColumns(bool b);
+
+        /// <summary>
+        /// Setting this to true causes cells that are strings, but that contain numeric values, to map to numeric properties. For example,
+        /// a string containing the "1,512kg" would map to an integer property with a value of 1512.
+        /// </summary>
+        /// <example>
+        /// <code>
+        /// IEnumerable&lt;MyClass&gt; results = excelStream.ExcelToEnumerable&lt;MyClass&gt;(x => x
+        ///     .RelaxedNumberMatching()
+        /// );
+        /// </code>
+        /// </example>
+        /// <param name="b"></param>
+        /// <returns></returns>
+        IExcelToEnumerableOptionsBuilder<T> RelaxedNumberMatching(bool b);
     }
 }

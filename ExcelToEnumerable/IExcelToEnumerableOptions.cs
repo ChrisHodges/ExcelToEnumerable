@@ -54,5 +54,6 @@ namespace ExcelToEnumerable
         List<string> ExplicitlyRequiredProperties { get; set; }
         
         bool AllPropertiesOptionalByDefault { get; set; }
+        bool RelaxedNumberMatching { get; set; }
     }
 }

@@ -1557,5 +1557,32 @@ namespace ExcelToEnumerable.Tests
             result[1].Double.Should().Be(-4294967296);
             result[1].Decimal.Should().Be(-23.0123456789012M);
         }
+
+        [Fact]
+        public void RelaxedNumberMatchingWorks()
+        {
+            var testSpreadsheetLocation = TestHelper.TestsheetPath("FuzzyNumericMatch.xlsx");
+            var result = testSpreadsheetLocation.ExcelToEnumerable<AllNumericFormatsTestClass>(x => x.RelaxedNumberMatching(true))
+                .ToArray();
+            result.Length.Should().Be(2);
+            
+            result[0].Int.Should().Be(1);
+            result[0].Long.Should().Be(-123456789);
+            result[0].Double.Should().Be(-123456789.222);
+            result[0].Decimal.Should().Be(-123456789.222M);
+            result[0].NullableInt.Should().Be(1);
+            result[0].NullableLong.Should().Be(-123456789);
+            result[0].NullableDouble.Should().Be(-123456789.222);
+            result[0].NullableDecimal.Should().Be(-123456789.222M);
+            
+            result[1].Int.Should().Be(1);
+            result[1].Long.Should().Be(-123456789);
+            result[1].Double.Should().Be(-123456789.222);
+            result[1].Decimal.Should().Be(-123456789.222M);
+            result[1].NullableInt.Should().Be(null);
+            result[1].NullableLong.Should().Be(null);
+            result[1].NullableDouble.Should().Be(null);
+            result[1].NullableDecimal.Should().Be(null);
+        }
     }
 }
