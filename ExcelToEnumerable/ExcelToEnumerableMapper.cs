@@ -47,12 +47,24 @@ namespace ExcelToEnumerable
             var list = new List<T>();
             do
             {
-                if (worksheet.CurrentRowNumber > _options.EndRow)
+                if (_options.EndRow < 0 && worksheet.WorksheetDimension == null)
+                {
+                    throw new NotImplementedException("ExcelToEnumerable is currently unable to handle a negative EndingWithRow value for a worksheet that does not have a WorksheetDimension xml element.");
+                }
+                if (_options.EndRow < 0 && worksheet.WorksheetDimension != null)
+                {
+                    if (worksheet.CurrentRowNumber > worksheet.WorksheetDimension.BottomRight.Row + _options.EndRow)
+                    {
+                        break;
+                    }
+                }
+                if (_options.EndRow >= 0 && worksheet.CurrentRowNumber > _options.EndRow)
                 {
                     break;
                 }
 
                 rowMapper.ReadRowValues(worksheet);
+                // ReSharper disable once PossibleInvalidOperationException
                 var rowNumber = worksheet.CurrentRowNumber.Value;
                 switch (options.BlankRowBehaviour)
                 {
@@ -66,16 +78,15 @@ namespace ExcelToEnumerable
                         {
                             list.Add(item);
                         }
-
                         break;
                     case BlankRowBehaviour.StopReading:
+                        // ReSharper disable once IdentifierTypo
                         var continu =
                             HandleStopReadingOrThrowExceptionBehaviour(worksheet, list, rowMapper);
                         if (!continu)
                         {
                             return list;
                         }
-
                         break;
                     case BlankRowBehaviour.ThrowException:
                         var addedRow =
@@ -87,7 +98,6 @@ namespace ExcelToEnumerable
                                 $"Blank row found at row: '{rowNumber}'", rowNumber,
                                 rowMapper.RowValuesByColumRef);
                         }
-
                         break;
                 }
 

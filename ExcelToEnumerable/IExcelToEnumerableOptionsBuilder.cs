@@ -129,7 +129,8 @@ namespace ExcelToEnumerable
         IExcelPropertyConfiguration<T, TProperty> Property<TProperty>(Expression<Func<T, TProperty>> propertyExpression);
         
         /// <summary>
-        /// The highest row number to read up to. 1-based. If not set then the mapper will read to the end of the sheet.
+        /// The highest row number to read up to. 1-based. If negative, the mapper will read the until specified number of rows from the bottom.
+        /// If not set then the mapper will read to the end of the sheet.
         /// </summary>
         /// <example>
         /// <code>

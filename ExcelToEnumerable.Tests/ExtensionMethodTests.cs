@@ -1559,6 +1559,32 @@ namespace ExcelToEnumerable.Tests
         }
 
         [Fact]
+        public void EndingWithRowNegativeWorks()
+        {
+            var testSpreadsheetLocation = TestHelper.TestsheetPath("EndingWithRowNegative.xlsx");
+            var result = testSpreadsheetLocation.ExcelToEnumerable<EndingWithRowNegativeTestClass>(x => x
+                .EndingWithRow(-2)).ToArray();
+            result.Length.Should().Be(5);
+            result[0].Column.Should().Be(1);
+            result[1].Column.Should().Be(2);
+            result[2].Column.Should().Be(3);
+            result[3].Column.Should().Be(4);
+            result[4].Column.Should().Be(5);
+        }
+        
+        [Fact]
+        public void EndingWithRowNegativeAndNoDimensionWorksheetThrowsNotImplementedException()
+        {
+            var testSpreadsheetLocation = TestHelper.TestsheetPath("EndingWithRowNegativeNoDimension.xlsx");
+            Action action = () =>
+            {
+                testSpreadsheetLocation.ExcelToEnumerable<EndingWithRowNegativeTestClass>(x => x
+                    .EndingWithRow(-2));
+            };
+            action.Should().ThrowExactly<NotImplementedException>().WithMessage("ExcelToEnumerable is currently unable to handle a negative EndingWithRow value for a worksheet that does not have a WorksheetDimension xml element.");
+        }
+
+        [Fact]
         public void RelaxedNumberMatchingWorks()
         {
             var testSpreadsheetLocation = TestHelper.TestsheetPath("FuzzyNumericMatch.xlsx");

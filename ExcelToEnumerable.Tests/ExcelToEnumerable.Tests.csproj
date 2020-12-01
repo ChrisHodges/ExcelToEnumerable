@@ -39,6 +39,12 @@
       <Content Include="TestSpreadsheets\doubletest.xlsx">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </Content>
+      <Content Include="TestSpreadsheets\EndingWithRowNegative.xlsx">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <Content Include="TestSpreadsheets\EndingWithRowNegativeNoDimension.xlsx">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
       <Content Include="TestSpreadsheets\Exceptions.xlsx">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </Content>
