@@ -6,13 +6,13 @@ namespace ExcelToEnumerable.Tests.TestClasses
     [StartingFromRow(2)]
     public class OrdinalPropertiesColumnLetterAttributeTestClass
     {
-        [UsesColumnLetter("C")]
+        [MapsToColumnLetter("C")]
         public string ColumnC { get; set; }
 
-        [UsesColumnLetter("A")]
+        [MapsToColumnLetter("A")]
         public string ColumnA { get; set; }
 
-        [UsesColumnLetter("B")]
+        [MapsToColumnLetter("B")]
         public string ColumnB { get; set; }
     }
 }

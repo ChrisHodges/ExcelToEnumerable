@@ -8,12 +8,12 @@ namespace ExcelToEnumerable
 {
     internal static class ExcelPropertyConfiguration
     {
-        internal static void UsesColumnNumber<T>(int i, string propertyName, IExcelToEnumerableOptions<T> options)
+        internal static void MapsToColumnNumber<T>(int i, string propertyName, IExcelToEnumerableOptions<T> options)
         {
             if (i < 1)
             {
                 throw new ExcelToEnumerableConfigException(
-                    $"Unable to map '{propertyName}' to column {i}. UsesColumnNumber expects a 1-based column number");
+                    $"Unable to map '{propertyName}' to column {i}. MapsToColumnNumber expects a 1-based column number");
             }
 
             options.CustomHeaderNumbers[propertyName] = i - 1;
@@ -49,7 +49,7 @@ namespace ExcelToEnumerable
             options.CollectionConfigurations.Add(propertyName, configuration);
         }
 
-        public static void UsesColumnNamed<T>(string columnName, string propertyName, IExcelToEnumerableOptions<T> options)
+        public static void MapsToColumnNamed<T>(string columnName, string propertyName, IExcelToEnumerableOptions<T> options)
         {
             options.CustomHeaderNames[propertyName] = columnName;
         }
@@ -166,9 +166,9 @@ namespace ExcelToEnumerable
             return _optionsBuilder;
         }
 
-        public IExcelToEnumerableOptionsBuilder<T> UsesColumnNamed(string columnName)
+        public IExcelToEnumerableOptionsBuilder<T> MapsToColumnNamed(string columnName)
         {
-            ExcelPropertyConfiguration.UsesColumnNamed(columnName, _propertyName, _options);
+            ExcelPropertyConfiguration.MapsToColumnNamed(columnName, _propertyName, _options);
             return _optionsBuilder;
         }
 
@@ -210,13 +210,13 @@ namespace ExcelToEnumerable
             return _optionsBuilder;
         }
 
-        public IExcelToEnumerableOptionsBuilder<T> UsesColumnNumber(int i)
+        public IExcelToEnumerableOptionsBuilder<T> MapsToColumnNumber(int i)
         {
-            ExcelPropertyConfiguration.UsesColumnNumber(i, _propertyName, _options);
+            ExcelPropertyConfiguration.MapsToColumnNumber(i, _propertyName, _options);
             return _optionsBuilder;
         }
 
-        public IExcelToEnumerableOptionsBuilder<T> UsesColumnLetter(string columnLetter)
+        public IExcelToEnumerableOptionsBuilder<T> MapsToColumnLetter(string columnLetter)
         {
             _options.CustomHeaderNumbers[_propertyName] = CellRef.ColumnNameToNumber(columnLetter) - 1;
             return _optionsBuilder;

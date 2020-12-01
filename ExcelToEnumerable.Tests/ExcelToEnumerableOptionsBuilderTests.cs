@@ -59,7 +59,7 @@ namespace ExcelToEnumerable.Tests
         }
         
         [Fact]
-        public void Adds_UsesColumnNumber_Attribute()
+        public void Adds_MapsToColumnNumber_Attribute()
         {
             var builder = new ExcelToEnumerableOptionsBuilder<OrdinalPropertiesAttributeTestClass>();
             var result = builder.Build();

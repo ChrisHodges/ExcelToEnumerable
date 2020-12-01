@@ -169,13 +169,13 @@ namespace ExcelToEnumerable
                 {
                     switch (propertyAttribute.AttributeType.Name)
                     {
-                        case nameof(UsesColumnNumberAttribute):
+                        case nameof(MapsToColumnNumberAttribute):
                             var columnNumber = (int) propertyAttribute.ConstructorArguments[0].Value;
-                            ExcelPropertyConfiguration.UsesColumnNumber(columnNumber, property.Name, builder._options);
+                            ExcelPropertyConfiguration.MapsToColumnNumber(columnNumber, property.Name, builder._options);
                             break;
-                        case nameof(UsesColumnLetterAttribute):
+                        case nameof(MapsToColumnLetterAttribute):
                             var columnLetter = (string) propertyAttribute.ConstructorArguments[0].Value;
-                            ExcelPropertyConfiguration.UsesColumnNumber(CellRef.ColumnNameToNumber(columnLetter),
+                            ExcelPropertyConfiguration.MapsToColumnNumber(CellRef.ColumnNameToNumber(columnLetter),
                                 property.Name, builder._options);
                             break;
                         case nameof(OptionalAttribute):
@@ -187,9 +187,9 @@ namespace ExcelToEnumerable
                                     .ConstructorArguments[0].Value).Select(x => x.Value.ToString());
                             ExcelPropertyConfiguration.MapFromColumns(columnNames, property.Name, builder._options);
                             break;
-                        case nameof(UsesColumnNamedAttribute):
+                        case nameof(MapsToColumnNamedAttribute):
                             var columnName = (string) propertyAttribute.ConstructorArguments[0].Value;
-                            ExcelPropertyConfiguration.UsesColumnNamed(columnName, property.Name, builder._options);
+                            ExcelPropertyConfiguration.MapsToColumnNamed(columnName, property.Name, builder._options);
                             break;
                         case nameof(IgnoreAttribute):
                             ExcelPropertyConfiguration.Ignore(property.Name, builder._options);

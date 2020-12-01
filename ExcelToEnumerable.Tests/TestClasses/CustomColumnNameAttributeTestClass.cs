@@ -10,7 +10,7 @@ namespace ExcelToEnumerable.Tests.TestClasses
     {
         public string String { get; set; }
         
-        [UsesColumnNamed("IntCustomName")]
+        [MapsToColumnNamed("IntCustomName")]
         public int? Int { get; set; }
         public DateTime? DateTime { get; set; }
         public double? Decimal { get; set; }

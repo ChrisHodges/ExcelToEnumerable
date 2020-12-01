@@ -141,13 +141,13 @@ namespace ExcelToEnumerable
         /// <example>
         /// <code>
         /// var result = excelStream.ExcelToEnumerable&lt;MyClass&gt;(x => x
-        ///     .Property(y => y.MyProperty).UsesColumnNamed("My Property");
+        ///     .Property(y => y.MyProperty).MapsToColumnNamed("My Property");
         /// );
         /// </code>
         /// </example>
         /// <param name="columnName"></param>
         /// <returns></returns>
-        IExcelToEnumerableOptionsBuilder<T> UsesColumnNamed(string columnName);
+        IExcelToEnumerableOptionsBuilder<T> MapsToColumnNamed(string columnName);
         
         /// <summary>
         /// Does not attempt to map property.
@@ -182,12 +182,12 @@ namespace ExcelToEnumerable
         /// <example>
         /// <code>
         /// var result = excelStream.ExcelToEnumerable&lt;MyClass&gt;(x => x
-        ///     .Property(y => y.MyProperty).UsesColumnNumber(5)
+        ///     .Property(y => y.MyProperty).MapsToColumnNumber(5)
         /// );
         /// </code>
         /// </example>
         /// <returns></returns>
-        IExcelToEnumerableOptionsBuilder<T> UsesColumnNumber(int i);
+        IExcelToEnumerableOptionsBuilder<T> MapsToColumnNumber(int i);
 
         /// <summary>
         /// Maps from a column with the specified letter, e.g. A, M, AB, ZZA, etc.
@@ -198,11 +198,11 @@ namespace ExcelToEnumerable
         /// <example>
         /// <code>
         /// var result = excelStream.ExcelToEnumerable&lt;MyClass&gt;(x => x
-        ///     .Property(y => y.MyProperty).UsesColumnLetter("E")
+        ///     .Property(y => y.MyProperty).MapsToColumnLetter("E")
         /// );
         /// </code>
         /// </example>
-        IExcelToEnumerableOptionsBuilder<T> UsesColumnLetter(string columnLetter);
+        IExcelToEnumerableOptionsBuilder<T> MapsToColumnLetter(string columnLetter);
         
         /// <summary>
         /// Marks the property as optional. The mapped property will remain at its default value if the cell value is null.

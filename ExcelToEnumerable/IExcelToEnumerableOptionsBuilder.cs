@@ -119,7 +119,7 @@ namespace ExcelToEnumerable
         /// <code>
         /// IEnumerable&lt;MyClass&gt; results = excelStream.ExcelToEnumerable&lt;MyClass&gt;(x => x
         ///     .Property(y => y.MyProperty).ShouldBeUnique()
-        ///     .Property(y => y.AnotherProperty).UsesColumnNamed("Column Name")
+        ///     .Property(y => y.AnotherProperty).MapsToColumnNamed("Column Name")
         /// );
         /// </code>
         /// </example>

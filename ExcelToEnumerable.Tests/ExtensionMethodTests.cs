@@ -146,8 +146,8 @@ namespace ExcelToEnumerable.Tests
             var result = testSpreadsheetLocation.ExcelToEnumerable<NoHeaderTestClass>(
                 x => x.UsingHeaderNames(false)
                     .UsingSheet("Numbered Columns")
-                    .Property(y => y.ColumnA).UsesColumnNumber(2)
-                    .Property(y => y.ColumnB).UsesColumnNumber(1)
+                    .Property(y => y.ColumnA).MapsToColumnNumber(2)
+                    .Property(y => y.ColumnB).MapsToColumnNumber(1)
             ).ToArray();
             result.First().ColumnA.Should().Be("Value1");
             result.First().ColumnB.Should().Be(1234);
@@ -156,15 +156,15 @@ namespace ExcelToEnumerable.Tests
         }
 
         [Fact]
-        public void UsesColumnNumberWorks()
+        public void MapsToColumnNumberWorks()
         {
             var testSpreadsheetLocation = TestHelper.TestsheetPath("OrdinalPropertiesTest.xlsx");
             var result = testSpreadsheetLocation.ExcelToEnumerable<OrdinalPropertiesTestClass>(x =>
                 x.StartingFromRow(4)
                     .UsingHeaderNames(false)
-                    .Property(y => y.ColumnA).UsesColumnNumber(1)
-                    .Property(y => y.ColumnB).UsesColumnNumber(2)
-                    .Property(y => y.ColumnC).UsesColumnNumber(3)
+                    .Property(y => y.ColumnA).MapsToColumnNumber(1)
+                    .Property(y => y.ColumnB).MapsToColumnNumber(2)
+                    .Property(y => y.ColumnC).MapsToColumnNumber(3)
                     .Property(y => y.ColumnAA).Ignore()
                     .Property(y => y.IgnoreThisProperty).Ignore()
             ).ToArray();
@@ -178,7 +178,7 @@ namespace ExcelToEnumerable.Tests
         }
         
         [Fact]
-        public void UsesColumnNumber_Attribute_Works()
+        public void MapsToColumnNumber_Attribute_Works()
         {
             var testSpreadsheetLocation = TestHelper.TestsheetPath("OrdinalPropertiesAttributeTest.xlsx");
             var result = testSpreadsheetLocation.ExcelToEnumerable<OrdinalPropertiesAttributeTestClass>().ToArray();
@@ -192,16 +192,16 @@ namespace ExcelToEnumerable.Tests
         }
 
         [Fact]
-        public void UsesColumnLetterWorks()
+        public void MapsToColumnLetterWorks()
         {
             var testSpreadsheetLocation = TestHelper.TestsheetPath("OrdinalPropertiesTest.xlsx");
             var result = testSpreadsheetLocation.ExcelToEnumerable<OrdinalPropertiesTestClass>(x =>
                 x.StartingFromRow(4)
                     .UsingHeaderNames(false)
-                    .Property(y => y.ColumnA).UsesColumnLetter("A")
-                    .Property(y => y.ColumnB).UsesColumnLetter("B")
-                    .Property(y => y.ColumnC).UsesColumnLetter("C")
-                    .Property(y => y.ColumnAA).UsesColumnLetter("AA")
+                    .Property(y => y.ColumnA).MapsToColumnLetter("A")
+                    .Property(y => y.ColumnB).MapsToColumnLetter("B")
+                    .Property(y => y.ColumnC).MapsToColumnLetter("C")
+                    .Property(y => y.ColumnAA).MapsToColumnLetter("AA")
                     .Property(y => y.Row).MapsToRowNumber()
                     .Property(y => y.IgnoreThisProperty).Ignore()
             ).ToArray();
@@ -218,7 +218,7 @@ namespace ExcelToEnumerable.Tests
         }
         
         [Fact]
-        public void UsesColumnLetterAttributeWorks()
+        public void MapsToColumnLetterAttributeWorks()
         {
             var testSpreadsheetLocation = TestHelper.TestsheetPath("OrdinalPropertiesAttributeTest.xlsx");
             var result = testSpreadsheetLocation.ExcelToEnumerable<OrdinalPropertiesColumnLetterAttributeTestClass>().ToArray();
@@ -242,7 +242,7 @@ namespace ExcelToEnumerable.Tests
                     x => x
                         .UsingHeaderNames(false)
                         .StartingFromRow(4)
-                        .Property(y => y.ColumnC).UsesColumnLetter("C")
+                        .Property(y => y.ColumnC).MapsToColumnLetter("C")
                 );
             }
             catch (ExcelToEnumerableConfigException ex)
@@ -489,7 +489,7 @@ namespace ExcelToEnumerable.Tests
                 x => x.StartingFromRow(2)
                     .EndingWithRow(2)
                     .UsingSheet("CustomColumnName")
-                    .Property(y => y.Int).UsesColumnNamed("IntCustomName")
+                    .Property(y => y.Int).MapsToColumnNamed("IntCustomName")
             );
             result.First().Int.Should().Be(1);
         }
@@ -577,7 +577,7 @@ namespace ExcelToEnumerable.Tests
                         .Property(y => y.Vat).IsRequired()
                         .Property(y => y.Vat).ShouldBeOneOf("Standard", "Reduced", "2nd Reduced", "Zero")
                         .Property(y => y.MeasureId).IsRequired()
-                        .Property(y => y.MeasureId).UsesColumnNamed("Measure")
+                        .Property(y => y.MeasureId).MapsToColumnNamed("Measure")
                         .Property(y => y.MeasureId).UsesCustomMapping(
                             z =>
                             {
@@ -1534,8 +1534,8 @@ namespace ExcelToEnumerable.Tests
                 testSpreadsheetLocation.ExcelToEnumerable<ColumnsMappedByNumberButWithUnmappedColumnsTestClass>(x => x
                     .StartingFromRow(2)
                     .UsingHeaderNames(false)
-                    .Property(y => y.PropertyA).UsesColumnNumber(1)
-                    .Property(y => y.PropertyB).UsesColumnNumber(2)
+                    .Property(y => y.PropertyA).MapsToColumnNumber(1)
+                    .Property(y => y.PropertyB).MapsToColumnNumber(2)
                 ).ToArray();
             result.Length.Should().Be(1);
             result[0].PropertyA.Should().Be("A");
