@@ -98,7 +98,7 @@ var result = "filePath".ExcelToEnumerable<Product>(
         .Property(y => y.Vat).ShouldBeOneOf("Standard", "Reduced", "2nd Reduced", "Zero")
         .Property(y => y.Measure).IsRequired()
         .Property(y => y.Id).ShouldBeUnique()
-        .Property(y => y.SupplierDescription).MapFromColumnNamed("Supplier Description")
+        .Property(y => y.SupplierDescription).MapToColumnNamed("Supplier Description")
         
         //Map a collection to a set of columns:
         .Property(y => y.SalesVolumes).MapFromColumns("Jan-Mar","Apr-Jun","Jul-Sep","Oct-Dec")
