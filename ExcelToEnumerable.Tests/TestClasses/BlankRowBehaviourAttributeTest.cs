@@ -4,7 +4,7 @@ using ExcelToEnumerable.Attributes;
 namespace ExcelToEnumerable.Tests
 {
     [StartingFromRow(3)]
-    [WithBlankRowBehaviour(BlankRowBehaviour.StopReading)]
+    [BlankRowBehaviour(BlankRowBehaviour.StopReading)]
     public class BlankRowBehaviourAttributeTest
     {
         public string Sku { get; set; }

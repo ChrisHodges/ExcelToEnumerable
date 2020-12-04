@@ -6,13 +6,14 @@ namespace ExcelToEnumerable.Attributes
     /// Defines how the mapper should behave when encountering a blank row
     /// </summary>
     [AttributeUsage(AttributeTargets.Class)]
-    public class WithBlankRowBehaviourAttribute : Attribute
+    // ReSharper disable once ClassNeverInstantiated.Global
+    public class BlankRowBehaviourAttribute : Attribute
     {
         /// <summary>
         /// The mapper will behave in the way specified by the specified <see cref="BlankRowBehaviour"/>
         /// </summary>
         /// <param name="blankRowBehaviour"></param>
-        public WithBlankRowBehaviourAttribute(BlankRowBehaviour blankRowBehaviour)
+        public BlankRowBehaviourAttribute(BlankRowBehaviour blankRowBehaviour)
         {
         }
     }

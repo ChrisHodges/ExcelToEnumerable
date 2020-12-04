@@ -147,7 +147,7 @@ namespace ExcelToEnumerable
                     case nameof(AggregateExceptionsAttribute):
                         builder.AggregateExceptions();
                         break;
-                    case nameof(WithBlankRowBehaviourAttribute):
+                    case nameof(BlankRowBehaviourAttribute):
                         builder.BlankRowBehaviour((BlankRowBehaviour) attribute.ConstructorArguments[0].Value);
                         break;
                     case nameof(RelaxedNumberMatchingAttribute):
