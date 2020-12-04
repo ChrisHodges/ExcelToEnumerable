@@ -101,7 +101,7 @@ namespace ExcelToEnumerable
                 fromCellSetter.ColumnName = null;
             }
 
-            if (options.RequiredFields.Contains(propertyInfo.Name))
+            if (options.NotNullProperties.Contains(propertyInfo.Name))
             {
                 fromCellSetter.Validators = new List<ExcelCellValidator> {ExcelCellValidatorFactory.CreateRequired()};
             }

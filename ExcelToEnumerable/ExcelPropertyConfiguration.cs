@@ -19,17 +19,29 @@ namespace ExcelToEnumerable
             options.CustomHeaderNumbers[propertyName] = i - 1;
         }
         
-        internal static void Optional<T>(bool isOptional, string propertyName, IExcelToEnumerableOptions<T> options)
+        internal static void OptionalColumn<T>(bool isOptional, string propertyName, IExcelToEnumerableOptions<T> options)
         {
             if (isOptional)
             {
-                options.OptionalProperties.Add(propertyName);
-                options.ExplicitlyRequiredProperties.Remove(propertyName);
+                options.OptionalColumns.Add(propertyName);
+                options.ExplicitlyRequiredColumns.Remove(propertyName);
             }
             else
             {
-                options.OptionalProperties.Remove(propertyName);
-                options.ExplicitlyRequiredProperties.Add(propertyName);
+                options.OptionalColumns.Remove(propertyName);
+                options.ExplicitlyRequiredColumns.Add(propertyName);
+            }
+        }
+        
+        internal static void RequiredColumn<T>(bool isRequired, string propertyName, IExcelToEnumerableOptions<T> options)
+        {
+            if (isRequired)
+            {
+                options.ExplicitlyRequiredColumns.Add(propertyName);
+            }
+            else
+            {
+                options.ExplicitlyRequiredColumns.Remove(propertyName);
             }
         }
 
@@ -87,9 +99,9 @@ namespace ExcelToEnumerable
             options.Validations[propertyName].Add(ExcelCellValidatorFactory.CreateGreaterThan(minValue));
         }
 
-        public static void Required<T>(string propertyName, IExcelToEnumerableOptions<T> options)
+        public static void NotNullProperties<T>(string propertyName, IExcelToEnumerableOptions<T> options)
         {
-            options.RequiredFields.Add(propertyName);
+            options.NotNullProperties.Add(propertyName);
         }
 
         public static void Unique<T>(string propertyName, IExcelToEnumerableOptions<T> options)
@@ -154,9 +166,9 @@ namespace ExcelToEnumerable
             return _optionsBuilder;
         }
 
-        public IExcelToEnumerableOptionsBuilder<T> IsRequired()
+        public IExcelToEnumerableOptionsBuilder<T> NotNull()
         {
-            ExcelPropertyConfiguration.Required(_propertyName, _options);
+            ExcelPropertyConfiguration.NotNullProperties(_propertyName, _options);
             return _optionsBuilder;
         }
 
@@ -172,24 +184,22 @@ namespace ExcelToEnumerable
             return _optionsBuilder;
         }
 
-        public IExcelToEnumerableOptionsBuilder<T> Ignore()
+        public IExcelToEnumerableOptionsBuilder<T> IgnoreColumn()
         {
             ExcelPropertyConfiguration.Ignore(_propertyName, _options);
             return _optionsBuilder;
         }
 
-        public IExcelToEnumerableOptionsBuilder<T> Optional(bool isOptional)
+        public IExcelToEnumerableOptionsBuilder<T> OptionalColumn(bool isOptional)
         {
-            if (isOptional)
-            {
-                _options.OptionalProperties.Add(_propertyName);
-                _options.ExplicitlyRequiredProperties.Remove(_propertyName);
-            }
-            else
-            {
-                _options.OptionalProperties.Remove(_propertyName);
-                _options.ExplicitlyRequiredProperties.Add(_propertyName);
-            }
+            ExcelPropertyConfiguration.OptionalColumn(isOptional, _propertyName, _options);
+            return _optionsBuilder;
+        }
+        
+        
+        public IExcelToEnumerableOptionsBuilder<T> RequiredColumn(bool isRequired)
+        {
+            ExcelPropertyConfiguration.RequiredColumn(isRequired, _propertyName, _options);
             return _optionsBuilder;
         }
 

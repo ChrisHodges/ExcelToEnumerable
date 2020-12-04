@@ -9,7 +9,7 @@ namespace ExcelToEnumerable
         
         IList<Exception> ExceptionList { get; }
         
-        IList<string> RequiredFields { get; }
+        IList<string> NotNullProperties { get; }
         
         int? WorksheetNumber { get; }
         
@@ -47,11 +47,11 @@ namespace ExcelToEnumerable
         
         Dictionary<string, int> CustomHeaderNumbers { get; }
         
-        List<string> OptionalProperties { get; set; }
+        List<string> OptionalColumns { get; set; }
         
         bool IgnoreColumnsWithoutMatchingProperties { get; set; }
         
-        List<string> ExplicitlyRequiredProperties { get; set; }
+        List<string> ExplicitlyRequiredColumns { get; set; }
         
         bool AllPropertiesOptionalByDefault { get; set; }
         bool RelaxedNumberMatching { get; set; }

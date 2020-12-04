@@ -86,17 +86,17 @@ namespace ExcelToEnumerable
                 foreach (var propertyInfo in typeof(T).GetProperties())
                 {
                     var propertyName = propertyInfo.Name;
-                    if (!_options.OptionalProperties.Contains(propertyName))
+                    if (!_options.OptionalColumns.Contains(propertyName))
                     {
-                        _options.OptionalProperties.Add(propertyName);
+                        _options.OptionalColumns.Add(propertyName);
                     }
                 }
 
-                foreach (var explicitlyRequiredField in _options.ExplicitlyRequiredProperties)
+                foreach (var explicitlyRequiredField in _options.ExplicitlyRequiredColumns)
                 {
-                    if (_options.OptionalProperties.Contains(explicitlyRequiredField))
+                    if (_options.OptionalColumns.Contains(explicitlyRequiredField))
                     {
-                        _options.OptionalProperties.Remove(explicitlyRequiredField);
+                        _options.OptionalColumns.Remove(explicitlyRequiredField);
                     }
                 }
             }
@@ -178,8 +178,8 @@ namespace ExcelToEnumerable
                             ExcelPropertyConfiguration.MapsToColumnNumber(CellRef.ColumnNameToNumber(columnLetter),
                                 property.Name, builder._options);
                             break;
-                        case nameof(OptionalAttribute):
-                            ExcelPropertyConfiguration.Optional(true, property.Name, builder._options);
+                        case nameof(OptionalColumnAttribute):
+                            ExcelPropertyConfiguration.OptionalColumn(true, property.Name, builder._options);
                             break;
                         case nameof(MapFromColumnsAttribute):
                             var columnNames =
@@ -191,7 +191,7 @@ namespace ExcelToEnumerable
                             var columnName = (string) propertyAttribute.ConstructorArguments[0].Value;
                             ExcelPropertyConfiguration.MapsToColumnNamed(columnName, property.Name, builder._options);
                             break;
-                        case nameof(IgnoreAttribute):
+                        case nameof(IgnoreColumnAttribute):
                             ExcelPropertyConfiguration.Ignore(property.Name, builder._options);
                             break;
                         case nameof(MapsToRowNumberAttribute):
@@ -205,8 +205,8 @@ namespace ExcelToEnumerable
                             var minValue = (double) propertyAttribute.ConstructorArguments[0].Value;
                             ExcelPropertyConfiguration.ShouldBeGreaterThan(minValue, property.Name, builder._options);
                             break;
-                        case nameof(RequiredAttribute):
-                            ExcelPropertyConfiguration.Required(property.Name, builder._options);
+                        case nameof(NotNullAttribute):
+                            ExcelPropertyConfiguration.NotNullProperties(property.Name, builder._options);
                             break;
                         case nameof(ShouldBeOneOfAttribute):
                             // CSH 27112020 We're adding a validator directly here, rather than going via the static ExcelPropertyConfiguration because the validator we're using here using
@@ -219,6 +219,9 @@ namespace ExcelToEnumerable
                             break;
                         case nameof(UniqueAttribute):
                             ExcelPropertyConfiguration.Unique(property.Name, builder._options);
+                            break;
+                        case nameof(RequiredColumnAttribute):
+                            ExcelPropertyConfiguration.RequiredColumn(true, property.Name, builder._options);
                             break;
                     }
                 }

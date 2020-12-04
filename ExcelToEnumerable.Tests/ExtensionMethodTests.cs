@@ -165,8 +165,8 @@ namespace ExcelToEnumerable.Tests
                     .Property(y => y.ColumnA).MapsToColumnNumber(1)
                     .Property(y => y.ColumnB).MapsToColumnNumber(2)
                     .Property(y => y.ColumnC).MapsToColumnNumber(3)
-                    .Property(y => y.ColumnAA).Ignore()
-                    .Property(y => y.IgnoreThisProperty).Ignore()
+                    .Property(y => y.ColumnAA).IgnoreColumn()
+                    .Property(y => y.IgnoreThisProperty).IgnoreColumn()
             ).ToArray();
             result.Count().Should().Be(2);
             result.First().ColumnA.Should().Be("A");
@@ -203,7 +203,7 @@ namespace ExcelToEnumerable.Tests
                     .Property(y => y.ColumnC).MapsToColumnLetter("C")
                     .Property(y => y.ColumnAA).MapsToColumnLetter("AA")
                     .Property(y => y.Row).MapsToRowNumber()
-                    .Property(y => y.IgnoreThisProperty).Ignore()
+                    .Property(y => y.IgnoreThisProperty).IgnoreColumn()
             ).ToArray();
             result.Length.Should().Be(2);
             result.First().ColumnA.Should().Be("A");
@@ -286,10 +286,10 @@ namespace ExcelToEnumerable.Tests
         public void OptionalColumns1()
         {
             var testSpreadsheetLocation = TestHelper.TestsheetPath("OptionalColumns.xlsx");
-            var result1 = testSpreadsheetLocation.ExcelToEnumerable<OptionalParametersTestClass>(x => x
+            var result1 = testSpreadsheetLocation.ExcelToEnumerable<OptionalColumnsTestClass>(x => x
                 .UsingSheet("2Columns")
             ).ToArray();
-            result1.Count().Should().Be(2);
+            result1.Length.Should().Be(2);
             var first = result1.First();
             first.Name.Should().Be("Chris");
             first.Fee1.Should().Be((decimal) 1.1);
@@ -304,7 +304,7 @@ namespace ExcelToEnumerable.Tests
         public void OptionalColumns2()
         {
             var testSpreadsheetLocation = TestHelper.TestsheetPath("OptionalColumns.xlsx");
-            var result1 = testSpreadsheetLocation.ExcelToEnumerable<OptionalParametersTestClass>(x => x
+            var result1 = testSpreadsheetLocation.ExcelToEnumerable<OptionalColumnsTestClass>(x => x
                 .UsingSheet("4Columns")
             ).ToArray();
             result1.Count().Should().Be(2);
@@ -326,10 +326,10 @@ namespace ExcelToEnumerable.Tests
             var testSpreadsheetLocation = TestHelper.TestsheetPath("OptionalColumns.xlsx");
             var action = new Action(() =>
             {
-                testSpreadsheetLocation.ExcelToEnumerable<OptionalParametersTestClass>(x => x
+                testSpreadsheetLocation.ExcelToEnumerable<OptionalColumnsTestClass>(x => x
                         .UsingSheet("2Columns")
                         .AllColumnsMustBeMappedToProperties(true)
-                        .Property(y => y.Fee3).Optional(false) //In this example Fee3 is now a mandatory column
+                        .Property(y => y.Fee3).OptionalColumn(false) //In this example Fee3 is now a mandatory column
                 );
             });
             action.Should().Throw<ExcelToEnumerableInvalidHeaderException>();
@@ -339,7 +339,7 @@ namespace ExcelToEnumerable.Tests
         public void OptionalColumns4()
         {
             var testSpreadsheetLocation = TestHelper.TestsheetPath("OptionalColumns.xlsx");
-            var result1 = testSpreadsheetLocation.ExcelToEnumerable<OptionalParametersTestClass>(x => x
+            var result1 = testSpreadsheetLocation.ExcelToEnumerable<OptionalColumnsTestClass>(x => x
                 .UsingSheet("4Columns")
                 .AllColumnsMustBeMappedToProperties(false)
                 .AllPropertiesMustBeMappedToColumns(false)
@@ -363,10 +363,10 @@ namespace ExcelToEnumerable.Tests
             var testSpreadsheetLocation = TestHelper.TestsheetPath("OptionalColumns.xlsx");
             var action = new Action(() =>
             {
-                testSpreadsheetLocation.ExcelToEnumerable<OptionalParametersTestClass>(x => x
+                testSpreadsheetLocation.ExcelToEnumerable<OptionalColumnsTestClass>(x => x
                     .UsingSheet("2Columns")
                     .AllPropertiesMustBeMappedToColumns(true)
-                    .Property(y => y.Fee2).Optional()
+                    .Property(y => y.Fee2).OptionalColumn()
                 );
             });
             action.Should().Throw<ExcelToEnumerableInvalidHeaderException>()
@@ -508,7 +508,7 @@ namespace ExcelToEnumerable.Tests
             var testSpreadsheetLocation = TestHelper.TestsheetPath("TestSpreadsheet1.xlsx");
             var result = testSpreadsheetLocation.ExcelToEnumerable<TestClass>(x =>
                 x.StartingFromRow(2)
-                    .Property(y => y.String).Ignore()
+                    .Property(y => y.String).IgnoreColumn()
             ).ToArray();
             result.Length.Should().Be(3);
             var row1 = result.First();
@@ -572,11 +572,11 @@ namespace ExcelToEnumerable.Tests
                         .OutputExceptionsTo(exceptionList)
                         .UsingHeaderNames(true)
                         .UsingSheet("Prices")
-                        .Property(y => y.MinimumOrderQuantity).IsRequired()
+                        .Property(y => y.MinimumOrderQuantity).NotNull()
                         .Property(y => y.MinimumOrderQuantity).ShouldBeGreaterThan(0)
-                        .Property(y => y.Vat).IsRequired()
+                        .Property(y => y.Vat).NotNull()
                         .Property(y => y.Vat).ShouldBeOneOf("Standard", "Reduced", "2nd Reduced", "Zero")
-                        .Property(y => y.MeasureId).IsRequired()
+                        .Property(y => y.MeasureId).NotNull()
                         .Property(y => y.MeasureId).MapsToColumnNamed("Measure")
                         .Property(y => y.MeasureId).UsesCustomMapping(
                             z =>
@@ -588,16 +588,16 @@ namespace ExcelToEnumerable.Tests
 
                                 throw new KeyNotFoundException();
                             })
-                        .Property(y => y.PslCategory).IsRequired()
+                        .Property(y => y.PslCategory).NotNull()
                         .Property(y => y.PslCategory).ShouldBeOneOf("BBB")
                         .Property(y => y.Sku).ShouldBeUnique()
-                        .Property(y => y.Sku).IsRequired()
-                        .Property(y => y.TranslatedSupplierDescriptions).IsRequired()
+                        .Property(y => y.Sku).NotNull()
+                        .Property(y => y.TranslatedSupplierDescriptions).NotNull()
                         .Property(y => y.TranslatedSupplierDescriptions)
                         .MapFromColumns("supplierdescription", "dutchdescription")
-                        .Property(y => y.Price).IsRequired()
+                        .Property(y => y.Price).NotNull()
                         .Property(y => y.Price).ShouldBeGreaterThan(0)
-                        .Property(y => y.Unit).IsRequired()
+                        .Property(y => y.Unit).NotNull()
                         .Property(y => y.Unit).ShouldBeGreaterThan(0)
                         .Property(y => y.DepotExclusions).MapFromColumns("depotid-14403", "depotid-14760")
                 ).ToArray();
@@ -1108,16 +1108,16 @@ namespace ExcelToEnumerable.Tests
         }
 
         [Fact]
-        public void RequiredPropertiesWorks()
+        public void NotNullPropertiesWorks()
         {
             var exceptionList = new List<Exception>();
             var testSpreadsheetLocation = TestHelper.TestsheetPath("TestSpreadsheet1.xlsx");
-            var result = testSpreadsheetLocation.ExcelToEnumerable<TestClass>(x =>
-                x.StartingFromRow(2)
-                    .Property(y => y.String).IsRequired()
-                    .Property(y => y.Int).IsRequired()
-                    .Property(y => y.DateTime).IsRequired()
-                    .OutputExceptionsTo(exceptionList));
+            var result = testSpreadsheetLocation.ExcelToEnumerable<TestClass>(x => x    
+                .StartingFromRow(2)
+                .Property(y => y.String).NotNull()
+                .Property(y => y.Int).NotNull()
+                .Property(y => y.DateTime).NotNull()
+                .OutputExceptionsTo(exceptionList));
             result.Count().Should().Be(2);
             exceptionList.Count.Should().Be(3);
             var firstException = (ExcelToEnumerableCellException) exceptionList.First();
@@ -1126,13 +1126,13 @@ namespace ExcelToEnumerable.Tests
         }
         
         [Fact]
-        public void RequiredPropertiesAttributeWorks()
+        public void NotNullPropertiesAttributeWorks()
         {
             AggregateException exception = null;
             try
             {
                 var testSpreadsheetLocation = TestHelper.TestsheetPath("TestSpreadsheet1.xlsx");
-                testSpreadsheetLocation.ExcelToEnumerable<RequiredAttributeTestClass>();
+                testSpreadsheetLocation.ExcelToEnumerable<NotNullAttributeTestClass>();
             }
             catch (AggregateException e)
             {
@@ -1149,7 +1149,7 @@ namespace ExcelToEnumerable.Tests
         }
 
         [Fact]
-        public void RequiredColumnAndAggregateExceptionWorks()
+        public void NotNullColumnAndAggregateExceptionWorks()
         {
             var testSpreadsheetLocation = TestHelper.TestsheetPath("TestSpreadsheet1.xlsx");
             AggregateException testException = null;
@@ -1158,9 +1158,9 @@ namespace ExcelToEnumerable.Tests
                 var result = testSpreadsheetLocation.ExcelToEnumerable<TestClass>(x =>
                     x.StartingFromRow(2)
                         .AggregateExceptions()
-                        .Property(y => y.String).IsRequired()
-                        .Property(y => y.Int).IsRequired()
-                        .Property(y => y.DateTime).IsRequired()
+                        .Property(y => y.String).NotNull()
+                        .Property(y => y.Int).NotNull()
+                        .Property(y => y.DateTime).NotNull()
                 );
             }
             catch (AggregateException e)
@@ -1368,7 +1368,7 @@ namespace ExcelToEnumerable.Tests
                         .HeaderOnRow(2)
                         .UsingSheet("Prices")
                         .OutputExceptionsTo(exceptionList)
-                        .Property(y => y.MinimumOrderQuantity).IsRequired()
+                        .Property(y => y.MinimumOrderQuantity).NotNull()
                         .Property(y => y.MinimumOrderQuantity).ShouldBeGreaterThan(0)
                         .Property(y => y.TranslatedSupplierDescriptions).MapFromColumns("dutchdescription")
                         .Property(y => y.DepotExclusions).MapFromColumns("depotid-14403", "depotid-14760")
@@ -1396,7 +1396,7 @@ namespace ExcelToEnumerable.Tests
                         .Property(y => y.TranslatedSupplierDescriptions).MapFromColumns("dutchdescription")
                         .Property(y => y.DepotExclusions).MapFromColumns("depotid-14403", "depotid-14760")
                         .OutputExceptionsTo(exceptionList)
-                        .Property(y => y.MinimumOrderQuantity).IsRequired()
+                        .Property(y => y.MinimumOrderQuantity).NotNull()
                         .Property(y => y.MinimumOrderQuantity).ShouldBeGreaterThan(0)
                 );
             result.Count().Should().Be(0);
@@ -1609,6 +1609,33 @@ namespace ExcelToEnumerable.Tests
             result[1].NullableLong.Should().Be(null);
             result[1].NullableDouble.Should().Be(null);
             result[1].NullableDecimal.Should().Be(null);
+        }
+
+        [Fact]
+        public void RequiredColumnWorks()
+        {
+            var testSpreadsheetLocation = TestHelper.TestsheetPath("RequiredColumns.xlsx");
+            Action action = () =>
+            {
+                testSpreadsheetLocation.ExcelToEnumerable<RequiredColumnsTestClass>(x => x
+                    .Property(y => y.RequiredProperty).RequiredColumn());
+            };
+            // ReSharper disable once StringLiteralTypo
+            action.Should().ThrowExactly<ExcelToEnumerableInvalidHeaderException>().WithMessage("Missing headers: 'requiredproperty'. ");
+        }
+
+        [Fact]
+        public void RequiredColumnWorksWithExplicitlyNameColumn()
+        {
+            var testSpreadsheetLocation = TestHelper.TestsheetPath("RequiredColumnsExplicitlyNamed.xlsx");
+            Action action = () =>
+            {
+                testSpreadsheetLocation.ExcelToEnumerable<RequiredColumnsTestClass>(x => x
+                    .Property(y => y.RequiredProperty).RequiredColumn()
+                    .Property(y => y.RequiredProperty).MapsToColumnNamed("This column is not on the spreadsheet"));
+            };
+            // ReSharper disable once StringLiteralTypo
+            action.Should().ThrowExactly<ExcelToEnumerableInvalidHeaderException>().WithMessage("Missing headers: 'thiscolumnisnotonthespreadsheet'. ");
         }
     }
 }

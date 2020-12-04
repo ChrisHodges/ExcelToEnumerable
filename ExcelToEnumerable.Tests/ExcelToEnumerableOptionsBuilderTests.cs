@@ -83,5 +83,13 @@ namespace ExcelToEnumerable.Tests
             var result = builder.Build();
             result.RelaxedNumberMatching.Should().BeTrue();
         }
+
+        [Fact]
+        public void Adds_RequiredColumn_Attribute()
+        {
+            var builder = new ExcelToEnumerableOptionsBuilder<RequiredColumnsAttributeTestClass>();
+            var result = builder.Build();
+            result.ExplicitlyRequiredColumns.Should().Contain("RequiredProperty");
+        }
     }
 }

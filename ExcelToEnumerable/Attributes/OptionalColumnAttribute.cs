@@ -1,4 +1,5 @@
 using System;
+using ExcelToEnumerable.Exceptions;
 
 namespace ExcelToEnumerable.Attributes
 {
@@ -7,15 +8,17 @@ namespace ExcelToEnumerable.Attributes
     /// this property's class.
     /// </summary>
     [AttributeUsage(AttributeTargets.Property)]
-    public class OptionalAttribute : Attribute
+    // ReSharper disable once ClassNeverInstantiated.Global
+    public class OptionalColumnAttribute : Attribute
     {
     }
     
     /// <summary>
-    /// Marks the property as required.
+    /// Will throw an <see cref="ExcelToEnumerableInvalidHeaderException"/> if the property does not have a corresponding column in the spreadsheet
     /// </summary>
     [AttributeUsage(AttributeTargets.Property)]
-    public class RequiredAttribute : Attribute
+    // ReSharper disable once ClassNeverInstantiated.Global
+    public class RequiredColumnAttribute : Attribute
     {
     }
 }

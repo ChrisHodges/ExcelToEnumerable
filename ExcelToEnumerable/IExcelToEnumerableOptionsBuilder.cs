@@ -194,7 +194,7 @@ namespace ExcelToEnumerable
         /// <summary>
         /// Throws an <see cref="ExcelToEnumerableInvalidHeaderException"/> if there are properties that are not
         /// mapped to a header on the spreadsheet. To override for a specific property use
-        /// <c>Property(x => x.MyProperty).Optional()</c>
+        /// <c>Property(x => x.MyProperty).OptionalColumn()</c>
         /// </summary>
         /// <example>
         /// <code>

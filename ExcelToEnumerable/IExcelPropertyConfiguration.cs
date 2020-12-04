@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using ExcelToEnumerable.Exceptions;
 
 namespace ExcelToEnumerable
 {
@@ -57,12 +58,12 @@ namespace ExcelToEnumerable
         /// <example>
         /// <code>
         /// var result = excelStream.ExcelToEnumerable&lt;MyClass&gt;(x => x
-        ///     .Property(y => y.MyProperty).IsRequired()
+        ///     .Property(y => y.MyProperty).NotNull()
         /// );
         /// </code>
         /// </example>
         /// <returns></returns>
-        IExcelToEnumerableOptionsBuilder<T> IsRequired();
+        IExcelToEnumerableOptionsBuilder<T> NotNull();
         
         /// <summary>
         /// Throws an exception if the cell value is not contained in the given list.
@@ -155,12 +156,12 @@ namespace ExcelToEnumerable
         /// <example>
         /// <code>
         /// var result = excelStream.ExcelToEnumerable&lt;MyClass&gt;(x => x
-        ///     .Property(y => y.MyProperty).Ignore();
+        ///     .Property(y => y.MyProperty).IgnoreColumn();
         /// );
         /// </code>
         /// </example>
         /// <returns></returns>
-        IExcelToEnumerableOptionsBuilder<T> Ignore();
+        IExcelToEnumerableOptionsBuilder<T> IgnoreColumn();
         
         /// <summary>
         /// Rather than mapping from a column of the spreadsheet, this property will map to the row number of the spreadsheet.
@@ -205,20 +206,20 @@ namespace ExcelToEnumerable
         IExcelToEnumerableOptionsBuilder<T> MapsToColumnLetter(string columnLetter);
         
         /// <summary>
-        /// Marks the property as optional. The mapped property will remain at its default value if the cell value is null.
+        /// The property will be mapped if the column exists, otherwise it will be initialised with its default value.
         /// </summary>
         /// <param name="isOptional"></param>
         /// <example>
         /// <code>
         /// var result = excelStream.ExcelToEnumerable&lt;MyClass&gt;(x => x
-        ///     .Property(y => y.MyProperty).Optional()
-        ///     .Property(y => y.MySecondProperty).Optional(true)
-        ///     .Property(y => y.MyThirdProperty).Optional(false)
+        ///     .Property(y => y.MyProperty).OptionalColumn()
+        ///     .Property(y => y.MySecondProperty).OptionalColumn(true)
+        ///     .Property(y => y.MyThirdProperty).OptionalColumn(false)
         /// );
         /// </code>
         /// </example>
         /// <returns></returns>
-        IExcelToEnumerableOptionsBuilder<T> Optional(bool isOptional = true);
+        IExcelToEnumerableOptionsBuilder<T> OptionalColumn(bool isOptional = true);
 
         /// <summary>
         /// Maps using the default mapper but first validates using the ExcelCellValidator argument
@@ -232,5 +233,11 @@ namespace ExcelToEnumerable
         /// </example>
         /// <returns></returns>
         IExcelToEnumerableOptionsBuilder<T> UsesCustomValidator(Func<object, bool> validator, string message);
+
+        /// <summary>
+        /// Will throw an <see cref="ExcelToEnumerableInvalidHeaderException"/> if the property does not have a corresponding column in the spreadsheet.
+        /// </summary>
+        /// <returns></returns>
+        IExcelToEnumerableOptionsBuilder<T>  RequiredColumn(bool isRequired = true);
     }
 }

@@ -154,7 +154,7 @@ namespace ExcelToEnumerable
             }
             else
             {
-                ValidateColumnNames(GetNormalisedColumnNames(Setters), normalisedHeaderArray, options.UnmappedProperties, options.OptionalProperties, options.IgnoreColumnsWithoutMatchingProperties);
+                ValidateColumnNames(GetNormalisedColumnNames(Setters), normalisedHeaderArray, options.UnmappedProperties, options.OptionalColumns, options.IgnoreColumnsWithoutMatchingProperties);
                 GetPropertySetterDictionaryByColumnName(normalisedHeaderArray);
             }
         }

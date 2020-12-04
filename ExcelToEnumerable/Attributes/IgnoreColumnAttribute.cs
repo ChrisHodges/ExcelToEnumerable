@@ -7,7 +7,7 @@ namespace ExcelToEnumerable.Attributes
     /// </summary>
     [AttributeUsage(AttributeTargets.Property)]
     // ReSharper disable once ClassNeverInstantiated.Global
-    public class IgnoreAttribute : Attribute
+    public class IgnoreColumnAttribute : Attribute
     {
     }
 }

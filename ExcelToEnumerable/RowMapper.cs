@@ -53,10 +53,10 @@ namespace ExcelToEnumerable
 
         public void Clear()
         {
+            RowValuesByColumRef.Clear();
             if (RowValues != null)
             {
                 RowValues.Clear();
-                RowValuesByColumRef.Clear();
                 RowIsPopulated = false;
             }
 
@@ -153,7 +153,7 @@ namespace ExcelToEnumerable
         {
             _currentObject = obj;
             var success = true;
-            List<string> fieldsPresentInThisRow = (options.RequiredFields != null && options.RequiredFields.Any())
+            List<string> fieldsPresentInThisRow = (options.NotNullProperties != null && options.NotNullProperties.Any())
                 ? new List<string>()
                 : null;
 

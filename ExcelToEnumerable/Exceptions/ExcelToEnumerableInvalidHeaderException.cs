@@ -7,7 +7,7 @@ namespace ExcelToEnumerable.Exceptions
     /// Thrown when the properties are not correctly mapped to headers. By default, ExcelToEnumerable expects all
     /// properties to have one or more corresponding headers. To ignore a property, use:
     /// <c>
-    /// optionsBuilder.Property(y => y.IgnoreThisProperty).Ignore()
+    /// optionsBuilder.Property(y => y.IgnoreThisProperty).IgnoreColumn()
     /// </c>
     /// To ignore columns without matching properties use:
     /// <c>

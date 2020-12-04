@@ -5,15 +5,15 @@ namespace ExcelToEnumerable.Tests.TestClasses
 {
     [AggregateExceptions]
     [StartingFromRow(2)]
-    public class RequiredAttributeTestClass
+    public class NotNullAttributeTestClass
     {
-        [Required]
+        [NotNull]
         public string String { get; set; }
         
-        [Required]
+        [NotNull]
         public int? Int { get; set; }
         
-        [Required]
+        [NotNull]
         public DateTime? DateTime { get; set; }
         public double? Decimal { get; set; }
     }

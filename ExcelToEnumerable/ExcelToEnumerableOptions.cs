@@ -43,7 +43,7 @@ namespace ExcelToEnumerable
 
         public ExceptionHandlingBehaviour ExceptionHandlingBehaviour { get; set; }
 
-        public IList<string> RequiredFields
+        public IList<string> NotNullProperties
         {
             get => _requiredFields;
             set => _requiredFields = value.ToList();
@@ -114,20 +114,20 @@ namespace ExcelToEnumerable
 
         public string LoweredRowNumberProperty { get; private set; }
         public Dictionary<string, int> CustomHeaderNumbers { get; } = new Dictionary<string, int>();
-        public List<string> OptionalProperties { get; set; } = new List<string>();
+        public List<string> OptionalColumns { get; set; } = new List<string>();
         public bool IgnoreColumnsWithoutMatchingProperties { get; set; }
-        public List<string> ExplicitlyRequiredProperties { get; set; } = new List<string>();
+        public List<string> ExplicitlyRequiredColumns { get; set; } = new List<string>();
         public bool RelaxedNumberMatching { get; set; }
 
         private IEnumerable<string> CreateLoweredRequiredColumns()
         {
-            var requiredFields = RequiredFields.Select(x => x.ToLowerInvariant());
+            var requiredFields = NotNullProperties.Select(x => x.ToLowerInvariant());
             if (CollectionConfigurations == null && CustomHeaderNames == null)
             {
                 return requiredFields;
             }
 
-            var fieldList = RequiredFields.Select(x => x.ToLowerInvariant()).ToList();
+            var fieldList = NotNullProperties.Select(x => x.ToLowerInvariant()).ToList();
             if (CollectionConfigurations != null)
             {
                 foreach (var collectionConfig in CollectionConfigurations.Where(x =>
