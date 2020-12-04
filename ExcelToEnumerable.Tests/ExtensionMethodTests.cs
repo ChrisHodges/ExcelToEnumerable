@@ -1637,5 +1637,20 @@ namespace ExcelToEnumerable.Tests
             // ReSharper disable once StringLiteralTypo
             action.Should().ThrowExactly<ExcelToEnumerableInvalidHeaderException>().WithMessage("Missing headers: 'thiscolumnisnotonthespreadsheet'. ");
         }
+
+        [Fact]
+        public void MapNullToNonNullableMapsToDefaultValue()
+        {
+            var testSpreadsheetLocation = TestHelper.TestsheetPath("MapNullToNonNullableProperty.xlsx");
+            var results = testSpreadsheetLocation.ExcelToEnumerable<MapNullToNonNullablePropertyThrowsExceptionTestClass>()
+                .ToArray();
+            results.Length.Should().Be(2);
+            results[0].Nullable.Should().BeNull();
+            results[0].NotNullable.Should().Be(0);
+            results[0].String.Should().Be("a");
+            results[1].Nullable.Should().Be(2);
+            results[1].NotNullable.Should().Be(1);
+            results[1].String.Should().Be("b");
+        }
     }
 }
