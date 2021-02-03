@@ -1461,7 +1461,7 @@ namespace ExcelToEnumerable.Tests
                 .UsingSheet("Sheet5Booleans")
                 .UsingHeaderNames(true)
                 .Property(y => y.BoolCollection).MapFromColumns("Bool", "NullableBool")
-            );
+            ).ToArray();
             var row1 = result.First();
             var row2 = result.Skip(1).First();
             var row3 = result.Skip(2).First();
@@ -1651,6 +1651,60 @@ namespace ExcelToEnumerable.Tests
             results[1].Nullable.Should().Be(2);
             results[1].NotNullable.Should().Be(1);
             results[1].String.Should().Be("b");
+        }
+        
+        [Fact]
+        public void ParsesEnumsCorrectly()
+        {
+            var testSpreadsheetLocation = TestHelper.TestsheetPath("EnumsTestSmall.xlsx");
+            var results = testSpreadsheetLocation.ExcelToEnumerable<EnumsTestClass>().ToArray();
+            results.Length.Should().Be(1);
+        }
+        
+        [Fact]
+        public void ParsesEnumsFromJustStringsCorrectly()
+        {
+            var testSpreadsheetLocation = TestHelper.TestsheetPath("EnumsTestFromStrings.xlsx");
+            var results = testSpreadsheetLocation.ExcelToEnumerable<StringsEnumsTestClass>().ToArray();
+            results.Length.Should().Be(4);
+            results[0].ParseFromStrings.Should().Be(StringsEnumsTestClass.ParseFromStringsEnum.Value1);
+            results[1].ParseFromStrings.Should().Be(StringsEnumsTestClass.ParseFromStringsEnum.Value1);
+            results[2].ParseFromStrings.Should().Be(StringsEnumsTestClass.ParseFromStringsEnum.Value2);
+            results[3].ParseFromStrings.Should().Be(StringsEnumsTestClass.ParseFromStringsEnum.Value2);
+        }
+
+        [Fact]
+        public void ParsesEnumsFromStringsCorrectly()
+        {
+            var testSpreadsheetLocation = TestHelper.TestsheetPath("EnumsTest.xlsx");
+            var exceptionList = new List<Exception>();
+            var results = testSpreadsheetLocation.ExcelToEnumerable<EnumsTestClass>(x => x
+                .OutputExceptionsTo(exceptionList)
+            ).ToArray();
+            
+            results.Length.Should().Be(7);
+            exceptionList.Count.Should().Be(2);
+
+            results[0].ParseFromStrings.Should().Be(EnumsTestClass.ParseFromStringsEnum.Value1);
+            results[0].ParseFromInts.Should().Be(EnumsTestClass.ParseFromIntsEnum.Ten);
+            
+            results[1].ParseFromStrings.Should().Be(EnumsTestClass.ParseFromStringsEnum.Value1);
+            results[1].ParseFromInts.Should().Be(EnumsTestClass.ParseFromIntsEnum.Ten);
+            
+            results[2].ParseFromStrings.Should().Be(EnumsTestClass.ParseFromStringsEnum.Value1);
+            results[2].ParseFromInts.Should().Be(EnumsTestClass.ParseFromIntsEnum.Ten);
+            
+            results[3].ParseFromStrings.Should().Be(EnumsTestClass.ParseFromStringsEnum.Value2);
+            results[3].ParseFromInts.Should().Be(EnumsTestClass.ParseFromIntsEnum.Ten);
+            
+            results[4].ParseFromStrings.Should().Be(0);
+            results[4].ParseFromInts.Should().Be(EnumsTestClass.ParseFromIntsEnum.Ten);
+            
+            results[5].ParseFromStrings.Should().Be(EnumsTestClass.ParseFromStringsEnum.Value1);
+            results[5].ParseFromInts.Should().Be(EnumsTestClass.ParseFromIntsEnum.Twenty);
+            
+            results[6].ParseFromStrings.Should().Be(EnumsTestClass.ParseFromStringsEnum.Value1);
+            results[6].ParseFromInts.Should().Be(null);
         }
     }
 }

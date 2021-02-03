@@ -34,9 +34,9 @@ namespace ExcelToEnumerable
         List<string> UniqueProperties { get; }
         
         Action<IDictionary<int, string>> OnReadingHeaderRowAction { get; }
-        
+
         Dictionary<string, Func<object, object>> CustomMappings { get; }
-        
+
         Dictionary<string, string> CustomHeaderNames { get; }
         
         List<string> UnmappedProperties { get; set; }

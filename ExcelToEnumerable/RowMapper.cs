@@ -112,7 +112,7 @@ namespace ExcelToEnumerable
             }
         }
 
-        private object ConvertType(object cellValue, Type type, bool relaxedNumberMatching)
+        internal static object ConvertType(object cellValue, Type type, bool relaxedNumberMatching)
         {
             if (type == typeof(string) && !(cellValue is string))
             {
@@ -160,37 +160,37 @@ namespace ExcelToEnumerable
             foreach (var item in RowValues)
             {
                 var cellValue = item.Value;
-                var fromCellSetter = _cellSettersDictionaryForRead[item.Key];
+                var propertySetter = _cellSettersDictionaryForRead[item.Key];
                 var isRequiredAlreadyAdded = false;
                 var invalidCast = false;
 
                 try
                 {
-                    cellValue = fromCellSetter.CustomMapping != null
-                        ? fromCellSetter.CustomMapping(cellValue)
-                        : ConvertType(cellValue, fromCellSetter.Type, fromCellSetter.RelaxedNumberMatching);
-                    fromCellSetter.Setter(obj, cellValue);
+                    cellValue = propertySetter.PropertyMapping != null
+                        ? propertySetter.PropertyMapping(cellValue)
+                        : ConvertType(cellValue, propertySetter.Type, propertySetter.RelaxedNumberMatching);
+                    propertySetter.Setter(obj, cellValue);
                 }
                 catch (Exception e)
                 {
-                    if (fromCellSetter.CustomMapping == null && !(e is InvalidCastException))
+                    if (propertySetter.PropertyMapping == null && !(e is InvalidCastException))
                     {
                         throw;
                     }
 
-                    HandleException(cellValue, fromCellSetter.ColumnName, rowCount, item.Key, options,
+                    HandleException(cellValue, propertySetter.ColumnName, rowCount, item.Key, options,
                         exceptionsList, e, null, "Value is invalid");
                     success = false;
                     invalidCast = true;
                 }
 
-                if (fromCellSetter.Validators != null && !invalidCast)
+                if (propertySetter.Validators != null && !invalidCast)
                 {
-                    foreach (var validator in fromCellSetter.Validators)
+                    foreach (var validator in propertySetter.Validators)
                     {
                         if (!validator.Validator(cellValue))
                         {
-                            HandleException(cellValue, fromCellSetter.ColumnName, rowCount, item.Key, options,
+                            HandleException(cellValue, propertySetter.ColumnName, rowCount, item.Key, options,
                                 exceptionsList, null,
                                 validator.ExcelToEnumerableValidationCode,
                                 validator.Message);
@@ -207,7 +207,7 @@ namespace ExcelToEnumerable
 
                 if (fieldsPresentInThisRow != null && !isRequiredAlreadyAdded)
                 {
-                    fieldsPresentInThisRow.Add(fromCellSetter.ColumnName);
+                    fieldsPresentInThisRow.Add(propertySetter.ColumnName);
                 }
             }
 
