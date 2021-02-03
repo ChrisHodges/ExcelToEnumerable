@@ -1005,8 +1005,8 @@ namespace ExcelToEnumerable.Tests
             // ReSharper disable once PossibleNullReferenceException
             sheetException.MissingProperties.Count().Should().Be(2);
             // ReSharper disable ReturnValueOfPureMethodIsNotUsed
-            sheetException.MissingProperties.Single(x => x == "**blankcolumn**(b)");
-            sheetException.MissingProperties.Single(x => x == "**blankcolumn**(c)");
+            sheetException.MissingProperties.Single(x => x == "blankcolumnb");
+            sheetException.MissingProperties.Single(x => x == "blankcolumnc");
             // ReSharper restore ReturnValueOfPureMethodIsNotUsed
         }
 

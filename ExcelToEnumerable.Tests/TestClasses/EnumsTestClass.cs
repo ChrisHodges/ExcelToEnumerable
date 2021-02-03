@@ -5,7 +5,8 @@ namespace ExcelToEnumerable.Tests.TestClasses
         public enum ParseFromStringsEnum
         {
             Value1 = 1,
-            Value2 = 2
+            Value2 = 2,
+            ForwardSlashTest
         }
 
         public enum ParseFromIntsEnum

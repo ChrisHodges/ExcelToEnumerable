@@ -8,6 +8,14 @@ namespace ExcelToEnumerable.Tests
     public class DefaultTypeMappersTests
     {
         [Fact]
+        public void EnumTypeMapperWorksWithNonAlphaNumericCharacters()
+        {
+            var enumTypeMapper =
+                DefaultTypeMappers.CreateEnumTypeMapper(typeof(EnumsTestClass.ParseFromStringsEnum));
+            enumTypeMapper("Forward /  SlashTest").Should().Be(EnumsTestClass.ParseFromStringsEnum.ForwardSlashTest);
+        }
+        
+        [Fact]
         public void CreatesEnumTypeMapper()
         {
             var enumTypeMapper =
@@ -25,7 +33,7 @@ namespace ExcelToEnumerable.Tests
             Action parseInvalidString = () => { enumTypeMapper("INVALID"); };
             parseInvalidString.Should().ThrowExactly<InvalidCastException>();
             
-            Action parseInvalidInt = () => { enumTypeMapper(3); };
+            Action parseInvalidInt = () => { enumTypeMapper(4); };
             parseInvalidInt.Should().ThrowExactly<InvalidCastException>();
 
             Action parseInvalidType = () => { enumTypeMapper(1.5M); };
@@ -50,7 +58,7 @@ namespace ExcelToEnumerable.Tests
             Action parseInvalidString = () => { enumTypeMapper("INVALID"); };
             parseInvalidString.Should().ThrowExactly<InvalidCastException>();
             
-            Action parseInvalidInt = () => { enumTypeMapper(3); };
+            Action parseInvalidInt = () => { enumTypeMapper(4); };
             parseInvalidInt.Should().ThrowExactly<InvalidCastException>();
 
             Action parseInvalidType = () => { enumTypeMapper(1.5M); };
