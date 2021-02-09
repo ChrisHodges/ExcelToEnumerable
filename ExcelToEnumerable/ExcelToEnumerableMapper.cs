@@ -66,6 +66,10 @@ namespace ExcelToEnumerable
                 rowMapper.ReadRowValues(worksheet);
                 // ReSharper disable once PossibleInvalidOperationException
                 var rowNumber = worksheet.CurrentRowNumber.Value;
+                if (rowNumber <= options.HeaderRow)
+                {
+                    continue;
+                }
                 switch (options.BlankRowBehaviour)
                 {
                     case BlankRowBehaviour.CreateEntity:

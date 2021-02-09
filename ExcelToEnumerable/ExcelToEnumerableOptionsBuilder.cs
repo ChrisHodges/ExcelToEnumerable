@@ -32,6 +32,11 @@ namespace ExcelToEnumerable
 
         public IExcelToEnumerableOptionsBuilder<T> UsingHeaderNames(bool usingHeaderNames)
         {
+            if (!usingHeaderNames)
+            {
+                _options.HeaderRow = 0;
+            }
+
             _options.UseHeaderNames = usingHeaderNames;
             return this;
         }

@@ -71,7 +71,7 @@ namespace ExcelToEnumerable
         public int? WorksheetNumber { get; set; }
 
         public int? EndRow { get; internal set; }
-        public int HeaderRow { get; internal set; }
+        public int HeaderRow { get; internal set; } = 1;
         public Action<IDictionary<int, string>> OnReadingHeaderRowAction { get; internal set; }
 
         public Dictionary<string, Func<object, object>> CustomMappings

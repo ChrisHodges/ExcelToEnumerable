@@ -24,7 +24,7 @@ namespace ExcelToEnumerable.Tests
                         .UsingHeaderNames(false)
                 );
             };
-            action.Should().Throw<AggregateException>().And.InnerExceptions.Count().Should().Be(3);
+            action.Should().Throw<AggregateException>().And.InnerExceptions.Count.Should().Be(3);
         }
 
         [Fact]
@@ -1104,7 +1104,7 @@ namespace ExcelToEnumerable.Tests
             var list = new List<Exception>();
             testSpreadsheetLocation.ExcelToEnumerable<TestClass>(
                 x => x.OutputExceptionsTo(list).UsingHeaderNames(false));
-            list.Count().Should().Be(3);
+            list.Count.Should().Be(3);
         }
 
         [Fact]
@@ -1705,6 +1705,17 @@ namespace ExcelToEnumerable.Tests
             
             results[6].ParseFromStrings.Should().Be(EnumsTestClass.ParseFromStringsEnum.Value1);
             results[6].ParseFromInts.Should().Be(null);
+        }
+        
+        [Fact]
+        public void RowWithInvalidCellStillCreatesEntity()
+        {
+            var exceptionList = new List<Exception>();
+            var results = TestHelper.TestsheetPath("InvalidRow.xlsx").ExcelToEnumerable<InvalidRowTestClass>(o => o
+                .OutputExceptionsTo(exceptionList)
+                .BlankRowBehaviour(BlankRowBehaviour.CreateEntity)
+                );
+            results.Count().Should().Be(2);
         }
     }
 }
