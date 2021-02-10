@@ -274,7 +274,7 @@ namespace ExcelToEnumerable.Tests
             rowValues["B"].Should().Be("1");
             rowValues["D"].Should().Be("notADecimal");
             rowValues.ContainsKey("C").Should().BeFalse();
-            var unmappedObject = exception.UnmappedObject as TestClass;
+            var unmappedObject = exception.MappedObject as TestClass;
             unmappedObject.Should().NotBeNull();
             unmappedObject.String.Should().Be("abc123");
             unmappedObject.Int.Should().Be(1);
@@ -704,7 +704,7 @@ namespace ExcelToEnumerable.Tests
                     .Be("Unable to set value 'Not a double' to property 'double' on row 2 column A. Value is invalid");
                 e.InnerException.GetType().Should().Be(typeof(InvalidCastException));
                 e.Column.Should().Be("A");
-                e.RowNumber.Should().Be(2);
+                e.Row.Should().Be(2);
                 e.PropertyName.Should().Be("double");
             }
         }
@@ -774,7 +774,7 @@ namespace ExcelToEnumerable.Tests
                     .Be("Unable to set value 'Not a double' to property 'double' on row 2 column A. Value is invalid");
                 e.InnerException.GetType().Should().Be(typeof(FormatException));
                 e.Column.Should().Be("A");
-                e.RowNumber.Should().Be(2);
+                e.Row.Should().Be(2);
                 e.PropertyName.Should().Be("double");
             }
         }
@@ -803,7 +803,7 @@ namespace ExcelToEnumerable.Tests
             }
 
             excelToEnumerableCellException.Should().NotBeNull();
-            excelToEnumerableCellException.RowNumber.Should().Be(1);
+            excelToEnumerableCellException.Row.Should().Be(1);
             excelToEnumerableCellException.Column.Should().Be("B");
             excelToEnumerableCellException.RowValues["A"].Should().Be("String");
             excelToEnumerableCellException.RowValues["B"].Should().Be("Int");
@@ -1023,7 +1023,7 @@ namespace ExcelToEnumerable.Tests
             list.Count.Should().Be(1);
             var firstException = (ExcelToEnumerableCellException) list.First();
             firstException.Column.Should().Be("B");
-            firstException.RowNumber.Should().Be(3);
+            firstException.Row.Should().Be(3);
         }
         
         [Fact]
@@ -1043,7 +1043,7 @@ namespace ExcelToEnumerable.Tests
             exception.Should().NotBeNull();
             // ReSharper disable once PossibleNullReferenceException
             exception.Column.Should().Be("B");
-            exception.RowNumber.Should().Be(3);
+            exception.Row.Should().Be(3);
         }
 
         [Fact]
@@ -1059,7 +1059,7 @@ namespace ExcelToEnumerable.Tests
             list.Count.Should().Be(1);
             var firstException = (ExcelToEnumerableCellException) list.First();
             firstException.Column.Should().Be("B");
-            firstException.RowNumber.Should().Be(3);
+            firstException.Row.Should().Be(3);
         }
 
         [Fact]
@@ -1074,7 +1074,7 @@ namespace ExcelToEnumerable.Tests
             list.Count.Should().Be(1);
             var firstException = (ExcelToEnumerableCellException) list.First();
             firstException.Column.Should().Be("B");
-            firstException.RowNumber.Should().Be(2);
+            firstException.Row.Should().Be(2);
         }
         
         [Fact]
@@ -1094,7 +1094,7 @@ namespace ExcelToEnumerable.Tests
             exception.Should().NotBeNull();
             // ReSharper disable once PossibleNullReferenceException
             exception.Column.Should().Be("B");
-            exception.RowNumber.Should().Be(2);
+            exception.Row.Should().Be(2);
         }
 
         [Fact]
@@ -1122,7 +1122,7 @@ namespace ExcelToEnumerable.Tests
             exceptionList.Count.Should().Be(3);
             var firstException = (ExcelToEnumerableCellException) exceptionList.First();
             firstException.Column.Should().Be("A");
-            firstException.RowNumber.Should().Be(4);
+            firstException.Row.Should().Be(4);
         }
         
         [Fact]
@@ -1145,7 +1145,7 @@ namespace ExcelToEnumerable.Tests
             exceptions.Count.Should().Be(3);
             var firstException = (ExcelToEnumerableCellException) exceptions.First();
             firstException.Column.Should().Be("A");
-            firstException.RowNumber.Should().Be(4);
+            firstException.Row.Should().Be(4);
         }
 
         [Fact]
@@ -1171,7 +1171,7 @@ namespace ExcelToEnumerable.Tests
             testException.InnerExceptions.Count().Should().Be(3);
             var firstException = (ExcelToEnumerableCellException) testException.InnerExceptions.First();
             firstException.Column.Should().Be("A");
-            firstException.RowNumber.Should().Be(4);
+            firstException.Row.Should().Be(4);
         }
 
         [Fact]
@@ -1223,7 +1223,7 @@ namespace ExcelToEnumerable.Tests
             list.Count.Should().Be(1);
             var firstException = (ExcelToEnumerableCellException) list.First();
             firstException.Column.Should().Be("A");
-            firstException.RowNumber.Should().Be(3);
+            firstException.Row.Should().Be(3);
         }
         
         [Fact]
@@ -1243,7 +1243,7 @@ namespace ExcelToEnumerable.Tests
             exception.Should().NotBeNull();
             // ReSharper disable once PossibleNullReferenceException
             exception.Column.Should().Be("A");
-            exception.RowNumber.Should().Be(3);
+            exception.Row.Should().Be(3);
         }
 
         [Fact]
@@ -1259,7 +1259,7 @@ namespace ExcelToEnumerable.Tests
             list.Count.Should().Be(1);
             var firstException = (ExcelToEnumerableCellException) list.First();
             firstException.Column.Should().Be("A");
-            firstException.RowNumber.Should().Be(3);
+            firstException.Row.Should().Be(3);
         }
 
         [Fact]
@@ -1374,12 +1374,12 @@ namespace ExcelToEnumerable.Tests
                         .Property(y => y.DepotExclusions).MapFromColumns("depotid-14403", "depotid-14760")
                 );
             result.Count().Should().Be(0);
-            var exceptions = exceptionList.Cast<ExcelToEnumerableCellException>().OrderBy(x => x.RowNumber);
+            var exceptions = exceptionList.Cast<ExcelToEnumerableCellException>().OrderBy(x => x.Row);
             exceptions.Count().Should().Be(1);
 
             var firstException = exceptions.First();
             firstException.Column.Should().Be("H");
-            firstException.RowNumber.Should().Be(8);
+            firstException.Row.Should().Be(8);
         }
 
         [Fact]
@@ -1400,15 +1400,15 @@ namespace ExcelToEnumerable.Tests
                         .Property(y => y.MinimumOrderQuantity).ShouldBeGreaterThan(0)
                 );
             result.Count().Should().Be(0);
-            var exceptions = exceptionList.Cast<ExcelToEnumerableCellException>().OrderBy(x => x.RowNumber);
+            var exceptions = exceptionList.Cast<ExcelToEnumerableCellException>().OrderBy(x => x.Row);
             exceptions.Count().Should().Be(2);
 
             var firstException = exceptions.First();
             firstException.Column.Should().Be("H");
-            firstException.RowNumber.Should().Be(7);
+            firstException.Row.Should().Be(7);
             var secondException = exceptions.Last();
             secondException.Column.Should().Be("H");
-            secondException.RowNumber.Should().Be(8);
+            secondException.Row.Should().Be(8);
         }
 
         [Fact]
@@ -1430,7 +1430,7 @@ namespace ExcelToEnumerable.Tests
             result.Count().Should().Be(0);
             exceptionList.Count.Should().Be(1);
             var exception = (ExcelToEnumerableCellException) exceptionList.First();
-            exception.RowNumber.Should().Be(21);
+            exception.Row.Should().Be(21);
             exception.Column.Should().Be("J");
         }
 

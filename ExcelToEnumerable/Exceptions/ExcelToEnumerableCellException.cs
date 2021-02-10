@@ -8,12 +8,12 @@ namespace ExcelToEnumerable.Exceptions
     /// </summary>
     public class ExcelToEnumerableCellException : ExcelToEnumerableRowException
     {
-        internal ExcelToEnumerableCellException(object unmappedObject, int row, int column, object cellValue,
+        internal ExcelToEnumerableCellException(object mappedObject, int row, int column, object cellValue,
             string propertyName, IDictionary<string, object> rowValues,
             string validationMessage = null, Exception innerException = null,
             ExcelToEnumerableValidationCode? excelToEnumerableValidationCode = null)
             :
-            base(unmappedObject,
+            base(mappedObject,
                 $"Unable to set value '{cellValue}' to property '{propertyName}' on row {row} column {(column + 1).ToColumnName()}. {validationMessage}",
                 row,
                 rowValues,

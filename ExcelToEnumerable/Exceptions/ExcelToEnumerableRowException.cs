@@ -10,18 +10,18 @@ namespace ExcelToEnumerable.Exceptions
     /// </summary>
     public class ExcelToEnumerableRowException : ExcelToEnumerableException
     {
-        internal ExcelToEnumerableRowException(object unmappedObject, string message, int rowNumber,
+        internal ExcelToEnumerableRowException(object mappedObject, string message, int row,
             IDictionary<string, object> rowValues, Exception innerException = null) : base(message, innerException)
         {
-            RowNumber = rowNumber;
+            Row = row;
             RowValues = rowValues.ToDictionary(x => x.Key, x => x.Value?.ToString() ?? null);
-            UnmappedObject = unmappedObject;
+            MappedObject = mappedObject;
         }
 
         /// <summary>
         /// The number of the spreadsheet row relating to the exception
         /// </summary>
-        public int RowNumber { get; }
+        public int Row { get; }
         
         /// <summary>
         /// A column letter -> column value dictionary representing the values in spreadsheet row
@@ -31,6 +31,6 @@ namespace ExcelToEnumerable.Exceptions
         /// <summary>
         /// The object that the mapper is attempting to map values to.
         /// </summary>
-        public object UnmappedObject { get; set; }
+        public object MappedObject { get; set; }
     }
 }
