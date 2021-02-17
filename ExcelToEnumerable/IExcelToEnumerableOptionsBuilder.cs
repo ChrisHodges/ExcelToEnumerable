@@ -127,7 +127,22 @@ namespace ExcelToEnumerable
         /// <typeparam name="TProperty"></typeparam>
         /// <returns></returns>
         IExcelPropertyConfiguration<T, TProperty> Property<TProperty>(Expression<Func<T, TProperty>> propertyExpression);
-        
+
+        /// <summary>
+        /// Specifies a mapping option for a specific property. See <see cref="IExcelPropertyConfiguration{T,TProperty}"/> for options.
+        /// </summary>
+        /// <example>
+        /// <code>
+        /// IEnumerable&lt;MyClass&gt; results = excelStream.ExcelToEnumerable&lt;MyClass&gt;(x => x
+        ///     .Property("MyProperty").ShouldBeUnique()
+        ///     .Property("AnotherProperty").MapsToColumnNamed("Column Name")
+        /// );
+        /// </code>
+        /// </example>
+        /// <param name="propertyName"></param>
+        /// <typeparam name="string"></typeparam>
+        /// <returns></returns>
+        IExcelPropertyConfiguration<T, TProperty> Property<TProperty>(string propertyName);
         /// <summary>
         /// The highest row number to read up to. 1-based. If negative, the mapper will read the until specified number of rows from the bottom.
         /// If not set then the mapper will read to the end of the sheet.

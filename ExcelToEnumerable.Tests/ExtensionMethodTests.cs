@@ -119,6 +119,24 @@ namespace ExcelToEnumerable.Tests
         }
         
         [Fact]
+        public void LookupByStringPropertyNameWorks()
+        {
+            var testSpreadsheetLocation = TestHelper.TestsheetPath("LookupPropertyByStringName.xlsx");
+            var contracts = testSpreadsheetLocation.ExcelToEnumerable<Contract>(
+                x =>
+                {
+                    x.Property<String>("Pr01_Vsb");
+                    x.Property<String>("Pr01_Vsa");
+                    x.Property<String>("Pr01_uvsb");
+                    x.Property<String>("Pr01_Adat");
+                    x.Property<String>("Pr01_Brzv");
+                    x.Property<String>("Pr01_Brzb");
+                    x.Property<String>("Pr01_Jb").MapsToColumnNamed("My Custom Name");
+                }
+            );
+            contracts.Last().Pr01_Jb.Should().Be(289.99);
+        }
+        [Fact]
         public void UsingHeaderNames_True_Works()
         {
             var testSpreadsheetLocation = TestHelper.TestsheetPath("NoHeaderTests.xlsx");

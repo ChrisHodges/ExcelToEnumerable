@@ -105,6 +105,9 @@
     </ItemGroup>
 
     <ItemGroup>
+      <None Update="TestSpreadsheets\LookupPropertyByStringName.xlsx">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
       <None Update="TestSpreadsheets\MostComplexExample.xlsx">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>
