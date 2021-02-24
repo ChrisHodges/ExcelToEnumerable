@@ -1,7 +1,7 @@
 # ExcelToEnumerable
 [![NuGet](https://img.shields.io/nuget/v/ExcelToEnumerable)](https://www.nuget.org/packages/ExcelToEnumerable)
 
-A high-performance library for mapping Excel tables to a list of objects.
+A high performance library for mapping Excel tables to a list of objects.
 
 Please fork and submit pull requests to the `development` branch.
 
