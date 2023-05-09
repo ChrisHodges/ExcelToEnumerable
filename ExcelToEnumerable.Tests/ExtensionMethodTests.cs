@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Threading;
 using ExcelToEnumerable.Exceptions;
 using ExcelToEnumerable.Tests.TestClasses;
@@ -869,6 +870,28 @@ namespace ExcelToEnumerable.Tests
             ).ToArray();
             result.Count().Should().Be(2);
             result.First().Collection.First().Should().Be("A");
+        }
+
+        [Fact]
+        public void CustomMapperWorks()
+        {
+            var testSpreadsheetLocation = TestHelper.TestsheetPath("TestSpreadsheet1.xlsx");
+
+            var fileStream = new FileStream(testSpreadsheetLocation, FileMode.Open, FileAccess.Read);
+
+            var result = fileStream.ExcelToEnumerable<CustomColumnNameTestClass>(x =>
+            {
+                foreach ( PropertyInfo propertyInfo in typeof(CustomColumnNameTestClass).GetProperties())
+                {
+                    if(propertyInfo.Name == "Int")
+                    {
+                        x.Property(propertyInfo).MapsToColumnNamed("IntCustomName");
+                    }
+                }
+            }).ToArray();
+
+            result.Count().Should().Be(1);
+            result.First().Int.Should().Be(1);
         }
 
         [Fact]
