@@ -83,6 +83,13 @@ namespace ExcelToEnumerable
             return excelPropertyConfiguration;
         }
 
+        public IExcelPropertyConfiguration<T, object> Property(MemberInfo memberInfo)
+        {
+            var excelPropertyConfiguration =
+                new ExcelPropertyConfiguration<T, object>(this, memberInfo.Name, _options);
+            return excelPropertyConfiguration;
+        }
+
         public IExcelToEnumerableOptions<T> Build()
         {
             AddOptionsFromAttributes(this, typeof(T));

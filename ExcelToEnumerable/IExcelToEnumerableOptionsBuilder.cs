@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
+using System.Reflection;
 using ExcelToEnumerable.Exceptions;
 
 namespace ExcelToEnumerable
@@ -128,6 +129,21 @@ namespace ExcelToEnumerable
         /// <returns></returns>
         IExcelPropertyConfiguration<T, TProperty> Property<TProperty>(Expression<Func<T, TProperty>> propertyExpression);
         
+        /// <summary>
+        /// Specifies a mapping option for a specific property. See <see cref="IExcelPropertyConfiguration{T,TProperty}"/> for options.
+        /// </summary>
+        /// <example>
+        /// <code>
+        /// IEnumerable&lt;T&gt; results = excelStream.ExcelToEnumerable&lt;T&gt;(x => x
+        ///     .Property(typeof(T).GetProperties().First(x => x.Name == "MyProperty")).ShouldBeUnique()
+        ///     .Property(y => y.AnotherProperty).MapsToColumnNamed("Column Name")
+        /// );
+        /// </code>
+        /// </example>
+        /// <param name="member">The member to map.</param>
+        /// <returns></returns>
+        IExcelPropertyConfiguration<T, object> Property(MemberInfo member);
+
         /// <summary>
         /// The highest row number to read up to. 1-based. If negative, the mapper will read the until specified number of rows from the bottom.
         /// If not set then the mapper will read to the end of the sheet.
