@@ -5,12 +5,12 @@
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <PackageId>ExcelToEnumerable</PackageId>
-        <PackageVersion>0.3.13-alpha</PackageVersion>
+        <PackageVersion>0.3.14-alpha</PackageVersion>
         <Title>ExcelToEnumerable</Title>
         <Authors>ExcelToEnumerable</Authors>
         <Description>Easily converts Excel Spreadsheets to Enumerables of any type.</Description>
-        <AssemblyVersion>0.3.13</AssemblyVersion>
-        <FileVersion>0.3.13</FileVersion>
+        <AssemblyVersion>0.3.14</AssemblyVersion>
+        <FileVersion>0.3.14</FileVersion>
         <PackageProjectUrl>https://github.com/ChrisHodges/ExcelToEnumerable/</PackageProjectUrl>
         <RepositoryUrl>https://github.com/ChrisHodges/ExcelToEnumerable/</RepositoryUrl>
         <PackageReleaseNotes>Updated LightweightExcelReader version</PackageReleaseNotes>
@@ -31,7 +31,7 @@
     </PropertyGroup>
     <ItemGroup>
         <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.0" PrivateAssets="All" />
-      <PackageReference Include="LightweightExcelReader" Version="0.1.13-alpha">
+      <PackageReference Include="LightweightExcelReader" Version="0.1.14-alpha">
       </PackageReference>
       <PackageReference Include="SpreadsheetCellRef" Version="1.0.1" />
     </ItemGroup>
